@@ -213,10 +213,10 @@ function sanitizeText(text) {
     ? text.slice(0, MAX_TEXT_LENGTH)
     : text;
 
-  // Email addresses - use possessive-like matching to prevent backtracking
-  // Pattern: local part (alphanumeric, limited special chars) @ domain
+  // Email addresses - use simple linear pattern to prevent ReDoS
+  // Matches word characters/dots/hyphens before @, then domain
   sanitized = sanitized.replace(
-    /[a-zA-Z0-9](?:[a-zA-Z0-9._-]{0,62}[a-zA-Z0-9])?@[a-zA-Z0-9](?:[a-zA-Z0-9.-]{0,252}[a-zA-Z0-9])?\.[a-zA-Z]{2,63}/g,
+    /[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}/g,
     '[email]'
   );
 
