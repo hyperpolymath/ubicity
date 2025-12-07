@@ -14,8 +14,6 @@ jobs:
     name: NPM Audit
 
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - name: Checkout code
@@ -60,8 +58,6 @@ jobs:
     name: Dependency Review
 
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     if: github.event_name == 'pull_request'
 
@@ -78,8 +74,6 @@ jobs:
     name: Snyk Security Scan
 
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - name: Checkout code
