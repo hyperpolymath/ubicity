@@ -1,17 +1,19 @@
-# Dual License
+SPDX-License-Identifier: MIT OR AGPL-3.0-or-later
+SPDX-FileCopyrightText: 2024-2025 hyperpolymath
 
-UbiCity is dual-licensed under your choice of:
+================================================================================
+DUAL LICENSE: MIT OR AGPL-3.0-or-later
+================================================================================
 
-1. **MIT License** (permissive, OSI-approved)
-2. **Palimpsest License v0.8** (values-aligned, experimental)
+This project is dual-licensed under the MIT License OR the GNU Affero General
+Public License v3.0 or later. You may choose to use, copy, modify, and
+distribute this work under the terms of EITHER license (your choice).
 
-You may choose **either** license for your use.
+--------------------------------------------------------------------------------
+MIT LICENSE
+--------------------------------------------------------------------------------
 
----
-
-## Option 1: MIT License
-
-Copyright (c) 2024-2025 Hyperpolymath and contributors
+Copyright (c) 2024-2025 hyperpolymath
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,114 +33,59 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
----
+--------------------------------------------------------------------------------
+GNU AFFERO GENERAL PUBLIC LICENSE v3.0 OR LATER
+--------------------------------------------------------------------------------
 
-## Option 2: Palimpsest License v0.8
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
 
-### Preamble
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+details.
 
-The Palimpsest License is designed for software that embodies specific values:
-- **Emotional safety** in technical work
-- **Reversibility** in design
-- **Privacy by default**
-- **Tools not platforms**
-- **Community governance**
+You should have received a copy of the GNU Affero General Public License along
+with this program. If not, see <https://www.gnu.org/licenses/>.
 
-If these values align with your use case, you may choose this license.
+The full text of the AGPL-3.0 is available at:
+  https://www.gnu.org/licenses/agpl-3.0.txt
 
-### Terms
+--------------------------------------------------------------------------------
+CHOOSING YOUR LICENSE
+--------------------------------------------------------------------------------
 
-Copyright (c) 2024-2025 Hyperpolymath and contributors
+You may choose to use this work under:
+  1. MIT License - Standard permissive open source license
+  2. AGPL-3.0-or-later - Copyleft license requiring source disclosure for
+     network services
 
-**Grant of Rights**: Subject to the conditions below, you are granted:
+For most uses, MIT License provides maximum flexibility.
+For ensuring open source remains open (especially for SaaS/network services),
+AGPL-3.0-or-later provides stronger protections.
 
-1. **Use**: Run the software for any purpose aligned with the values stated above
-2. **Study**: Examine the source code
-3. **Modify**: Create derivative works
-4. **Distribute**: Share copies, modified or unmodified
+================================================================================
+PALIMPSEST PHILOSOPHICAL OVERLAY (NON-BINDING)
+================================================================================
 
-**Conditions**:
+This project encourages (but does not legally require) adherence to the
+principles of the Palimpsest License - a framework for consent-based digital
+interaction and the future web.
 
-1. **Attribution**: Preserve copyright notices and license text
-2. **Source Access**: If you distribute binaries, provide source code access
-3. **Values Alignment**: Use must not violate the core values:
-   - ❌ Surveillance or behavior manipulation
-   - ❌ Lock-in or artificial scarcity
-   - ❌ Privacy violations or data harvesting
-   - ❌ Emotional abuse or dark patterns
+Core Principles (Encouraged):
+  - Respect for emotional and creative lineage
+  - Transparent AI training practices with explicit consent
+  - Preservation of metadata and attribution
+  - Protection of narrative intent and cultural context
 
-4. **Derivative License**: Derivatives may be licensed under:
-   - Palimpsest v0.8 or later
-   - MIT, Apache 2.0, GPL (if values-aligned use)
+The Palimpsest principles represent our vision for a consent-based internet.
+While not legally binding for use of this software, we encourage all users
+and contributors to familiarize themselves with these principles.
 
-**No Warranty**: THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+Learn more: https://github.com/hyperpolymath/palimpsest-license
 
-**Governance**: This license may be updated by the Palimpsest License Stewards.
-Projects using Palimpsest may choose to stay on v0.8 or upgrade.
-
-**Interpretation**: In case of ambiguity, favor interpretations that:
-- Maximize user freedom
-- Prioritize community well-being
-- Prevent harm
-
-### Why Two Licenses?
-
-- **MIT**: For maximum compatibility and commercial use
-- **Palimpsest**: For values-aligned use by those who share our philosophy
-
-Choose the license that matches your needs and values.
-
-### Palimpsest License Resources
-
-- **Specification**: https://palimpsest.example.org/v0.8
-- **FAQ**: https://palimpsest.example.org/faq
-- **Stewards**: https://palimpsest.example.org/governance
-- **Comparison**: https://palimpsest.example.org/vs-mit
-
-**Note**: Palimpsest v0.8 is **experimental**. If legal certainty is required,
-use the MIT license.
-
----
-
-## Choosing a License
-
-### Use MIT if:
-- You need OSI-approved license for corporate compliance
-- You want maximum legal clarity
-- You're building commercial products
-- You don't care about values alignment
-
-### Use Palimpsest if:
-- You share UbiCity's values
-- You want to prevent harmful use
-- You're building community-driven projects
-- You're willing to experiment with new licensing models
-
-**You cannot use BOTH simultaneously**. Pick one.
-
----
-
-## Third-Party Dependencies
-
-UbiCity uses the following third-party software:
-
-- **Deno**: MIT License
-- **ReScript**: LGPL v2.1 (compiler) + MIT (runtime)
-- **Rust**: MIT + Apache 2.0 (dual-licensed)
-- **wasm-bindgen**: MIT + Apache 2.0
-
-All dependencies are compatible with both MIT and Palimpsest.
-
----
-
-## Questions?
-
-**License choice**: license@ubicity.example.org
-**Palimpsest questions**: palimpsest@ubicity.example.org
-**Commercial licensing**: If you need alternative terms, contact us.
-
----
-
-**SPDX-License-Identifier**: MIT OR Palimpsest-0.8
-
-Last updated: 2025-11-22
+================================================================================
+END OF LICENSE
+================================================================================
