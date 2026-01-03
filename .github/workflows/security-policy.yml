@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later
 name: Security Policy
 on: [push, pull_request]
 
@@ -10,7 +10,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Security checks
         run: |
           FAILED=false
@@ -22,10 +22,10 @@ jobs:
             echo "$WEAK_CRYPTO"
           fi
           
-          # Block HTTP URLs (except localhost) - enforce HTTPS
-          HTTP_URLS=$(grep -rE 'http://[^l][^o][^c]' --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rs" --include="*.yaml" --include="*.yml" . 2>/dev/null | grep -v 'localhost\|127.0.0.1\|example\|test\|spec\|schema' | head -5 || true)
+          # Block HTTP URLs (except localhost)
+          HTTP_URLS=$(grep -rE 'http://[^l][^o][^c]' --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rs" --include="*.yaml" --include="*.yml" . 2>/dev/null | grep -v 'localhost\|127.0.0.1\|example\|test\|spec' | head -5 || true)
           if [ -n "$HTTP_URLS" ]; then
-            echo "⚠️ Insecure HTTP URLs found. Use HTTPS:"
+            echo "⚠️ HTTP URLs found. Use HTTPS:"
             echo "$HTTP_URLS"
           fi
           
