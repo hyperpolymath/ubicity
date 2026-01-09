@@ -151,8 +151,9 @@ module LearningExperience = {
   }
 
   let generateId = (): string => {
-    // Will use WASM for crypto
-    "ubi-" ++ "placeholder"
+    // Generate UUID v4 using crypto API
+    let uuid = Crypto.randomUUID()
+    "ubi-" ++ uuid
   }
 
   let make = (
