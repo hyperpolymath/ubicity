@@ -1,0 +1,239 @@
+= UbiCity Testing Report
+:author: Claude Code
+:date: 2025-12-29
+:toc: auto
+:toclevels: 3
+
+== Executive Summary
+
+This report documents the testing and fixes applied to the UbiCity project to enable Deno compatibility. The project has been migrated from Node.js-specific patterns to Deno-compatible code while maintaining full functionality.
+
+== Environment
+
+* *Platform*: Linux 6.17.12-300.fc43.x86_64
+* *Deno Version*: 1.45.0
+* *Date*: 2025-12-29
+* *Project*: ubicity
+* *Location*: /var/home/hyper/repos/ubicity
+
+== Issues Fixed
+
+=== 1. deno.json Configuration Errors
+
+*Problem*: The `deno.json` configuration referenced `.ts` files that did not exist. The actual source files were `.js`.
+
+*Files Affected*:
+
+* `deno.json` - exports and task definitions
+
+*Fix Applied*:
+
+* Changed `exports` from `./src/index.ts` to `./src/index.js`
+* Updated all task definitions to reference `.js` files instead of `.ts`
+* Changed `compile:cli` and `compile:capture` to use `.js` files
+* Set `checkJs: false` since the project uses plain JavaScript without type annotations
+
+=== 2. Node.js Import Compatibility
+
+*Problem*: Source files used bare Node.js module imports without the `node:` prefix, which is required in Deno.
+
+*Files Fixed*:
+
+* `/var/home/hyper/repos/ubicity/src/mapper.js` - `crypto` -> `node:crypto`
+* `/var/home/hyper/repos/ubicity/src/storage.js` - `fs`, `path`, `url` -> `node:fs`, `node:path`, `node:url`
+* `/var/home/hyper/repos/ubicity/src/capture.js` - `readline/promises` -> `node:readline/promises`
+* `/var/home/hyper/repos/ubicity/src/export.js` - `fs` -> `node:fs`
+* `/var/home/hyper/repos/ubicity/src/performance.js` - `perf_hooks` -> `node:perf_hooks`
+* `/var/home/hyper/repos/ubicity/src/privacy.js` - `crypto` -> `node:crypto`
+* `/var/home/hyper/repos/ubicity/src/import.js` - `fs` -> `node:fs`
+
+=== 3. CLI Scripts Node.js Globals
+
+*Problem*: CLI scripts used Node.js global variables (`process.argv`, `process.exit`) which are not available in Deno.
+
+*Files Fixed*:
+
+* `/var/home/hyper/repos/ubicity/src/cli.js`:
+** Changed `process.argv.slice(2)` to `Deno.args`
+** Changed `process.exit()` to `Deno.exit()`
+** Updated shebang to `#!/usr/bin/env -S deno run --allow-read --allow-write`
+
+* `/var/home/hyper/repos/ubicity/src/capture.js`:
+** Changed `process.argv[2]` to `Deno.args[0]`
+** Changed `process.exit()` to `Deno.exit()`
+** Changed `import.meta.url === \`file://${process.argv[1]}\`` to `import.meta.main`
+** Updated shebang to `#!/usr/bin/env -S deno run --allow-read --allow-write`
+** Changed stdin/stdout from `node:process` to `Deno.stdin`/`Deno.stdout`
+
+== Test Results
+
+=== Test Suite Summary
+
+All 44 tests pass successfully.
+
+[cols="3,1,1"]
+|===
+| Test File | Tests | Status
+
+| tests/core.test.ts
+| 5
+| PASS
+
+| tests/export.test.js
+| 4
+| PASS
+
+| tests/export.test.ts
+| 5
+| PASS
+
+| tests/mapper.test.js
+| 9
+| PASS
+
+| tests/mapper.test.ts
+| 5
+| PASS
+
+| tests/privacy.test.js
+| 5
+| PASS
+
+| tests/privacy.test.ts
+| 6
+| PASS
+
+| tests/schemas.test.js
+| 5
+| PASS
+
+| *Total*
+| *44*
+| *ALL PASS*
+|===
+
+=== Test Details
+
+==== Core Tests (core.test.ts)
+
+* LearningExperience validation
+* Data persistence
+* ID generation uniqueness
+* Timestamp validation
+* Domain array handling
+
+==== Export Tests (export.test.js, export.test.ts)
+
+* CSV format generation
+* GeoJSON format generation
+* DOT graph format generation
+* Markdown format generation
+* CSV escaping special characters
+
+==== Mapper Tests (mapper.test.js, mapper.test.ts)
+
+* LearningExperience generates ID if not provided
+* LearningExperience generates timestamp if not provided
+* UrbanKnowledgeMapper initializes indices
+* captureExperience updates indices
+* findInterdisciplinaryConnections identifies multi-domain experiences
+* mapByLocation aggregates experiences
+* getLearnerJourney tracks timeline
+* generateDomainNetwork creates edges
+* findLearningHotspots filters by diversity
+* Hotspot detection
+* Domain network generation
+* Learner journey tracking
+* Interdisciplinary connections
+* Diversity score calculation
+
+==== Privacy Tests (privacy.test.js, privacy.test.ts)
+
+* anonymizeLearner hashes learner IDs consistently
+* anonymizeLocation fuzzes coordinates
+* removePII sanitizes email addresses
+* removePII sanitizes phone numbers
+* fullyAnonymize applies all anonymization
+* Learner ID anonymization
+* Location fuzzing
+* PII removal from text
+* Privacy level enforcement
+* Data minimization
+* Shareable dataset generation
+
+==== Schema Tests (schemas.test.js)
+
+* minimal valid experience passes validation
+* experience with full metadata passes validation
+* missing required fields fails validation
+* invalid coordinates fail validation
+* validateExperience throws on invalid data
+
+== CLI Verification
+
+=== Available Tasks
+
+[source,shell]
+----
+deno task start     # Run CLI
+deno task capture   # Capture a learning experience
+deno task report    # Generate analysis report
+deno task hotspots  # Find learning hotspots
+deno task stats     # Show storage statistics
+deno task test      # Run tests
+deno task fmt       # Format code
+deno task lint      # Lint code
+----
+
+=== CLI Help Output
+
+[source]
+----
+UbiCity - Urban Learning Capture System
+============================================================
+
+Usage: ubicity <command> [options]
+
+Commands:
+  capture      Capture a learning experience
+  report       Generate full analysis report
+  hotspots     Find learning hotspots
+  network      Show domain connection network
+  learner      Show journey for a specific learner
+  stats        Show storage statistics
+  help         Show this help message
+----
+
+=== Stats Output
+
+[source]
+----
+Storage Statistics:
+============================================================
+  Directory: /var/home/hyper/repos/ubicity/ubicity-data
+  Total Experiences: 8
+  Total Size: 12.05 KB
+  Loaded in Memory: 8
+----
+
+== Lint Status
+
+35 lint issues remain (primarily no-unused-vars and require-await warnings). These are non-critical and do not affect functionality.
+
+== Formatting
+
+Code has been formatted with `deno fmt`. All source files are now consistent with Deno's formatting standards.
+
+== Recommendations
+
+1. *Consider TypeScript Migration*: The project uses JavaScript with JSDoc. Converting to TypeScript would improve type safety.
+
+2. *Address Lint Warnings*: Remove unused imports and fix async function declarations.
+
+3. *Add CI/CD*: Set up GitHub Actions with Deno for automated testing.
+
+4. *Version Pin Dependencies*: The deno.json uses `^` version constraints; consider pinning for reproducibility.
+
+== Conclusion
+
+The UbiCity project has been successfully tested and fixed for Deno compatibility. All 44 tests pass, the CLI works correctly, and the codebase has been formatted. The project is now fully functional with Deno 1.45.0.
