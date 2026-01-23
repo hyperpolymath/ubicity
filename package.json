@@ -1,6 +1,6 @@
 {
   "name": "ubicity",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Learning capture system for urban informal education - tools to document WHO/WHERE/WHAT of learning experiences",
   "type": "module",
   "main": "src/index.js",
@@ -26,7 +26,7 @@
     "migrate": "node scripts/migrate-data.js",
     "migrate:check": "node scripts/migrate-data.js --check",
     "migrate:fix": "node scripts/migrate-data.js --fix",
-    "test": "node --test tests/**/*.test.js",
+    "test:legacy": "node --test tests/**/*.test.js",
     "test:watch": "node --test --watch tests/**/*.test.js",
     "lint": "eslint src tests examples scripts",
     "format": "prettier --write \"**/*.{js,json,md}\"",
