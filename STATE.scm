@@ -60,9 +60,9 @@
         (notes . "README, META/ECOSYSTEM/STATE.scm, THREAT_MODEL.md complete")))
 
       (testing
-       ((status . "comprehensive-unit-coverage")
-        (completion . 96)
-        (notes . "144 unit tests (139 passing, 96.5% pass rate) - All 7 core modules comprehensively tested: UbiCity/Decoder/Mapper/Analysis/Privacy/Export/Visualization. 5 known Privacy edge case failures (phone regex, GPS rounding). Capture/CaptureCLI are I/O-heavy, require integration testing.")))
+       ((status . "complete-module-coverage")
+        (completion . 100)
+        (notes . "149 tests (144 passing, 96.6% pass rate) - ALL 9 ReScript modules tested. Core modules (UbiCity/Decoder/Mapper/Analysis/Privacy/Export/Visualization) have comprehensive unit tests. CLI modules (Capture/CaptureCLI) have smoke tests verifying invocation and basic behavior. 5 known Privacy edge case failures (phone regex, GPS rounding) documented.")))
 
       (core-functionality
        ((status . "complete")

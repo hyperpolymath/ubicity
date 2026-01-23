@@ -77,3 +77,8 @@ htmlcov/
 /tmp/
 *.tmp
 *.bak
+
+# UbiCity Data
+/data/
+/ubicity-data/
+experiences.json
