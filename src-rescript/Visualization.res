@@ -2,8 +2,6 @@
 // UbiCity Visualization Generator
 // Creates interactive HTML reports with filtering and search
 
-open UbiCity
-
 type visualizationOptions = {
   outputFile: string,
   includeMap: bool,

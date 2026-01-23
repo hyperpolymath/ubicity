@@ -155,9 +155,35 @@ let loadAll = (mapper: t): promise<result<int, string>> => {
   mapper.storage
   ->Storage.loadAllExperiences
   ->Promise.then(experiencesData => {
-    // TODO: Parse experience data from JS objects to ReScript types
-    // For now, just return the count
-    Promise.resolve(Ok(experiencesData->Array.length))
+    // Decode JS objects to ReScript types
+    switch Decoder.decodeExperiences(experiencesData) {
+    | Error(err) => Promise.resolve(Error(`Decode failed: ${err}`))
+    | Ok(experiences) => {
+        // Load experiences into mapper
+        experiences->Array.forEach(exp => {
+          mapper.experiences->Dict.set(exp.id, exp)
+        })
+
+        // Update indices
+        let updated = experiences->Array.reduce(mapper, (m, exp) => updateIndices(m, exp))
+
+        // Copy indices back to mapper (since we created a new record with updated)
+        // Dict doesn't have clear(), so we just copy all entries from updated
+        updated.indices.location
+        ->Dict.toArray
+        ->Array.forEach(((k, v)) => mapper.indices.location->Dict.set(k, v))
+
+        updated.indices.domain
+        ->Dict.toArray
+        ->Array.forEach(((k, v)) => mapper.indices.domain->Dict.set(k, v))
+
+        updated.indices.learner
+        ->Dict.toArray
+        ->Array.forEach(((k, v)) => mapper.indices.learner->Dict.set(k, v))
+
+        Promise.resolve(Ok(experiences->Array.length))
+      }
+    }
   })
   ->Promise.catch(_ => Promise.resolve(Error("Failed to load experiences")))
 }
