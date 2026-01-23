@@ -21,7 +21,7 @@ module Storage = {
   external loadAllExperiences: t => promise<array<'a>> = "loadAllExperiences"
 
   @send
-  external saveVisualization: (t, string, string) => promise<result<unit, string>> = "saveVisualization"
+  external saveVisualization: (t, string, string) => promise<string> = "saveVisualization"
 }
 
 type indices = {

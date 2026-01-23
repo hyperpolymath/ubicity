@@ -402,4 +402,4 @@ export {
   mapByLocation ,
   generateDomainNetwork ,
 }
-/* UbiCity Not a pure module */
+/* Decoder Not a pure module */

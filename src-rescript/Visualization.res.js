@@ -3,6 +3,7 @@
 import * as Mapper from "./Mapper.res.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.js";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.js";
+import * as Core__Promise from "@rescript/core/src/Core__Promise.res.js";
 
 var defaultOptions = {
   outputFile: "ubicity-map.html",
@@ -109,18 +110,17 @@ async function generateVisualization(mapper, options) {
       }).length;
   var network = Mapper.generateDomainNetwork(mapper);
   var html = generateHTML(report.summary, report.learningHotspots, network, locationsWithCoords);
-  var saveResult = await mapper.storage.saveVisualization(html, opts.outputFile);
-  if (saveResult.TAG === "Ok") {
-    return Promise.resolve({
-                TAG: "Ok",
-                _0: opts.outputFile
-              });
-  } else {
-    return Promise.resolve({
-                TAG: "Error",
-                _0: "Failed to save visualization: " + saveResult._0
-              });
-  }
+  return Core__Promise.$$catch(mapper.storage.saveVisualization(html, opts.outputFile).then(function (_filepath) {
+                  return Promise.resolve({
+                              TAG: "Ok",
+                              _0: opts.outputFile
+                            });
+                }), (function (_err) {
+                return Promise.resolve({
+                            TAG: "Error",
+                            _0: "Failed to save visualization"
+                          });
+              }));
 }
 
 export {

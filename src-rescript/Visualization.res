@@ -558,11 +558,10 @@ let generateVisualization = async (
           )
 
           // Save visualization
-          let saveResult = await Mapper.Storage.saveVisualization(mapper.storage, html, opts.outputFile)
-          switch saveResult {
-          | Ok(_) => Promise.resolve(Ok(opts.outputFile))
-          | Error(err) => Promise.resolve(Error("Failed to save visualization: " ++ err))
-          }
+          mapper.storage
+          ->Mapper.Storage.saveVisualization(html, opts.outputFile)
+          ->Promise.then(_filepath => Promise.resolve(Ok(opts.outputFile)))
+          ->Promise.catch(_err => Promise.resolve(Error("Failed to save visualization")))
         }
       }
     }

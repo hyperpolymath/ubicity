@@ -4,6 +4,10 @@
 
 open UbiCity
 
+// FFI bindings for generating IDs
+@module("crypto") @val
+external randomUUID: unit => string = "randomUUID"
+
 // Helper to get string field from JSON object
 let getString = (json: JSON.t, field: string): result<string, string> => {
   switch json->JSON.Decode.object {
@@ -93,9 +97,20 @@ let getOptionalNumber = (json: JSON.t, field: string): option<float> => {
   ->Option.flatMap(JSON.Decode.float)
 }
 
-// Decode Coordinates
+// Decode Coordinates (handles both lat/lon and latitude/longitude)
 let decodeCoordinates = (json: JSON.t): result<Coordinates.t, string> => {
-  switch (getNumber(json, "latitude"), getNumber(json, "longitude")) {
+  // Try latitude/longitude first, then fall back to lat/lon
+  let latResult = switch getNumber(json, "latitude") {
+  | Ok(lat) => Ok(lat)
+  | Error(_) => getNumber(json, "lat")
+  }
+
+  let lonResult = switch getNumber(json, "longitude") {
+  | Ok(lon) => Ok(lon)
+  | Error(_) => getNumber(json, "lon")
+  }
+
+  switch (latResult, lonResult) {
   | (Ok(latitude), Ok(longitude)) => Ok({latitude, longitude})
   | (Error(err), _) | (_, Error(err)) => Error(`Coordinates decode error: ${err}`)
   }
@@ -251,19 +266,21 @@ let decodePrivacy = (json: JSON.t): result<Privacy.t, string> => {
   }
 }
 
-// Decode LearningExperience
+// Decode LearningExperience (with fallbacks for legacy data)
 let decodeLearningExperience = (json: JSON.t): result<LearningExperience.t, string> => {
-  // Get required fields
-  let idResult = getString(json, "id")
-  let timestampResult = getString(json, "timestamp")
-  let versionResult = getString(json, "version")
+  // Get core required fields
   let learnerResult = getObject(json, "learner")->Result.flatMap(decodeLearner)
   let contextResult = getObject(json, "context")->Result.flatMap(decodeContext)
   let experienceResult = getObject(json, "experience")->Result.flatMap(decodeExperienceData)
 
+  // Get optional fields with defaults for legacy data
+  let id = getOptionalString(json, "id")->Option.getOr(`ubi-${randomUUID()}`)
+  let timestamp = getOptionalString(json, "timestamp")->Option.getOr(Date.now()->Float.toString)
+  let version = getOptionalString(json, "version")->Option.getOr("1.0")
+
   // Combine all results
-  switch (idResult, timestampResult, versionResult, learnerResult, contextResult, experienceResult) {
-  | (Ok(id), Ok(timestamp), Ok(version), Ok(learner), Ok(context), Ok(experience)) => {
+  switch (learnerResult, contextResult, experienceResult) {
+  | (Ok(learner), Ok(context), Ok(experience)) => {
       // Get optional fields
       let privacy = getOptionalObject(json, "privacy")->Option.flatMap(privJson => {
         switch decodePrivacy(privJson) {
@@ -287,12 +304,9 @@ let decodeLearningExperience = (json: JSON.t): result<LearningExperience.t, stri
         tags,
       })
     }
-  | (Error(err), _, _, _, _, _)
-  | (_, Error(err), _, _, _, _)
-  | (_, _, Error(err), _, _, _)
-  | (_, _, _, Error(err), _, _)
-  | (_, _, _, _, Error(err), _)
-  | (_, _, _, _, _, Error(err)) =>
+  | (Error(err), _, _)
+  | (_, Error(err), _)
+  | (_, _, Error(err)) =>
     Error(`LearningExperience decode error: ${err}`)
   }
 }
