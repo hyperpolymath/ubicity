@@ -8,6 +8,9 @@
     "ubicity": "./src/cli.js"
   },
   "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "test:integration": "node test-integration.mjs && node test-existing-data.mjs",
+    "test:all": "npm run test && npm run test:integration",
     "capture": "node src/capture.js",
     "capture:quick": "node src/capture.js quick",
     "capture:full": "node src/capture.js full",
