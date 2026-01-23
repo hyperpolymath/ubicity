@@ -212,6 +212,151 @@ function getTopDomains(mapper, limitOpt, param) {
               }).slice(0, limit);
 }
 
+function generateReport(mapper) {
+  var experiences = Object.values(mapper.experiences);
+  var summary_totalExperiences = experiences.length;
+  var summary_uniqueLocations = Object.keys(mapper.indices.location).length;
+  var summary_uniqueDomains = Object.keys(mapper.indices.domain).length;
+  var summary_uniqueLearners = Object.keys(mapper.indices.learner).length;
+  var summary_interdisciplinaryExperiences = UbiCity.Analysis.findInterdisciplinary(experiences).length;
+  var summary = {
+    totalExperiences: summary_totalExperiences,
+    uniqueLocations: summary_uniqueLocations,
+    uniqueDomains: summary_uniqueDomains,
+    uniqueLearners: summary_uniqueLearners,
+    interdisciplinaryExperiences: summary_interdisciplinaryExperiences
+  };
+  var learningHotspots = Object.entries(mapper.indices.location).map(function (param) {
+          var experienceIds = param[1];
+          var locationExps = Core__Array.filterMap(experienceIds.map(function (id) {
+                    return mapper.experiences[id];
+                  }), (function (x) {
+                  return x;
+                }));
+          var domains = Core__Array.reduce(Core__Array.reduce(locationExps, [], (function (acc, exp) {
+                      var doms = exp.experience.domains;
+                      if (doms !== undefined) {
+                        return acc.concat(doms);
+                      } else {
+                        return acc;
+                      }
+                    })), [], (function (acc, d) {
+                  if (acc.includes(d)) {
+                    return acc;
+                  } else {
+                    return acc.concat([d]);
+                  }
+                }));
+          var learners = Core__Array.reduce(locationExps.map(function (exp) {
+                    return exp.learner.id;
+                  }), [], (function (acc, id) {
+                  if (acc.includes(id)) {
+                    return acc;
+                  } else {
+                    return acc.concat([id]);
+                  }
+                }));
+          return {
+                  location: param[0],
+                  count: experienceIds.length,
+                  diversity: domains.length,
+                  learners: learners.length,
+                  domains: domains
+                };
+        }).toSorted(function (a, b) {
+        return b.diversity - a.diversity | 0;
+      });
+  return Promise.resolve({
+              TAG: "Ok",
+              _0: {
+                summary: summary,
+                learningHotspots: learningHotspots
+              }
+            });
+}
+
+function mapByLocation(mapper) {
+  var result = {};
+  Object.entries(mapper.indices.location).forEach(function (param) {
+        var experienceIds = param[1];
+        var locationExps = Core__Array.filterMap(experienceIds.map(function (id) {
+                  return mapper.experiences[id];
+                }), (function (x) {
+                return x;
+              }));
+        var coordinates = Core__Option.flatMap(locationExps.find(function (exp) {
+                  return Core__Option.isSome(exp.context.location.coordinates);
+                }), (function (exp) {
+                return exp.context.location.coordinates;
+              }));
+        var domains = Core__Array.reduce(Core__Array.reduce(locationExps, [], (function (acc, exp) {
+                    var doms = exp.experience.domains;
+                    if (doms !== undefined) {
+                      return acc.concat(doms);
+                    } else {
+                      return acc;
+                    }
+                  })), [], (function (acc, d) {
+                if (acc.includes(d)) {
+                  return acc;
+                } else {
+                  return acc.concat([d]);
+                }
+              }));
+        result[param[0]] = {
+          coordinates: coordinates,
+          count: experienceIds.length,
+          domains: domains
+        };
+      });
+  return result;
+}
+
+function generateDomainNetwork(mapper) {
+  var experiences = Object.values(mapper.experiences);
+  var domainCounts = {};
+  var coOccurrences = {};
+  experiences.forEach(function (exp) {
+        var domains = exp.experience.domains;
+        if (domains !== undefined) {
+          domains.forEach(function (d) {
+                var count = Core__Option.getOr(domainCounts[d], 0);
+                domainCounts[d] = count + 1 | 0;
+              });
+          domains.forEach(function (d1) {
+                domains.forEach(function (d2) {
+                      if (d1 >= d2) {
+                        return ;
+                      }
+                      var key = d1 + "--" + d2;
+                      var count = Core__Option.getOr(coOccurrences[key], 0);
+                      coOccurrences[key] = count + 1 | 0;
+                    });
+              });
+          return ;
+        }
+        
+      });
+  var nodes = Object.entries(domainCounts).map(function (param) {
+        return {
+                id: param[0],
+                size: param[1]
+              };
+      });
+  var edges = Object.entries(coOccurrences).map(function (param) {
+        var parts = param[0].split("--");
+        return {
+                source: Core__Option.getOr(parts[0], ""),
+                target: Core__Option.getOr(parts[1], ""),
+                weight: param[1]
+              };
+      });
+  return {
+          nodes: nodes,
+          edges: edges
+        };
+}
+
 export {
   $$Storage ,
   make$1 as make,
@@ -229,5 +374,8 @@ export {
   findByLearner ,
   getHotspots ,
   getTopDomains ,
+  generateReport ,
+  mapByLocation ,
+  generateDomainNetwork ,
 }
 /* UbiCity Not a pure module */

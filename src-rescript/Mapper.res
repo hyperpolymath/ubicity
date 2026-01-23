@@ -19,6 +19,9 @@ module Storage = {
 
   @send
   external loadAllExperiences: t => promise<array<'a>> = "loadAllExperiences"
+
+  @send
+  external saveVisualization: (t, string, string) => promise<result<unit, string>> = "saveVisualization"
 }
 
 type indices = {
@@ -237,4 +240,178 @@ let getTopDomains = (mapper: t, ~limit=10, ()): array<(string, int)> => {
     Float.fromInt(countB - countA)
   })
   ->Array.slice(~start=0, ~end=limit)
+}
+
+// Types for report generation
+type reportSummary = {
+  totalExperiences: int,
+  uniqueLocations: int,
+  uniqueDomains: int,
+  uniqueLearners: int,
+  interdisciplinaryExperiences: int,
+}
+
+type learningHotspot = {
+  location: string,
+  count: int,
+  diversity: int,
+  learners: int,
+  domains: array<string>,
+}
+
+type domainNode = {
+  id: string,
+  size: int,
+}
+
+type domainEdge = {
+  source: string,
+  target: string,
+  weight: int,
+}
+
+type domainNetwork = {
+  nodes: array<domainNode>,
+  edges: array<domainEdge>,
+}
+
+type locationData = {
+  coordinates: option<Coordinates.t>,
+  count: int,
+  domains: array<string>,
+}
+
+type report = {
+  summary: reportSummary,
+  learningHotspots: array<learningHotspot>,
+}
+
+// Generate comprehensive report
+let generateReport = (mapper: t): promise<result<report, string>> => {
+  let experiences = mapper.experiences->Dict.valuesToArray
+
+  let summary: reportSummary = {
+    totalExperiences: experiences->Array.length,
+    uniqueLocations: mapper.indices.location->Dict.keysToArray->Array.length,
+    uniqueDomains: mapper.indices.domain->Dict.keysToArray->Array.length,
+    uniqueLearners: mapper.indices.learner->Dict.keysToArray->Array.length,
+    interdisciplinaryExperiences: Analysis.findInterdisciplinary(experiences)->Array.length,
+  }
+
+  let learningHotspots = mapper.indices.location
+    ->Dict.toArray
+    ->Array.map(((location, experienceIds)) => {
+      let locationExps = experienceIds
+        ->Array.map(id => mapper.experiences->Dict.get(id))
+        ->Array.filterMap(x => x)
+
+      let domains = locationExps
+        ->Array.reduce([], (acc, exp) => {
+          switch exp.experience.domains {
+          | Some(doms) => Array.concat(acc, doms)
+          | None => acc
+          }
+        })
+        ->Array.reduce([], (acc, d) => {
+          if acc->Array.includes(d) {acc} else {acc->Array.concat([d])}
+        })
+
+      let learners = locationExps
+        ->Array.map(exp => exp.learner.id)
+        ->Array.reduce([], (acc, id) => {
+          if acc->Array.includes(id) {acc} else {acc->Array.concat([id])}
+        })
+
+      {
+        location,
+        count: experienceIds->Array.length,
+        diversity: domains->Array.length,
+        learners: learners->Array.length,
+        domains,
+      }
+    })
+    ->Array.toSorted((a, b) => Float.fromInt(b.diversity - a.diversity))
+
+  Promise.resolve(Ok({summary, learningHotspots}))
+}
+
+// Map by location
+let mapByLocation = (mapper: t): Dict.t<locationData> => {
+  let result = Dict.make()
+
+  mapper.indices.location->Dict.toArray->Array.forEach(((location, experienceIds)) => {
+    let locationExps = experienceIds
+      ->Array.map(id => mapper.experiences->Dict.get(id))
+      ->Array.filterMap(x => x)
+
+    let coordinates = locationExps
+      ->Array.find(exp => exp.context.location.coordinates->Option.isSome)
+      ->Option.flatMap(exp => exp.context.location.coordinates)
+
+    let domains = locationExps
+      ->Array.reduce([], (acc, exp) => {
+        switch exp.experience.domains {
+        | Some(doms) => Array.concat(acc, doms)
+        | None => acc
+        }
+      })
+      ->Array.reduce([], (acc, d) => {
+        if acc->Array.includes(d) {acc} else {acc->Array.concat([d])}
+      })
+
+    result->Dict.set(location, {
+      coordinates,
+      count: experienceIds->Array.length,
+      domains,
+    })
+  })
+
+  result
+}
+
+// Generate domain network
+let generateDomainNetwork = (mapper: t): domainNetwork => {
+  let experiences = mapper.experiences->Dict.valuesToArray
+
+  let domainCounts = Dict.make()
+  let coOccurrences = Dict.make()
+
+  experiences->Array.forEach(exp => {
+    switch exp.experience.domains {
+    | Some(domains) => {
+        domains->Array.forEach(d => {
+          let count = domainCounts->Dict.get(d)->Option.getOr(0)
+          domainCounts->Dict.set(d, count + 1)
+        })
+
+        domains->Array.forEach(d1 => {
+          domains->Array.forEach(d2 => {
+            if d1 < d2 {
+              let key = `${d1}--${d2}`
+              let count = coOccurrences->Dict.get(key)->Option.getOr(0)
+              coOccurrences->Dict.set(key, count + 1)
+            }
+          })
+        })
+      }
+    | None => ()
+    }
+  })
+
+  let nodes = domainCounts
+    ->Dict.toArray
+    ->Array.map(((id, size)) => {id, size})
+
+  let edges = coOccurrences
+    ->Dict.toArray
+    ->Array.map(((key, weight)) => {
+      let parts = key->String.split("--")
+      {
+        source: parts[0]->Option.getOr(""),
+        target: parts[1]->Option.getOr(""),
+        weight,
+      }
+    })
+
+  {nodes, edges}
 }
