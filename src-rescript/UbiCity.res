@@ -128,7 +128,7 @@ module ExperienceData = {
 }
 
 module Privacy = {
-  type level = [#private | #anonymous | #public]
+  type level = [#\"private" | #anonymous | #public]
 
   type t = {
     level: level,
@@ -148,6 +148,10 @@ module LearningExperience = {
     privacy: option<Privacy.t>,
     tags: option<array<string>>,
     version: string,
+  }
+
+  module Crypto = {
+    @module("crypto") @val external randomUUID: unit => string = "randomUUID"
   }
 
   let generateId = (): string => {
@@ -189,31 +193,41 @@ module Analysis = {
 
   let groupByLocation = (
     experiences: array<LearningExperience.t>,
-  ): Map.t<string, array<LearningExperience.t>> => {
-    experiences->Array.reduce(Map.String.empty, (acc, exp) => {
+  ): Dict.t<array<LearningExperience.t>> => {
+    experiences->Array.reduce(Dict.make(), (acc, exp) => {
       let locationName = exp.context.location.name
-      let existing = acc->Map.String.get(locationName)->Option.getOr([])
-      acc->Map.String.set(locationName, existing->Array.concat([exp]))
+      let existing = acc->Dict.get(locationName)->Option.getOr([])
+      acc->Dict.set(locationName, existing->Array.concat([exp]))
+      acc
     })
   }
 
   let groupByLearner = (
     experiences: array<LearningExperience.t>,
-  ): Map.t<string, array<LearningExperience.t>> => {
-    experiences->Array.reduce(Map.String.empty, (acc, exp) => {
+  ): Dict.t<array<LearningExperience.t>> => {
+    experiences->Array.reduce(Dict.make(), (acc, exp) => {
       let learnerId = exp.learner.id
-      let existing = acc->Map.String.get(learnerId)->Option.getOr([])
-      acc->Map.String.set(learnerId, existing->Array.concat([exp]))
+      let existing = acc->Dict.get(learnerId)->Option.getOr([])
+      acc->Dict.set(learnerId, existing->Array.concat([exp]))
+      acc
     })
   }
 
   let calculateDiversity = (experiences: array<LearningExperience.t>): int => {
-    let domains = experiences->Array.reduce(Set.String.empty, (acc, exp) => {
+    let domains = experiences->Array.reduce([], (acc, exp) => {
       switch exp.experience.domains {
-      | Some(doms) => doms->Array.reduce(acc, (acc2, domain) => acc2->Set.String.add(domain))
+      | Some(doms) => Array.concat(acc, doms)
       | None => acc
       }
     })
-    domains->Set.String.size
+    // Get unique domains
+    let uniqueDomains = domains->Array.reduce([], (acc, domain) => {
+      if acc->Array.includes(domain) {
+        acc
+      } else {
+        acc->Array.concat([domain])
+      }
+    })
+    uniqueDomains->Array.length
   }
 }

@@ -15,7 +15,7 @@
   '((version . "0.1.0")
     (schema-version . "1.0")
     (created . "2025-12-15")
-    (updated . "2025-12-17")
+    (updated . "2026-01-23")
     (project . "ubicity")
     (repo . "github.com/hyperpolymath/ubicity")))
 
@@ -40,8 +40,8 @@
 ;;;============================================================================
 
 (define current-position
-  '((phase . "v0.1 - Initial Setup and RSR Compliance")
-    (overall-completion . 30)
+  '((phase . "v0.2 - Core Functionality & ReScript Migration")
+    (overall-completion . 55)
 
     (components
      ((rsr-compliance
@@ -66,8 +66,8 @@
 
       (core-functionality
        ((status . "in-progress")
-        (completion . 25)
-        (notes . "Initial implementation underway - ReScript migration pending")))))
+        (completion . 65)
+        (notes . "ReScript modules compiled successfully - Capture, Mapper, CLI functional")))))
 
     (working-features
      ("RSR-compliant CI/CD pipeline"
@@ -76,7 +76,14 @@
       "SHA-pinned GitHub Actions"
       "Security policy with GitHub private reporting"
       "Threat model documented"
-      "CodeQL + OSSF Scorecard integration"))))
+      "CodeQL + OSSF Scorecard integration"
+      "ReScript domain types (UbiCity.res) - compiled ✓"
+      "ReScript CLI capture tool (Capture.res) - compiled ✓"
+      "ReScript knowledge mapper (Mapper.res) - compiled ✓"
+      "ReScript CLI entry point (CaptureCLI.res) - compiled ✓"
+      "ReScript configuration (rescript.json, package.json)"
+      "Dict-based data structures (string-keyed maps)"
+      "FFI bindings (crypto.randomUUID, readline/promises, storage.js)")))))
 
 ;;;============================================================================
 ;;; ROUTE TO MVP
@@ -171,7 +178,20 @@
 
 (define session-history
   '((snapshots
-     (((date . "2025-12-17")
+     (((date . "2026-01-23")
+       (session . "rescript-migration-compilation")
+       (accomplishments
+        ("Created rescript.json configuration with @rescript/core dependency"
+         "Fixed syntax errors: private keyword escaping, record spread ordering"
+         "Rewrote data structures: Map/Set → Dict/Array for ReScript Core compatibility"
+         "Added FFI bindings for Node.js crypto.randomUUID"
+         "Fixed Readline module ordering issue"
+         "Fixed JSON.stringify → JSON.stringifyAny for template generation"
+         "Successfully compiled all ReScript modules to JavaScript"
+         "Generated clean, readable JavaScript output"))
+       (notes . "ReScript migration compilation session - all modules now functional"))
+
+      ((date . "2025-12-17")
        (session . "security-review-and-roadmap")
        (accomplishments
         ("Fixed SECURITY.md with correct version information"

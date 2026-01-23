@@ -11,6 +11,9 @@
     "capture": "node src/capture.js",
     "capture:quick": "node src/capture.js quick",
     "capture:full": "node src/capture.js full",
+    "capture:res": "node src-rescript/CaptureCLI.res.js",
+    "capture:res:quick": "node src-rescript/CaptureCLI.res.js quick",
+    "capture:res:full": "node src-rescript/CaptureCLI.res.js full",
     "visualize": "node src/visualize.js",
     "report": "node src/cli.js report",
     "hotspots": "node src/cli.js hotspots",
@@ -24,7 +27,10 @@
     "test:watch": "node --test --watch tests/**/*.test.js",
     "lint": "eslint src tests examples scripts",
     "format": "prettier --write \"**/*.{js,json,md}\"",
-    "format:check": "prettier --check \"**/*.{js,json,md}\""
+    "format:check": "prettier --check \"**/*.{js,json,md}\"",
+    "res:build": "rescript",
+    "res:clean": "rescript clean",
+    "res:dev": "rescript build -w"
   },
   "keywords": [
     "learning",
@@ -45,7 +51,9 @@
   },
   "devDependencies": {
     "eslint": "^8.56.0",
-    "prettier": "^3.2.4"
+    "prettier": "^3.2.4",
+    "@rescript/core": "^1.0.0",
+    "rescript": "^11.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
