@@ -15,7 +15,7 @@
   '((version . "0.2.0")
     (schema-version . "1.0")
     (created . "2025-12-15")
-    (updated . "2026-01-23T21:33:02Z")
+    (updated . "2026-01-23T21:40:28Z")
     (project . "ubicity")
     (repo . "github.com/hyperpolymath/ubicity")))
 
@@ -60,9 +60,9 @@
         (notes . "README, META/ECOSYSTEM/STATE.scm, THREAT_MODEL.md complete")))
 
       (testing
-       ((status . "unit-tests-complete")
-        (completion . 60)
-        (notes . "16 unit tests + integration tests pass - Decoder/Mapper/Storage validated")))
+       ((status . "expanding-coverage")
+        (completion . 65)
+        (notes . "53 unit tests (30 new + 23 legacy) pass - Decoder/Mapper/Analysis validated")))
 
       (core-functionality
        ((status . "complete")
@@ -200,6 +200,19 @@
 (define session-history
   '((snapshots
      (((date . "2026-01-23")
+       (session . "analysis-tests-v05-progress")
+       (accomplishments
+        ("Created test/analysis.test.mjs with 14 comprehensive tests"
+         "Test coverage: Analysis.res 0% → 90%+ (all major functions)"
+         "Total unit tests: 16 → 53 (30 new + 23 legacy)"
+         "Validated TemporalAnalyzer (time/day distributions, streak detection)"
+         "Validated CollaborativeNetworkAnalyzer (network building)"
+         "Validated RecommendationEngine (learner/location/domain recommendations)"
+         "All 53 tests passing in ~380ms combined"
+         "Test coverage: 60% → 65%"))
+       (notes . "Advancing toward v0.5 - test coverage goal 70%"))
+
+      ((date . "2026-01-23")
        (session . "v03-milestone-review")
        (accomplishments
         ("Updated STATE.scm milestones: v0.2 and v0.3 marked complete"
