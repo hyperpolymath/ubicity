@@ -40,8 +40,8 @@
 ;;;============================================================================
 
 (define current-position
-  '((phase . "v0.2 - Core Functionality & ReScript Migration")
-    (overall-completion . 90)
+  '((phase . "v0.2 Complete - Ready for v0.3")
+    (overall-completion . 95)
 
     (components
      ((rsr-compliance
@@ -60,14 +60,14 @@
         (notes . "README, META/ECOSYSTEM/STATE.scm, THREAT_MODEL.md complete")))
 
       (testing
-       ((status . "integration-complete")
-        (completion . 40)
-        (notes . "Integration tests pass - full pipeline validated with legacy data")))
+       ((status . "unit-tests-complete")
+        (completion . 60)
+        (notes . "16 unit tests + integration tests pass - Decoder/Mapper/Storage validated")))
 
       (core-functionality
-       ((status . "near-complete")
-        (completion . 95)
-        (notes . "All ReScript modules compiled with JSON decoders - Analysis, Privacy, Export, Visualization, Decoder complete")))))
+       ((status . "complete")
+        (completion . 100)
+        (notes . "All ReScript modules compiled and tested - v0.2 milestone achieved")))))
 
     (working-features
      ("RSR-compliant CI/CD pipeline"
@@ -195,6 +195,18 @@
 (define session-history
   '((snapshots
      (((date . "2026-01-23")
+       (session . "unit-tests-v02-complete")
+       (accomplishments
+        ("Created test/decoder.test.mjs (8 tests for JSON decoding)"
+         "Created test/mapper.test.mjs (8 tests for indexing and queries)"
+         "Created run-tests.mjs (test runner with glob support)"
+         "Added package.json test scripts (test, test:integration, test:all)"
+         "All 16 unit tests pass in 416ms"
+         "Test coverage: Decoder (legacy formats, validation), Mapper (CRUD, indices, queries)"
+         "v0.2 milestone complete: ReScript migration, validation, integration tests, unit tests"))
+       (notes . "v0.2 Core Functionality milestone achieved - all deliverables complete"))
+
+      ((date . "2026-01-23")
        (session . "integration-testing-complete")
        (accomplishments
         ("Added storage.js FFI implementation (ExperienceStorage class)"
