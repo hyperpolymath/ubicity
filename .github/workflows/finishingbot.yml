@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Finishingbot - Release readiness validation
+# Part of gitbot-fleet
+
+name: Finishingbot Release Check
+
+permissions: read-all
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  release-readiness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@6d9817901c499d6b02debbb57edb38d33daa680b  # stable
+        with:
+          toolchain: stable
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@ad397744b0d591a723ab90405b7247fac0e6b8db  # v2
+
+      - name: Clone finishingbot
+        run: |
+          git clone https://github.com/hyperpolymath/finishingbot.git /tmp/finishingbot
+          cd /tmp/finishingbot
+          cargo build --release
+
+      - name: Run finishingbot
+        id: finishingbot
+        continue-on-error: true
+        run: |
+          /tmp/finishingbot/target/release/finishingbot check \
+            --repo ${{ github.workspace }} \
+            --output json > finishingbot-results.json
+
+      - name: Display results
+        if: always()
+        run: |
+          if [ -f finishingbot-results.json ]; then
+            echo "## Finishingbot Results" >> $GITHUB_STEP_SUMMARY
+            cat finishingbot-results.json | jq -r '.findings[] | "- [\(.severity)] \(.message)"' >> $GITHUB_STEP_SUMMARY || true
+          fi
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595  # v4
+        with:
+          name: finishingbot-results
+          path: finishingbot-results.json
+          if-no-files-found: ignore
+
+      - name: Fail on high-severity findings
+        if: steps.finishingbot.outcome == 'failure'
+        run: exit 1

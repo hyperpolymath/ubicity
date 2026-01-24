@@ -1,0 +1,63 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Rhodibot - RSR compliance checking
+# Part of gitbot-fleet
+
+name: Rhodibot RSR Compliance
+
+permissions: read-all
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  rsr-compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@6d9817901c499d6b02debbb57edb38d33daa680b  # stable
+        with:
+          toolchain: stable
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@ad397744b0d591a723ab90405b7247fac0e6b8db  # v2
+
+      - name: Clone rhodibot
+        run: |
+          git clone https://github.com/hyperpolymath/rhodibot.git /tmp/rhodibot
+          cd /tmp/rhodibot
+          cargo build --release
+
+      - name: Run rhodibot check
+        id: rhodibot
+        continue-on-error: true
+        run: |
+          /tmp/rhodibot/target/release/rhodibot check \
+            --repo ${{ github.workspace }} \
+            --policy standard \
+            --output json > rhodibot-results.json
+
+      - name: Display results
+        if: always()
+        run: |
+          if [ -f rhodibot-results.json ]; then
+            echo "## Rhodibot RSR Compliance Results" >> $GITHUB_STEP_SUMMARY
+            cat rhodibot-results.json | jq -r '.violations[] | "- [\(.severity)] \(.check): \(.message)"' >> $GITHUB_STEP_SUMMARY || true
+          fi
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595  # v4
+        with:
+          name: rhodibot-results
+          path: rhodibot-results.json
+          if-no-files-found: ignore
+
+      - name: Fail on high-severity violations
+        if: steps.rhodibot.outcome == 'failure'
+        run: exit 1

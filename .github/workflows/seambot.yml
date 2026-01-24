@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Seambot - Seam hygiene and integration health
+# Part of gitbot-fleet
+
+name: Seambot Integration Health
+
+permissions: read-all
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  seam-health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@6d9817901c499d6b02debbb57edb38d33daa680b  # stable
+        with:
+          toolchain: stable
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@ad397744b0d591a723ab90405b7247fac0e6b8db  # v2
+
+      - name: Clone seambot
+        run: |
+          git clone https://github.com/hyperpolymath/seambot.git /tmp/seambot
+          cd /tmp/seambot
+          cargo build --release
+
+      - name: Check for SEAM_REGISTER
+        id: check-seam
+        run: |
+          if [ -f SEAM_REGISTER ]; then
+            echo "has_seam=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_seam=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run seambot check
+        if: steps.check-seam.outputs.has_seam == 'true'
+        id: seambot
+        continue-on-error: true
+        run: |
+          /tmp/seambot/target/release/seambot check \
+            --repo ${{ github.workspace }} \
+            --output json > seambot-results.json
+
+      - name: Display results
+        if: always() && steps.check-seam.outputs.has_seam == 'true'
+        run: |
+          if [ -f seambot-results.json ]; then
+            echo "## Seambot Integration Health Results" >> $GITHUB_STEP_SUMMARY
+            cat seambot-results.json | jq -r '.findings[] | "- [\(.severity)] \(.message)"' >> $GITHUB_STEP_SUMMARY || true
+          fi
+
+      - name: Skip message
+        if: steps.check-seam.outputs.has_seam == 'false'
+        run: |
+          echo "## Seambot - Skipped" >> $GITHUB_STEP_SUMMARY
+          echo "No SEAM_REGISTER found. Seambot checks are not applicable to this repository." >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload results
+        if: always() && steps.check-seam.outputs.has_seam == 'true'
+        uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595  # v4
+        with:
+          name: seambot-results
+          path: seambot-results.json
+          if-no-files-found: ignore
