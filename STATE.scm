@@ -15,7 +15,7 @@
   '((version . "0.2.0")
     (schema-version . "1.0")
     (created . "2025-12-15")
-    (updated . "2026-01-23T22:40:00Z")
+    (updated . "2026-01-24T01:00:00Z")
     (project . "ubicity")
     (repo . "github.com/hyperpolymath/ubicity")))
 
@@ -213,7 +213,27 @@
 
 (define session-history
   '((snapshots
-     (((date . "2026-01-23")
+     (((date . "2026-01-24")
+       (session . "seam-documentation-gitbot-fixes")
+       (accomplishments
+        ("Created comprehensive seam documentation for ubicity architecture"
+         "Defined 4 architectural seams (privacy-boundary, cli-core, data-analysis, analysis-export)"
+         "privacy-boundary: Ring 0 security seam with PII protection invariants"
+         "cli-core: Ring 1 separation of UI from business logic"
+         "data-analysis: Ring 1 data validation boundary"
+         "analysis-export: Ring 2 computation vs presentation boundary"
+         "Created spec/seams/ directory structure (checklists, conformance, freeze-stamps)"
+         "Wrote conformance examples for all 4 seams (privacy, cli-core, data-analysis, analysis-export)"
+         "Wrote implementation checklists for all 4 seams"
+         "Created seam-register.json (machine-readable) and seam-register.adoc (human-readable)"
+         "seambot check now passes ✓ (4/4 seams checked, 0 errors)"
+         "Fixed seambot.yml workflow (correct seam register path, proper command)"
+         "Fixed finishingbot.yml workflow (repo name: finishing-bot, command: audit)"
+         "Fixed rhodibot.yml workflow (CLI args: --owner/--repo instead of --repo path)"
+         "All gitbot-fleet workflows now use correct bot CLIs"))
+       (notes . "Seam-driven architecture documentation complete - gitbot-fleet integration now functional"))
+
+      ((date . "2026-01-23")
        (session . "gitbot-fleet-integration")
        (accomplishments
         ("Created finishingbot.yml workflow (release readiness validation)"
