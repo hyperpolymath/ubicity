@@ -1,0 +1,36 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+= Privacy Boundary Seam Implementation Checklist
+:seam-id: privacy-boundary
+
+== Pre-Implementation
+
+[ ] Review conformance examples: link:../conformance/privacy-boundary-conformance.adoc[]
+[ ] Understand critical invariants: no-pii-in-exports, gps-fuzzing-required, learner-id-hashing, pii-pattern-removal
+[ ] This is a Ring 0 (security) seam - violations are critical
+
+== Implementation
+
+[ ] All export functions call Privacy.generateShareableDataset() or equivalent
+[ ] GPS coordinates use Privacy.anonymizeLocation() with fuzzCoordinates: true
+[ ] Learner IDs use Privacy.anonymizeLearner() with hashId: true
+[ ] Text fields use Privacy.sanitizeText() to remove PII patterns
+
+== Post-Implementation
+
+[ ] Privacy tests pass (test/privacy.test.mjs)
+[ ] Manual review of exported sample data (no emails, precise GPS, real names)
+[ ] k-anonymity check: no aggregates with < 3 individuals
+
+== Invariant Verification
+
+* **no-pii-in-exports**: Manual inspection of CSV/GeoJSON/HTML exports
+* **gps-fuzzing-required**: Automated test in test/privacy.test.mjs
+* **learner-id-hashing**: Automated test in test/privacy.test.mjs  
+* **pii-pattern-removal**: Automated test in test/privacy.test.mjs
+
+== Security Review
+
+[ ] No PII patterns (@, phone numbers, SSN) in exported files
+[ ] GPS coordinates rounded to ~110m grid
+[ ] Learner IDs irreversible (cryptographic hash)
+[ ] Filenames don't leak identity

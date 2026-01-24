@@ -1,0 +1,269 @@
+= CLI to Core Module Boundary Conformance Examples
+:seam-id: cli-core
+:seam-type: module
+:ring: 1
+
+== Overview
+
+The CLI-Core seam separates interactive user interface from core business logic. CLI modules (Capture.res, CaptureCLI.res) handle user interaction and delegate all data operations to core modules (UbiCity.res, Mapper.res, Decoder.res).
+
+== Conformant Patterns
+
+=== ✓ CLI delegates to Mapper for storage
+
+[source,rescript]
+----
+// CORRECT: Capture.res delegates to Mapper
+// File: Capture.res
+
+let captureExperience = async (
+  ~learnerId: string,
+  ~locationName: string,
+  ~experienceType: string,
+  ~description: string,
+) => {
+  // 1. Build experience using UbiCity types (validation happens here)
+  let learner = Learner.make(~id=learnerId, ())
+  let location = Location.make(~name=locationName, ())
+  // ...
+
+  let experience = LearningExperience.make(
+    ~learner, ~context, ~experience, ()
+  )
+
+  // 2. Delegate storage to Mapper ✓
+  let mapper = await Mapper.make()
+  await Mapper.captureExperience(mapper, experience)
+}
+----
+
+=== ✓ Validation in core modules
+
+[source,rescript]
+----
+// CORRECT: Validation in UbiCity.res, not CLI
+// File: UbiCity.res
+
+module Location = {
+  let make = (~name: string, ~coordinates=?, ~type_=?, ~address=?, ()) => {
+    // Validation here ✓
+    if String.trim(name) == "" {
+      Error("Location name is required")
+    } else {
+      Ok({name, coordinates, type_, address})
+    }
+  }
+}
+
+// CLI just calls it:
+// File: Capture.res
+let location = Location.make(~name=userInput, ())
+switch location {
+| Ok(loc) => // Continue
+| Error(msg) => Console.error(msg) // Display error only
+}
+----
+
+=== ✓ CLI has no business logic
+
+[source,rescript]
+----
+// CORRECT: CLI only handles presentation
+// File: CaptureCLI.res
+
+let promptForExperienceType = async () => {
+  Console.log("Type (experiment/workshop/observation/conversation/reading/making):")
+  let input = await readline()
+
+  // No validation here - just get input ✓
+  // Validation happens in UbiCity.ExperienceType
+  input
+}
+----
+
+== Non-Conformant Patterns
+
+=== ✗ CLI directly manipulates files
+
+[source,rescript]
+----
+// WRONG: Capture.res directly writes to storage
+// File: Capture.res
+
+let captureExperience = async (~experience) => {
+  let json = JSON.stringify(experience)
+
+  // ❌ CLI should NEVER touch file system directly
+  NodeJs.Fs.writeFileSync(
+    "data/experiences.json",
+    json,
+  )
+}
+----
+
+**Violation**: `no-direct-storage` invariant violated
+
+**Fix**: Use `Mapper.captureExperience()` instead
+
+=== ✗ Validation in CLI
+
+[source,rescript]
+----
+// WRONG: CLI validates input instead of delegating to core
+// File: Capture.res
+
+let validateLocationName = (name: string) => {
+  // ❌ Validation logic belongs in UbiCity.Location.make()
+  if String.length(name) < 3 {
+    Error("Location name must be at least 3 characters")
+  } else if String.length(name) > 100 {
+    Error("Location name too long")
+  } else {
+    Ok(name)
+  }
+}
+----
+
+**Violation**: `validation-in-core` invariant violated
+
+**Fix**: Move validation to `UbiCity.Location.make()`
+
+=== ✗ Business logic in CLI
+
+[source,rescript]
+----
+// WRONG: CLI calculates domain-specific values
+// File: CaptureCLI.res
+
+let generateExperienceId = () => {
+  // ❌ ID generation is business logic, belongs in UbiCity.res
+  let timestamp = Date.now()->Float.toString
+  let random = Math.random()->Float.toString
+  "ubi-" ++ timestamp ++ "-" ++ random
+}
+----
+
+**Violation**: `no-business-logic-in-cli` invariant violated
+
+**Fix**: Use `UbiCity.LearningExperience.generateId()` instead
+
+=== ✗ CLI queries storage directly
+
+[source,rescript]
+----
+// WRONG: CLI reads experiences for count
+// File: CaptureCLI.res
+
+let showExperienceCount = async () => {
+  // ❌ CLI shouldn't read storage directly
+  let json = NodeJs.Fs.readFileSync("data/experiences.json", #utf8)
+  let data = JSON.parse(json)
+  let count = Array.length(data.experiences)
+
+  Console.log(`Total experiences: ${count->Int.toString}`)
+}
+----
+
+**Violation**: `no-direct-storage` invariant violated
+
+**Fix**: Use `Mapper.loadAll()` and count the result
+
+== Correct Interaction Flow
+
+[source,text]
+----
+User Input
+    ↓
+CaptureCLI.res (prompt, display)
+    ↓
+Capture.res (orchestrate)
+    ↓
+UbiCity.res (validate, build types)
+    ↓
+Mapper.res (store, query)
+    ↓
+File System
+----
+
+== Edge Cases
+
+=== Interactive prompts with defaults
+
+[source,rescript]
+----
+// OK: CLI can have default values for UX
+let promptWithDefault = async (~prompt: string, ~default: string) => {
+  Console.log(`${prompt} (default: ${default}):`)
+  let input = await readline()
+
+  // Providing default is presentation logic ✓
+  if String.trim(input) == "" {
+    default
+  } else {
+    input
+  }
+}
+
+// But validation still in core:
+let privacy = Privacy.make(~level=userInput)  // Validates in UbiCity.res
+----
+
+=== Error formatting
+
+[source,rescript]
+----
+// OK: CLI can format error messages for display
+// File: Capture.res
+
+let formatError = (error: string) => {
+  // Formatting for user-friendly display ✓
+  `❌ Error: ${error}`
+}
+
+// But the error itself comes from core:
+switch Location.make(~name=input, ()) {
+| Error(msg) => Console.error(formatError(msg))  // ✓
+| Ok(loc) => // Continue
+}
+----
+
+== Testing CLI-Core Boundary
+
+[source,rescript]
+----
+// Unit test: Core modules don't import CLI modules
+// File: test/seam-cli-core.test.mjs
+
+test('UbiCity.res does not import Capture.res', async () => {
+  const source = fs.readFileSync('src-rescript/UbiCity.res', 'utf-8');
+  assert(!source.includes('Capture'));
+  assert(!source.includes('CaptureCLI'));
+});
+
+test('Mapper.res does not import Capture.res', async () => {
+  const source = fs.readFileSync('src-rescript/Mapper.res', 'utf-8');
+  assert(!source.includes('Capture'));
+});
+----
+
+== Compliance Checklist
+
+When modifying CLI modules:
+
+- [ ] No `NodeJs.Fs` calls in Capture.res or CaptureCLI.res
+- [ ] No validation logic in CLI (delegate to UbiCity.res)
+- [ ] No business logic calculations in CLI
+- [ ] CLI only uses Mapper for storage/queries
+- [ ] Error messages from core modules, only formatted in CLI
+
+When modifying core modules:
+
+- [ ] No imports from Capture.res or CaptureCLI.res
+- [ ] No `Console.log` or user-facing output (return values/errors)
+- [ ] No assumptions about CLI presentation
+
+== References
+
+- CLI modules: `src-rescript/Capture.res`, `src-rescript/CaptureCLI.res`
+- Core modules: `src-rescript/UbiCity.res`, `src-rescript/Mapper.res`
+- CLI tests: `test/cli-smoke.test.mjs`

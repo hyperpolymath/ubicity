@@ -1,0 +1,284 @@
+= Data Layer to Analysis Logic Boundary Conformance Examples
+:seam-id: data-analysis
+:seam-type: module
+:ring: 1
+
+== Overview
+
+The Data-Analysis seam separates data decoding/storage from analysis logic. Decoder.res and Mapper.res (storage functions) provide validated domain types to Mapper.res (query functions) and Analysis.res.
+
+== Conformant Patterns
+
+=== ✓ Analysis consumes validated types
+
+[source,rescript]
+----
+// CORRECT: Analysis.res receives validated types
+// File: Analysis.res
+
+module TemporalAnalyzer = {
+  // Accepts array of validated LearningExperience ✓
+  let analyzeByTimeOfDay = (experiences: array<LearningExperience.t>) => {
+    experiences
+    ->Array.map(exp => {
+      // Work with typed fields ✓
+      let hour = parseHour(exp.timestamp)
+      classifyTimeOfDay(hour)
+    })
+    ->aggregateCounts
+  }
+}
+----
+
+=== ✓ Decoder validates before analysis
+
+[source,rescript]
+----
+// CORRECT: Decoder ensures valid types
+// File: Decoder.res
+
+let decodeExperiences = (json: JSON.t): result<array<LearningExperience.t>, string> => {
+  // Decode and validate ✓
+  switch JSON.Decode.array(decodeLearningExperience, json) {
+  | Ok(experiences) => Ok(experiences)
+  | Error(_) => Error("Invalid experience data")
+  }
+}
+
+// Mapper loads and validates:
+// File: Mapper.res
+let loadAll = async (mapper) => {
+  let json = readFile(mapper.dataPath)
+  switch Decoder.decodeExperiences(json) {
+  | Ok(exps) => exps  // Guaranteed valid ✓
+  | Error(e) => []
+  }
+}
+----
+
+=== ✓ Analysis uses Mapper queries, not file system
+
+[source,rescript]
+----
+// CORRECT: Analysis calls Mapper, not file system
+// File: Analysis.res
+
+module RecommendationEngine = {
+  let recommendSimilarLearners = async (
+    ~learnerId: string,
+    ~topN: int,
+  ) => {
+    // Use Mapper query functions ✓
+    let mapper = await Mapper.make()
+    let allExperiences = await Mapper.loadAll(mapper)
+
+    // Analysis logic works with types ✓
+    computeSimilarity(allExperiences, learnerId)
+    ->Array.slice(~start=0, ~end=topN)
+  }
+}
+----
+
+== Non-Conformant Patterns
+
+=== ✗ Analysis works with raw JSON
+
+[source,rescript]
+----
+// WRONG: Analysis.res directly parses JSON
+// File: Analysis.res
+
+let analyzeByTimeOfDay = (jsonData: string) => {
+  // ❌ Analysis should receive validated types, not JSON
+  let data = JSON.parse(jsonData)
+
+  // ❌ Accessing untyped fields
+  data.experiences->Array.map(exp => {
+    let timestamp = exp["timestamp"]  // Unsafe!
+    // ...
+  })
+}
+----
+
+**Violation**: `no-raw-json` invariant violated
+
+**Fix**: Accept `array<LearningExperience.t>` instead
+
+=== ✗ Analysis reads files directly
+
+[source,rescript]
+----
+// WRONG: Analysis.res accesses file system
+// File: Analysis.res
+
+module CollaborativeNetworkAnalyzer = {
+  let buildCollaborationNetwork = async () => {
+    // ❌ Analysis shouldn't know about file paths
+    let json = NodeJs.Fs.readFileSync("data/experiences.json", #utf8)
+    let experiences = JSON.parse(json).experiences
+
+    // Analysis logic...
+  }
+}
+----
+
+**Violation**: `storage-abstraction` invariant violated
+
+**Fix**: Accept `experiences` parameter from Mapper.loadAll()
+
+=== ✗ Unvalidated data passed to analysis
+
+[source,rescript]
+----
+// WRONG: Skipping validation
+// File: Mapper.res
+
+let loadAll = async (mapper) => {
+  let json = readFile(mapper.dataPath)
+
+  // ❌ Returning raw parsed data without validation
+  JSON.parse(json).experiences
+}
+
+// Now Analysis.res receives potentially invalid data ❌
+----
+
+**Violation**: `validated-types-only` invariant violated
+
+**Fix**: Always use `Decoder.decodeExperiences()` before returning
+
+=== ✗ Analysis performs I/O operations
+
+[source,rescript]
+----
+// WRONG: Analysis writes intermediate results
+// File: Analysis.res
+
+let detectStreaks = (experiences) => {
+  let streaks = computeStreaks(experiences)
+
+  // ❌ Analysis shouldn't write files
+  NodeJs.Fs.writeFileSync(
+    "cache/streaks.json",
+    JSON.stringify(streaks)
+  )
+
+  streaks
+}
+----
+
+**Violation**: `storage-abstraction` invariant violated
+
+**Fix**: Return streaks, let caller decide about caching
+
+== Correct Data Flow
+
+[source,text]
+----
+File System
+    ↓
+Mapper.loadAll() (read file)
+    ↓
+Decoder.decodeExperiences() (validate)
+    ↓
+array<LearningExperience.t> (typed)
+    ↓
+Analysis.* (pure computation)
+    ↓
+Results (typed)
+----
+
+== Edge Cases
+
+=== Mapper as both data layer and query layer
+
+[source,rescript]
+----
+// OK: Mapper.res can have both responsibilities
+// File: Mapper.res
+
+// Data layer functions (this side of seam):
+let captureExperience = async (mapper, experience) => {
+  // Storage logic
+}
+
+let loadAll = async (mapper) => {
+  // Load and validate
+}
+
+// Query layer functions (other side of seam):
+let getByLocation = (mapper, locationName) => {
+  // Filter loaded experiences
+}
+
+let identifyHotspots = (mapper) => {
+  // Analyze loaded experiences
+}
+
+// This is acceptable - Mapper bridges both sides ✓
+----
+
+=== Analysis that needs partial data
+
+[source,rescript]
+----
+// OK: Analysis can accept filtered subsets
+// File: Analysis.res
+
+let analyzeByDomain = (
+  experiences: array<LearningExperience.t>,  // Subset OK ✓
+  ~domain: string,
+) => {
+  // Works with already-filtered data ✓
+  experiences
+  ->Array.filter(exp =>
+    exp.experience.domains->Array.includes(domain)
+  )
+  ->computeStatistics
+}
+
+// Caller filters using Mapper:
+let roboticsExperiences = Mapper.getByDomain(mapper, "robotics")
+let stats = Analysis.analyzeByDomain(roboticsExperiences, "robotics")
+----
+
+== Type Safety Verification
+
+[source,rescript]
+----
+// ReScript type system enforces this seam ✓
+
+// If Analysis.res tries to accept JSON:
+let analyzeByTimeOfDay = (jsonData: JSON.t) => {  // ❌ Type error!
+  // Can't access .timestamp on JSON.t
+  jsonData.timestamp  // Compiler error
+}
+
+// Must use typed domain model:
+let analyzeByTimeOfDay = (experiences: array<LearningExperience.t>) => {
+  experiences->Array.map(exp => exp.timestamp)  // ✓ Type safe
+}
+----
+
+== Compliance Checklist
+
+When modifying Data layer (Decoder, Mapper storage):
+
+- [ ] All public functions return `result<T, string>` or validated types
+- [ ] No direct type casting (Obj.magic, %raw, etc.)
+- [ ] Validation errors are descriptive
+- [ ] File I/O only in Mapper.res, never in Decoder.res
+
+When modifying Analysis layer:
+
+- [ ] Functions accept typed parameters (never JSON or string)
+- [ ] No file system imports (NodeJs.Fs, etc.)
+- [ ] No assumptions about data source (could be in-memory, file, API)
+- [ ] Pure functions where possible (deterministic given same input)
+
+== References
+
+- Data layer: `src-rescript/Decoder.res`, `src-rescript/Mapper.res` (storage)
+- Analysis layer: `src-rescript/Analysis.res`, `src-rescript/Mapper.res` (queries)
+- Domain types: `src-rescript/UbiCity.res`
+- Tests: `test/decoder.test.mjs`, `test/analysis.test.mjs`

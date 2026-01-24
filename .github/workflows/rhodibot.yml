@@ -38,16 +38,25 @@ jobs:
         continue-on-error: true
         run: |
           /tmp/rhodibot/target/release/rhodibot check \
-            --repo ${{ github.workspace }} \
-            --policy standard \
-            --output json > rhodibot-results.json
+            --owner ${{ github.repository_owner }} \
+            --repo ${{ github.event.repository.name }} > rhodibot-results.txt 2>&1
+          echo $? > rhodibot-exit-code.txt
 
       - name: Display results
         if: always()
         run: |
-          if [ -f rhodibot-results.json ]; then
+          if [ -f rhodibot-results.txt ]; then
             echo "## Rhodibot RSR Compliance Results" >> $GITHUB_STEP_SUMMARY
-            cat rhodibot-results.json | jq -r '.violations[] | "- [\(.severity)] \(.check): \(.message)"' >> $GITHUB_STEP_SUMMARY || true
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat rhodibot-results.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+
+            exit_code=$(cat rhodibot-exit-code.txt)
+            if [ "$exit_code" = "0" ]; then
+              echo "✅ RSR compliance checks passed" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ RSR compliance issues found (exit code: $exit_code)" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
 
       - name: Upload results
@@ -55,7 +64,7 @@ jobs:
         uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595  # v4
         with:
           name: rhodibot-results
-          path: rhodibot-results.json
+          path: rhodibot-results.txt
           if-no-files-found: ignore
 
       - name: Fail on high-severity violations

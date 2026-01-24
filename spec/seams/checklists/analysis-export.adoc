@@ -1,0 +1,27 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+= Analysis-Export Seam Implementation Checklist
+:seam-id: analysis-export
+
+== Pre-Implementation
+
+[ ] Review conformance examples: link:../conformance/analysis-export-conformance.adoc[]
+[ ] Understand invariants: format-agnostic-analysis, export-consumes-types, no-computation-in-export
+
+== Implementation
+
+[ ] Analysis.res functions return typed structures (not strings/CSV/HTML)
+[ ] Export.res functions only format data (no calculations)
+[ ] Visualization.res accepts pre-computed results (summary, hotspots, network)
+[ ] No statistical functions in Export/Visualization modules
+
+== Post-Implementation
+
+[ ] Analysis tests verify typed return values
+[ ] Export tests verify string output formats
+[ ] No imports from Export.res in Analysis.res
+
+== Invariant Verification
+
+* **format-agnostic-analysis**: Analysis.res should not import Export/Visualization
+* **export-consumes-types**: Type system enforces (ReScript compiler)
+* **no-computation-in-export**: Manual code review for avg/median/mode/clustering in Export.res

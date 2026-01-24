@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+= Conformance Example: Example Seam
+
+== Purpose
+
+This document demonstrates correct usage of the example-seam boundary.
+
+== Correct Usage
+
+.module-a calling module-b
+[source,rust]
+----
+// Correct: Using the declared interface
+let result = module_b::api::process(input)?;
+----
+
+== Anti-Patterns
+
+.Hidden channel via global state
+[source,rust]
+----
+// WRONG: Bypassing the seam via global state
+GLOBAL_STATE.write().unwrap().set_value(input);
+module_b::internal::read_from_global();
+----
+
+.Hidden channel via environment
+[source,rust]
+----
+// WRONG: Communicating via environment variables
+std::env::set_var("HIDDEN_DATA", input);
+module_b::internal::check_env();
+----
+
+== Invariant Verification
+
+=== no-hidden-channels
+
+Verification method: Manual review
+
+Checklist:
+* [ ] No global/static mutable state shared across seam
+* [ ] No environment variable communication
+* [ ] No file system side-channels
+* [ ] All data flows through declared interfaces

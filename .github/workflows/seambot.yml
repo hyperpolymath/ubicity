@@ -33,10 +33,10 @@ jobs:
           cd /tmp/seambot
           cargo build --release
 
-      - name: Check for SEAM_REGISTER
+      - name: Check for seam register
         id: check-seam
         run: |
-          if [ -f SEAM_REGISTER ]; then
+          if [ -f spec/seams/seam-register.json ]; then
             echo "has_seam=true" >> $GITHUB_OUTPUT
           else
             echo "has_seam=false" >> $GITHUB_OUTPUT
@@ -47,28 +47,36 @@ jobs:
         id: seambot
         continue-on-error: true
         run: |
-          /tmp/seambot/target/release/seambot check \
-            --repo ${{ github.workspace }} \
-            --output json > seambot-results.json
+          /tmp/seambot/target/release/seambot check > seambot-results.txt 2>&1
+          echo $? > seambot-exit-code.txt
 
       - name: Display results
         if: always() && steps.check-seam.outputs.has_seam == 'true'
         run: |
-          if [ -f seambot-results.json ]; then
+          if [ -f seambot-results.txt ]; then
             echo "## Seambot Integration Health Results" >> $GITHUB_STEP_SUMMARY
-            cat seambot-results.json | jq -r '.findings[] | "- [\(.severity)] \(.message)"' >> $GITHUB_STEP_SUMMARY || true
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat seambot-results.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+
+            exit_code=$(cat seambot-exit-code.txt)
+            if [ "$exit_code" = "0" ]; then
+              echo "✅ All seam checks passed" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ Seam checks failed (exit code: $exit_code)" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
 
       - name: Skip message
         if: steps.check-seam.outputs.has_seam == 'false'
         run: |
           echo "## Seambot - Skipped" >> $GITHUB_STEP_SUMMARY
-          echo "No SEAM_REGISTER found. Seambot checks are not applicable to this repository." >> $GITHUB_STEP_SUMMARY
+          echo "No spec/seams/seam-register.json found. Seambot checks are not applicable to this repository." >> $GITHUB_STEP_SUMMARY
 
       - name: Upload results
         if: always() && steps.check-seam.outputs.has_seam == 'true'
         uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595  # v4
         with:
           name: seambot-results
-          path: seambot-results.json
+          path: seambot-results.txt
           if-no-files-found: ignore

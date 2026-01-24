@@ -27,26 +27,35 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@ad397744b0d591a723ab90405b7247fac0e6b8db  # v2
 
-      - name: Clone finishingbot
+      - name: Clone finishing-bot
         run: |
-          git clone https://github.com/hyperpolymath/finishingbot.git /tmp/finishingbot
-          cd /tmp/finishingbot
+          git clone https://github.com/hyperpolymath/finishing-bot.git /tmp/finishing-bot
+          cd /tmp/finishing-bot
           cargo build --release
 
-      - name: Run finishingbot
+      - name: Run finishingbot audit
         id: finishingbot
         continue-on-error: true
         run: |
-          /tmp/finishingbot/target/release/finishingbot check \
-            --repo ${{ github.workspace }} \
-            --output json > finishingbot-results.json
+          cd ${{ github.workspace }}
+          /tmp/finishing-bot/target/release/finishingbot audit > finishingbot-results.txt 2>&1
+          echo $? > finishingbot-exit-code.txt
 
       - name: Display results
         if: always()
         run: |
-          if [ -f finishingbot-results.json ]; then
-            echo "## Finishingbot Results" >> $GITHUB_STEP_SUMMARY
-            cat finishingbot-results.json | jq -r '.findings[] | "- [\(.severity)] \(.message)"' >> $GITHUB_STEP_SUMMARY || true
+          if [ -f finishingbot-results.txt ]; then
+            echo "## Finishingbot Release Readiness Results" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat finishingbot-results.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+
+            exit_code=$(cat finishingbot-exit-code.txt)
+            if [ "$exit_code" = "0" ]; then
+              echo "✅ Release readiness checks passed" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ Release readiness checks failed (exit code: $exit_code)" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
 
       - name: Upload results
@@ -54,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595  # v4
         with:
           name: finishingbot-results
-          path: finishingbot-results.json
+          path: finishingbot-results.txt
           if-no-files-found: ignore
 
       - name: Fail on high-severity findings

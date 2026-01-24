@@ -1,0 +1,211 @@
+{
+  "version": "1.0",
+  "repository": "ubicity",
+  "seams": [
+    {
+      "id": "cli-core",
+      "name": "CLI to Core Module Boundary",
+      "description": "Separates interactive user interface from core business logic. CLI modules handle user interaction and delegate all data manipulation to core modules.",
+      "side_a": [
+        "src-rescript/Capture.res",
+        "src-rescript/CaptureCLI.res"
+      ],
+      "side_b": [
+        "src-rescript/UbiCity.res",
+        "src-rescript/Mapper.res",
+        "src-rescript/Decoder.res"
+      ],
+      "seam_type": "module",
+      "invariants": [
+        {
+          "id": "no-direct-storage",
+          "description": "CLI never directly reads/writes storage files - must go through Mapper.res",
+          "verification": "manual",
+          "severity": "error"
+        },
+        {
+          "id": "validation-in-core",
+          "description": "All data validation happens in core modules (UbiCity.res), not CLI",
+          "verification": "manual",
+          "severity": "error"
+        },
+        {
+          "id": "no-business-logic-in-cli",
+          "description": "CLI contains only presentation and user interaction logic",
+          "verification": "manual",
+          "severity": "warning"
+        }
+      ],
+      "introduced_at": "v1.0.0",
+      "frozen": false,
+      "ring": 1,
+      "checklist_path": "spec/seams/checklists/cli-core.adoc",
+      "conformance_paths": [
+        "spec/seams/conformance/cli-core-conformance.adoc"
+      ],
+      "boundary_path": "src-rescript/Capture.res",
+      "declared_dependencies": [
+        "UbiCity.res",
+        "Mapper.res"
+      ]
+    },
+    {
+      "id": "privacy-boundary",
+      "name": "Privacy Protection Boundary",
+      "description": "Security seam that ensures PII protection and anonymization. All data crossing export boundaries must pass through privacy checks.",
+      "side_a": [
+        "src-rescript/Mapper.res",
+        "src-rescript/Analysis.res",
+        "src-rescript/UbiCity.res"
+      ],
+      "side_b": [
+        "src-rescript/Privacy.res"
+      ],
+      "seam_type": "layer",
+      "invariants": [
+        {
+          "id": "no-pii-in-exports",
+          "description": "No personally identifiable information crosses export boundary without sanitization",
+          "verification": "manual",
+          "severity": "error"
+        },
+        {
+          "id": "gps-fuzzing-required",
+          "description": "GPS coordinates must be fuzzed for anonymous privacy level",
+          "verification": {
+            "automated": {
+              "test_path": "test/privacy.test.mjs"
+            }
+          },
+          "severity": "error"
+        },
+        {
+          "id": "learner-id-hashing",
+          "description": "Learner IDs must be hashed when anonymization is enabled",
+          "verification": {
+            "automated": {
+              "test_path": "test/privacy.test.mjs"
+            }
+          },
+          "severity": "error"
+        },
+        {
+          "id": "pii-pattern-removal",
+          "description": "Email, phone, SSN patterns must be redacted from free-text fields",
+          "verification": {
+            "automated": {
+              "test_path": "test/privacy.test.mjs"
+            }
+          },
+          "severity": "error"
+        }
+      ],
+      "introduced_at": "v1.0.0",
+      "frozen": false,
+      "ring": 0,
+      "checklist_path": "spec/seams/checklists/privacy-boundary.adoc",
+      "conformance_paths": [
+        "spec/seams/conformance/privacy-boundary-conformance.adoc"
+      ],
+      "boundary_path": "src-rescript/Privacy.res",
+      "declared_dependencies": []
+    },
+    {
+      "id": "data-analysis",
+      "name": "Data Layer to Analysis Logic Boundary",
+      "description": "Separates data decoding/storage from analysis logic. Ensures analysis modules work with validated domain types.",
+      "side_a": [
+        "src-rescript/Decoder.res",
+        "src-rescript/Mapper.res (storage functions)"
+      ],
+      "side_b": [
+        "src-rescript/Mapper.res (query functions)",
+        "src-rescript/Analysis.res"
+      ],
+      "seam_type": "module",
+      "invariants": [
+        {
+          "id": "validated-types-only",
+          "description": "Analysis modules only receive validated UbiCity.LearningExperience types",
+          "verification": "type_system",
+          "severity": "error"
+        },
+        {
+          "id": "no-raw-json",
+          "description": "Analysis never works with raw JSON - must use decoded types",
+          "verification": "manual",
+          "severity": "error"
+        },
+        {
+          "id": "storage-abstraction",
+          "description": "Analysis doesn't know about file system - uses Mapper query functions",
+          "verification": "manual",
+          "severity": "warning"
+        }
+      ],
+      "introduced_at": "v1.0.0",
+      "frozen": false,
+      "ring": 1,
+      "checklist_path": "spec/seams/checklists/data-analysis.adoc",
+      "conformance_paths": [
+        "spec/seams/conformance/data-analysis-conformance.adoc"
+      ],
+      "boundary_path": "src-rescript/Decoder.res",
+      "declared_dependencies": [
+        "UbiCity.res"
+      ]
+    },
+    {
+      "id": "analysis-export",
+      "name": "Analysis to Export/Visualization Boundary",
+      "description": "Separates analytical computations from presentation formats. Analysis produces structured data, Export/Visualization format it.",
+      "side_a": [
+        "src-rescript/Analysis.res",
+        "src-rescript/Mapper.res"
+      ],
+      "side_b": [
+        "src-rescript/Export.res",
+        "src-rescript/Visualization.res"
+      ],
+      "seam_type": "module",
+      "invariants": [
+        {
+          "id": "format-agnostic-analysis",
+          "description": "Analysis modules don't generate output formats (CSV, HTML, etc.) - only structured data",
+          "verification": "manual",
+          "severity": "warning"
+        },
+        {
+          "id": "export-consumes-types",
+          "description": "Export modules work with domain types, not analysis-specific structures",
+          "verification": "type_system",
+          "severity": "error"
+        },
+        {
+          "id": "no-computation-in-export",
+          "description": "Export/Visualization don't perform analysis - only format existing results",
+          "verification": "manual",
+          "severity": "warning"
+        }
+      ],
+      "introduced_at": "v1.0.0",
+      "frozen": false,
+      "ring": 2,
+      "checklist_path": "spec/seams/checklists/analysis-export.adoc",
+      "conformance_paths": [
+        "spec/seams/conformance/analysis-export-conformance.adoc"
+      ],
+      "boundary_path": "src-rescript/Export.res",
+      "declared_dependencies": [
+        "UbiCity.res",
+        "Analysis.res"
+      ]
+    }
+  ],
+  "cross_repo_seams": [],
+  "metadata": {
+    "updated_at": "2026-01-24T00:45:00Z",
+    "updated_by": "Claude Code (ubicity v1.0.0 seam documentation)",
+    "commit_hash": null
+  }
+}

@@ -1,0 +1,202 @@
+= Privacy Boundary Conformance Examples
+:seam-id: privacy-boundary
+:seam-type: security
+:ring: 0
+
+== Overview
+
+The privacy boundary is a **security seam** that protects personally identifiable information (PII) from leaking across export boundaries. This is a Ring 0 seam - violations are critical security issues.
+
+== Conformant Patterns
+
+=== ✓ Anonymizing before export
+
+[source,javascript]
+----
+// CORRECT: Anonymize before exporting
+import { generateShareableDataset } from './Privacy.res.js';
+
+const experiences = await loadAll(mapper);
+const shareable = generateShareableDataset(experiences, {
+  anonymizeLearners: true,
+  anonymizeLocations: true,
+  removePII: true,
+  includePrivate: false,
+});
+
+// Now safe to export
+const csv = exportToCSV(shareable);
+fs.writeFileSync('public-data.csv', csv);
+----
+
+=== ✓ GPS fuzzing for anonymous privacy
+
+[source,javascript]
+----
+// CORRECT: Fuzz coordinates when anonymizing locations
+import { anonymizeLocation } from './Privacy.res.js';
+
+const anonExperience = anonymizeLocation(experience, {
+  fuzzCoordinates: true,  // Required for anonymous level
+  removeAddress: true,
+});
+
+// Coordinates now rounded to ~110m grid
+----
+
+=== ✓ Learner ID hashing
+
+[source,javascript]
+----
+// CORRECT: Hash learner IDs when sharing data
+import { anonymizeLearner } from './Privacy.res.js';
+
+const anonExperience = anonymizeLearner(experience, {
+  hashId: true,           // "alice-maker" → "8f3a2b..."
+  removeInterests: true,  // Strips potentially identifying interests
+});
+----
+
+=== ✓ PII pattern removal from text
+
+[source,javascript]
+----
+// CORRECT: Sanitize text fields before export
+import { sanitizeText } from './Privacy.res.js';
+
+const notes = "Contact me at alice@example.com or 555-123-4567";
+const cleaned = sanitizeText(notes);
+// Result: "Contact me at [EMAIL] or [PHONE]"
+----
+
+== Non-Conformant Patterns
+
+=== ✗ Exporting raw data without anonymization
+
+[source,javascript]
+----
+// WRONG: Exports raw data with PII
+const experiences = await loadAll(mapper);
+const csv = exportToCSV(experiences);  // ❌ Contains real learner IDs, GPS, emails
+fs.writeFileSync('public-data.csv', csv);
+----
+
+**Violation**: `no-pii-in-exports` invariant violated
+
+**Fix**: Use `generateShareableDataset()` first
+
+=== ✗ GPS coordinates without fuzzing
+
+[source,javascript]
+----
+// WRONG: Anonymizes learner but keeps precise GPS
+const anonExperience = anonymizeLearner(experience, { hashId: true });
+const geojson = exportToGeoJSON([anonExperience]);
+// ❌ GeoJSON still has precise coordinates (de-anonymizable)
+----
+
+**Violation**: `gps-fuzzing-required` invariant violated
+
+**Fix**: Also call `anonymizeLocation()` with `fuzzCoordinates: true`
+
+=== ✗ Learner IDs in exported filenames
+
+[source,javascript]
+----
+// WRONG: Learner ID in filename
+const experiences = getByLearner(mapper, "alice-maker");
+const markdown = exportJourneysToMarkdown(experiences);
+fs.writeFileSync('journey-alice-maker.md', markdown);
+// ❌ Filename leaks identity even if content anonymized
+----
+
+**Violation**: `no-pii-in-exports` invariant violated
+
+**Fix**: Use anonymized ID or generic filename
+
+=== ✗ Partial anonymization
+
+[source,javascript]
+----
+// WRONG: Anonymizes some fields but misses others
+const experience = {
+  learner: { id: "8f3a2b..." },  // Hashed ✓
+  context: {
+    location: {
+      name: "Alice's Home Workshop",  // ❌ PII in location name
+      coordinates: { lat: 40.748817, lon: -73.985428 }  // ❌ Precise GPS
+    }
+  },
+  experience: {
+    description: "Email alice@example.com for details"  // ❌ Email in text
+  }
+};
+----
+
+**Violations**: Multiple PII leaks despite hashed ID
+
+**Fix**: Use `fullyAnonymize()` to ensure comprehensive sanitization
+
+== Edge Cases
+
+=== Aggregate data that's still identifiable
+
+[source,javascript]
+----
+// CAREFUL: Aggregates can still leak identity
+const hotspots = identifyHotspots(mapper);
+// If a location has only 1 learner, that learner is identifiable
+// even with hashed IDs
+----
+
+**Mitigation**: Filter out hotspots with < N learners (k-anonymity)
+
+=== Cross-referencing attacks
+
+[source,javascript]
+----
+// CAREFUL: Multiple anonymized datasets can be cross-referenced
+// Dataset 1: Learner A visited locations [X, Y, Z]
+// Dataset 2: Learner B interested in [robotics, art]
+// If only one person visited X+Y+Z, they're identifiable
+----
+
+**Mitigation**: Document this limitation, advise against publishing multiple anonymized datasets from same source
+
+== Testing Privacy Invariants
+
+[source,javascript]
+----
+// Test: Verify no PII patterns in anonymized data
+import { fullyAnonymize } from './Privacy.res.js';
+
+const experience = createTestExperience({
+  learner: { id: "alice@example.com" },  // Email as ID
+  notes: "Call me at 555-1234"
+});
+
+const anon = fullyAnonymize(experience);
+
+// Assert no PII patterns
+assert(!JSON.stringify(anon).includes('@'));
+assert(!JSON.stringify(anon).includes('555'));
+assert(!JSON.stringify(anon).includes('alice'));
+----
+
+== Compliance Checklist
+
+Before exporting data:
+
+- [ ] All learner IDs hashed (if anonymizing learners)
+- [ ] GPS coordinates fuzzed (if anonymizing locations)
+- [ ] Email/phone/SSN patterns removed from all text fields
+- [ ] Location names don't reveal identity ("Alice's Workshop" → "Community Workshop")
+- [ ] Interests lists don't reveal identity
+- [ ] Filenames don't contain PII
+- [ ] Aggregate data maintains k-anonymity (k ≥ 3 recommended)
+
+== References
+
+- Privacy.res module: `src-rescript/Privacy.res`
+- Privacy tests: `test/privacy.test.mjs`
+- GDPR considerations: See `docs/PRIVACY.md` (TODO)

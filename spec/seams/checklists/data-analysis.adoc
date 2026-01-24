@@ -1,0 +1,27 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+= Data-Analysis Seam Implementation Checklist
+:seam-id: data-analysis
+
+== Pre-Implementation
+
+[ ] Review conformance examples: link:../conformance/data-analysis-conformance.adoc[]
+[ ] Understand invariants: validated-types-only, no-raw-json, storage-abstraction
+
+== Implementation
+
+[ ] Analysis.res functions accept array<LearningExperience.t> parameters
+[ ] No JSON.parse() calls in Analysis.res
+[ ] Analysis uses Mapper.loadAll() / Mapper.getBy*() for data access
+[ ] Decoder.res validates all JSON before returning to analysis
+
+== Post-Implementation
+
+[ ] Type checker enforces typed parameters (ReScript compilation)
+[ ] No NodeJs.Fs imports in Analysis.res
+[ ] Decoder tests verify validation catches invalid data
+
+== Invariant Verification
+
+* **validated-types-only**: Type system enforces (ReScript compiler)
+* **no-raw-json**: grep -r "JSON.parse" src-rescript/Analysis.res (should be empty)
+* **storage-abstraction**: grep -r "NodeJs.Fs" src-rescript/Analysis.res (should be empty)

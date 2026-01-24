@@ -1,0 +1,313 @@
+= Analysis to Export/Visualization Boundary Conformance Examples
+:seam-id: analysis-export
+:seam-type: module
+:ring: 2
+
+== Overview
+
+The Analysis-Export seam separates analytical computations from presentation formats. Analysis modules produce structured data (typed results), Export/Visualization modules format them for consumption (CSV, HTML, GeoJSON, etc.).
+
+== Conformant Patterns
+
+=== ✓ Analysis produces typed results
+
+[source,rescript]
+----
+// CORRECT: Analysis returns structured types
+// File: Analysis.res
+
+module TemporalAnalyzer = {
+  type timeOfDayCount = {
+    morning: int,
+    afternoon: int,
+    evening: int,
+    night: int,
+  }
+
+  let analyzeByTimeOfDay = (experiences): timeOfDayCount => {
+    // Returns typed data structure ✓
+    {
+      morning: countMatching(experiences, isMorning),
+      afternoon: countMatching(experiences, isAfternoon),
+      evening: countMatching(experiences, isEvening),
+      night: countMatching(experiences, isNight),
+    }
+  }
+}
+
+// Export consumes the typed result:
+// File: Export.res
+let results = TemporalAnalyzer.analyzeByTimeOfDay(experiences)
+let csv = `morning,${results.morning->Int.toString}\n...`
+----
+
+=== ✓ Export formats existing data
+
+[source,rescript]
+----
+// CORRECT: Export.res formats, doesn't compute
+// File: Export.res
+
+let exportToCSV = (experiences: array<LearningExperience.t>): string => {
+  // Just formatting ✓
+  let header = "id,timestamp,learner,location,type,description\n"
+  let rows = experiences
+    ->Array.map(exp => {
+      // Format each field ✓
+      `${exp.id},${exp.timestamp},${exp.learner.id},...`
+    })
+    ->Array.join("\n")
+
+  header ++ rows
+}
+----
+
+=== ✓ Visualization generates presentation, not insights
+
+[source,rescript]
+----
+// CORRECT: Visualization.res generates HTML from pre-computed data
+// File: Visualization.res
+
+let generateHTML = (
+  ~summary: summary,        // Pre-computed
+  ~hotspots: array<hotspot>, // Pre-computed
+  ~network: network,         // Pre-computed
+  ~coordsCount: int,         // Pre-computed
+) => {
+  // Just renders to HTML ✓
+  `<!DOCTYPE html>
+  <html>
+    <body>
+      <h1>Total Experiences: ${summary.totalExperiences->Int.toString}</h1>
+      ${renderHotspots(hotspots)}
+      ${renderNetwork(network)}
+    </body>
+  </html>`
+}
+----
+
+== Non-Conformant Patterns
+
+=== ✗ Export performs analysis
+
+[source,rescript]
+----
+// WRONG: Export.res calculates statistics
+// File: Export.res
+
+let exportToCSV = (experiences: array<LearningExperience.t>): string => {
+  let header = "id,timestamp,learner,location,type,description\n"
+
+  // ❌ Computing statistics during export
+  let avgPerDay = experiences->Array.length / getDayCount(experiences)
+  let topDomain = findMostCommonDomain(experiences)
+
+  let summaryRow = `SUMMARY,${avgPerDay},${topDomain}\n`
+
+  // This is analysis, not formatting ❌
+  summaryRow ++ formatRows(experiences)
+}
+----
+
+**Violation**: `no-computation-in-export` invariant violated
+
+**Fix**: Move calculations to Analysis.res, pass results to Export
+
+=== ✗ Analysis generates output formats
+
+[source,rescript]
+----
+// WRONG: Analysis.res returns CSV string
+// File: Analysis.res
+
+module TemporalAnalyzer = {
+  let analyzeByTimeOfDay = (experiences): string => {
+    let counts = computeCounts(experiences)
+
+    // ❌ Generating CSV is export responsibility
+    `morning,${counts.morning}\nafternoon,${counts.afternoon}...`
+  }
+}
+----
+
+**Violation**: `format-agnostic-analysis` invariant violated
+
+**Fix**: Return typed structure, let Export.res create CSV
+
+=== ✗ Export works with analysis-specific structures
+
+[source,rescript]
+----
+// WRONG: Export coupled to Analysis internals
+// File: Export.res
+
+type analysisInternal = {
+  // ❌ This is Analysis.res internal structure
+  rawCounts: array<int>,
+  buckets: array<string>,
+  metadata: dict<string>,
+}
+
+let exportAnalysisResults = (internal: analysisInternal): string => {
+  // ❌ Export shouldn't know Analysis internals
+  internal.rawCounts->Array.mapWithIndex((count, i) => {
+    `${internal.buckets[i]},${count}`
+  })
+}
+----
+
+**Violation**: `export-consumes-types` invariant violated
+
+**Fix**: Export should work with domain types (LearningExperience.t) or public result types
+
+=== ✗ Visualization computes network layout
+
+[source,rescript]
+----
+// WRONG: Visualization.res performs graph layout
+// File: Visualization.res
+
+let generateNetworkSVG = (experiences: array<LearningExperience.t>): string => {
+  // ❌ Computing network structure is analysis
+  let nodes = extractUniqueNodes(experiences)
+  let edges = computeEdges(experiences)
+  let positions = forceDirectedLayout(nodes, edges)  // ❌ Heavy computation
+
+  // Then render...
+}
+----
+
+**Violation**: `no-computation-in-export` invariant violated
+
+**Fix**: Analysis.res computes network structure, Visualization renders it
+
+== Correct Interaction Flow
+
+[source,text]
+----
+Experiences (typed)
+    ↓
+Analysis.* (compute patterns, statistics)
+    ↓
+Results (typed: hotspot[], network, stats)
+    ↓
+Export.* OR Visualization.* (format)
+    ↓
+Output (CSV, HTML, GeoJSON, DOT, etc.)
+----
+
+== Edge Cases
+
+=== Lightweight formatting in analysis results
+
+[source,rescript]
+----
+// OK: Simple data formatting for clarity
+// File: Analysis.res
+
+type streakResult = {
+  startDate: string,  // ISO 8601 formatted ✓
+  endDate: string,
+  dayCount: int,
+  experienceCount: int,
+}
+
+let detectStreaks = (experiences) => {
+  // Computing startDate as ISO string is OK ✓
+  // This is data representation, not presentation format
+  {
+    startDate: firstExp.timestamp->formatISO,
+    endDate: lastExp.timestamp->formatISO,
+    // ...
+  }
+}
+----
+
+This is acceptable - ISO date format is data representation, not presentation.
+
+=== Export doing validation
+
+[source,rescript]
+----
+// CAREFUL: Export can validate inputs
+// File: Export.res
+
+let exportToGeoJSON = (experiences: array<LearningExperience.t>): string => {
+  // Filtering out invalid data is OK ✓
+  let validExperiences = experiences->Array.filter(exp =>
+    exp.context.location.coordinates->Option.isSome
+  )
+
+  // This is input validation, not analysis ✓
+  formatGeoJSON(validExperiences)
+}
+----
+
+This is a gray area but acceptable - Export can validate its inputs are suitable for the format.
+
+=== Analysis that outputs strings for non-format reasons
+
+[source,rescript]
+----
+// OK: Analysis can return strings if they're domain data
+// File: Analysis.res
+
+let identifyTopDomain = (experiences): option<string> => {
+  // Returning domain name as string is OK ✓
+  // This is domain data, not formatted output
+  experiences
+  ->flatMapDomains
+  ->findMostCommon
+}
+----
+
+Not a format violation - the result happens to be a string because domain names are strings.
+
+== Compliance Checklist
+
+When modifying Analysis modules:
+
+- [ ] Functions return typed structures (not strings/JSON)
+- [ ] No CSV/HTML/XML/GeoJSON generation
+- [ ] No concerns about column widths, escaping, markup
+- [ ] Results are format-agnostic (could export to any format)
+
+When modifying Export/Visualization modules:
+
+- [ ] No statistical calculations (avg, median, mode, etc.)
+- [ ] No pattern detection (clustering, trends, anomalies)
+- [ ] No network/graph algorithms (layout, centrality, etc.)
+- [ ] Work with domain types or public result types only
+
+== Testing Export-Analysis Boundary
+
+[source,javascript]
+----
+// Test: Analysis modules don't import Export modules
+// File: test/seam-analysis-export.test.mjs
+
+test('Analysis.res does not import Export.res', () => {
+  const source = fs.readFileSync('src-rescript/Analysis.res', 'utf-8');
+  assert(!source.includes('Export'));
+  assert(!source.includes('Visualization'));
+});
+
+test('Export functions return strings', () => {
+  const csv = exportToCSV(testExperiences);
+  assert(typeof csv === 'string');
+  assert(csv.includes('id,timestamp'));  // Format check
+});
+
+test('Analysis functions return typed objects', () => {
+  const result = TemporalAnalyzer.analyzeByTimeOfDay(testExperiences);
+  assert(typeof result === 'object');
+  assert(typeof result.morning === 'number');  // Type check
+});
+----
+
+== References
+
+- Analysis modules: `src-rescript/Analysis.res`, `src-rescript/Mapper.res` (hotspots, networks)
+- Export modules: `src-rescript/Export.res`, `src-rescript/Visualization.res`
+- Tests: `test/analysis.test.mjs`, `test/export.test.mjs`, `test/visualization.test.mjs`

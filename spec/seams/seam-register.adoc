@@ -1,0 +1,227 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+= UbiCity Seam Register
+:repository: ubicity
+:version: 1.0
+:toc: macro
+:toclevels: 3
+
+This document describes the architectural seams in UbiCity - the deliberate boundaries between components that encode invariants, interfaces, and isolation rules.
+
+toc::[]
+
+== Overview
+
+**Seam Philosophy**: Seams are first-class architectural artifacts that represent conceptual boundaries, not just code-level abstractions. They help us track architectural drift, find hidden channels, and maintain separation of concerns.
+
+This register tracks all declared seams and their properties.
+
+== Seam Inventory
+
+=== Security Seams (Ring 0)
+
+==== privacy-boundary
+
+[cols="1,3"]
+|===
+| ID | `privacy-boundary`
+| Type | Security
+| Ring | 0 (Critical - Security)
+| Status | Active
+| Introduced | v1.0.0
+|===
+
+**Purpose**: Protect personally identifiable information (PII) from leaking across export boundaries.
+
+**Components**:
+
+* Side A (Data sources): `Mapper.res`, `Analysis.res`, `UbiCity.res`
+* Side B (Privacy protection): `Privacy.res`
+
+**Key Invariants**:
+
+* `no-pii-in-exports`: No PII crosses export boundary without sanitization
+* `gps-fuzzing-required`: GPS coordinates must be fuzzed for anonymous privacy level
+* `learner-id-hashing`: Learner IDs must be hashed when anonymization is enabled
+* `pii-pattern-removal`: Email, phone, SSN patterns must be redacted from free-text fields
+
+**Artifacts**:
+
+* Checklist: `spec/seams/checklists/privacy-boundary.adoc` (TODO)
+* Conformance: link:conformance/privacy-boundary-conformance.adoc[Privacy Boundary Conformance Examples]
+
+=== Module Seams (Ring 1)
+
+==== cli-core
+
+[cols="1,3"]
+|===
+| ID | `cli-core`
+| Type | Module
+| Ring | 1 (Core Architecture)
+| Status | Active
+| Introduced | v1.0.0
+|===
+
+**Purpose**: Separate interactive user interface from core business logic. CLI modules handle user interaction and delegate all data manipulation to core modules.
+
+**Components**:
+
+* Side A (CLI): `Capture.res`, `CaptureCLI.res`
+* Side B (Core): `UbiCity.res`, `Mapper.res`, `Decoder.res`
+
+**Key Invariants**:
+
+* `no-direct-storage`: CLI never directly reads/writes storage files - must go through Mapper.res
+* `validation-in-core`: All data validation happens in core modules (UbiCity.res), not CLI
+* `no-business-logic-in-cli`: CLI contains only presentation and user interaction logic
+
+**Artifacts**:
+
+* Checklist: `spec/seams/checklists/cli-core.adoc` (TODO)
+* Conformance: link:conformance/cli-core-conformance.adoc[CLI-Core Conformance Examples]
+
+==== data-analysis
+
+[cols="1,3"]
+|===
+| ID | `data-analysis`
+| Type | Module
+| Ring | 1 (Core Architecture)
+| Status | Active
+| Introduced | v1.0.0
+|===
+
+**Purpose**: Separate data decoding/storage from analysis logic. Ensures analysis modules work with validated domain types.
+
+**Components**:
+
+* Side A (Data layer): `Decoder.res`, `Mapper.res (storage functions)`
+* Side B (Analysis layer): `Mapper.res (query functions)`, `Analysis.res`
+
+**Key Invariants**:
+
+* `validated-types-only`: Analysis modules only receive validated UbiCity.LearningExperience types
+* `no-raw-json`: Analysis never works with raw JSON - must use decoded types
+* `storage-abstraction`: Analysis doesn't know about file system - uses Mapper query functions
+
+**Artifacts**:
+
+* Checklist: `spec/seams/checklists/data-analysis.adoc` (TODO)
+* Conformance: link:conformance/data-analysis-conformance.adoc[Data-Analysis Conformance Examples]
+
+=== Presentation Seams (Ring 2)
+
+==== analysis-export
+
+[cols="1,3"]
+|===
+| ID | `analysis-export`
+| Type | Module
+| Ring | 2 (Presentation)
+| Status | Active
+| Introduced | v1.0.0
+|===
+
+**Purpose**: Separate analytical computations from presentation formats. Analysis produces structured data, Export/Visualization format it.
+
+**Components**:
+
+* Side A (Analysis): `Analysis.res`, `Mapper.res (hotspot/network functions)`
+* Side B (Presentation): `Export.res`, `Visualization.res`
+
+**Key Invariants**:
+
+* `format-agnostic-analysis`: Analysis modules don't generate output formats (CSV, HTML, etc.) - only structured data
+* `export-consumes-types`: Export modules work with domain types, not analysis-specific structures
+* `no-computation-in-export`: Export/Visualization don't perform analysis - only format existing results
+
+**Artifacts**:
+
+* Checklist: `spec/seams/checklists/analysis-export.adoc` (TODO)
+* Conformance: link:conformance/analysis-export-conformance.adoc[Analysis-Export Conformance Examples]
+
+== Seam Rings
+
+**Ring 0 (Security)**: Critical seams where violations are security issues.
+
+* privacy-boundary
+
+**Ring 1 (Core Architecture)**: Primary architectural boundaries that maintain system structure.
+
+* cli-core
+* data-analysis
+
+**Ring 2 (Presentation)**: Boundaries that separate presentation from logic.
+
+* analysis-export
+
+== Cross-Repository Seams
+
+None currently defined. Future integrations (e.g., with gitbot-fleet, rhodium-standard-repositories) may introduce cross-repo seams.
+
+== Machine-Readable Register
+
+The canonical machine-readable register is at `seam-register.json`.
+
+== Governance
+
+=== Adding a New Seam
+
+1. Define the seam in `seam-register.json`
+2. Create a checklist in `checklists/`
+3. Add at least one conformance example in `conformance/`
+4. Run `seambot check` to validate
+
+=== Freezing Seams
+
+When a stage is frozen (fN), all seams touched by that stage must be stamped:
+
+1. Run `seambot freeze-check --stage fN`
+2. Create freeze stamp in `freeze-stamps/fN.json`
+3. Document in release notes
+
+=== Cross-Repo Seams
+
+Seams that span multiple repositories are managed via git-loom.
+Reference them in `cross_repo_seams` section of the register.
+
+== Seam Hygiene
+
+**Checking seams**:
+
+[source,bash]
+----
+seambot check --repo .
+----
+
+**Detecting drift**:
+
+[source,bash]
+----
+seambot drift --seam-id <seam-id>
+----
+
+**Generating conformance reports**:
+
+[source,bash]
+----
+seambot conformance --output report.html
+----
+
+== Maintenance
+
+This seam register should be updated when:
+
+1. **New modules are added** - Assign to appropriate seam
+2. **Module responsibilities change** - May require seam redefinition
+3. **Invariants are violated** - Document why and update conformance examples
+4. **Seams are frozen** - Mark seam as frozen when interface is stable
+
+**Last updated**: 2026-01-24 +
+**Updated by**: Claude Code (ubicity v1.0.0 seam documentation)
+
+== References
+
+* Seam Philosophy: See seambot README for background on seam-driven architecture
+* Conformance Examples: link:conformance/[spec/seams/conformance/]
+* Implementation Checklists: link:checklists/[spec/seams/checklists/] (TODO)

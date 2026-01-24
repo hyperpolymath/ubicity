@@ -1,0 +1,27 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+= CLI-Core Seam Implementation Checklist
+:seam-id: cli-core
+
+== Pre-Implementation
+
+[ ] Review conformance examples: link:../conformance/cli-core-conformance.adoc[]
+[ ] Understand invariants: no-direct-storage, validation-in-core, no-business-logic-in-cli
+
+== Implementation
+
+[ ] CLI modules (Capture.res, CaptureCLI.res) only call Mapper.res for storage
+[ ] No NodeJs.Fs imports in CLI modules
+[ ] All validation uses UbiCity.res type constructors (Location.make, etc.)
+[ ] CLI functions return user-facing messages, not data structures
+
+== Post-Implementation
+
+[ ] Code review against conformance patterns
+[ ] No imports from Capture.res or CaptureCLI.res in core modules
+[ ] Smoke tests verify CLI starts and produces output
+
+== Invariant Verification
+
+* **no-direct-storage**: grep -r "NodeJs.Fs" src-rescript/Capture*.res (should be empty)
+* **validation-in-core**: All .make() calls should be from UbiCity module
+* **no-business-logic-in-cli**: No domain calculations in CLI (only formatting/display)
