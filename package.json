@@ -53,7 +53,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "eslint": "^8.56.0",
+    "eslint": "^9.26.0",
     "prettier": "^3.2.4",
     "@rescript/core": "^1.0.0",
     "rescript": "^11.0.0"
