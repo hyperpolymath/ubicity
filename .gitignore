@@ -82,3 +82,6 @@ htmlcov/
 /data/
 /ubicity-data/
 experiences.json
+
+# Crash recovery artifacts
+ai-cli-crash-capture/
