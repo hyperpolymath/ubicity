@@ -1,12 +1,15 @@
 // ReScript types for UbiCity domain model
-// Compiles to highly optimized JavaScript
+// These modules define the core data structures used throughout the application.
+// The ReScript compiler generates highly optimized and type-safe JavaScript from these definitions.
 
 module Coordinates = {
+  // Representation of a physical location on Earth using latitude and longitude.
   type t = {
     latitude: float,
     longitude: float,
   }
 
+  // Safe constructor for coordinates. Ensures values are within valid geographic bounds.
   let make = (~latitude: float, ~longitude: float): option<t> => {
     if latitude >= -90.0 && latitude <= 90.0 && longitude >= -180.0 && longitude <= 180.0 {
       Some({latitude, longitude})
@@ -15,6 +18,7 @@ module Coordinates = {
     }
   }
 
+  // Runtime validation for coordinates.
   let isValid = (coords: t): bool => {
     coords.latitude >= -90.0 &&
     coords.latitude <= 90.0 &&
@@ -24,13 +28,15 @@ module Coordinates = {
 }
 
 module Location = {
+  // A named place where learning occurs.
   type t = {
     name: string,
     coordinates: option<Coordinates.t>,
-    @as("type") type_: option<string>,
+    @as("type") type_: option<string>, // e.g., "makerspace", "library"
     address: option<string>,
   }
 
+  // Factory function for Location with basic validation on the 'name' field.
   let make = (~name: string, ~coordinates=?, ~type_=?, ~address=?, ()): result<t, string> => {
     if name->String.length == 0 {
       Error("Location name is required")
@@ -46,12 +52,14 @@ module Location = {
 }
 
 module Learner = {
+  // The person engaged in the learning experience.
   type t = {
-    id: string,
+    id: string, // Unique identifier or pseudonym
     name: option<string>,
     interests: option<array<string>>,
   }
 
+  // Factory function for Learner.
   let make = (~id: string, ~name=?, ~interests=?, ()): result<t, string> => {
     if id->String.length == 0 {
       Error("Learner ID is required")
@@ -62,13 +70,15 @@ module Learner = {
 }
 
 module Context = {
+  // The situational context of the learning event.
   type t = {
     location: Location.t,
-    situation: option<string>,
-    connections: option<array<string>>,
+    situation: option<string>, // Description of what was happening
+    connections: option<array<string>>, // People involved (pseudonyms or IDs)
     timeOfDay: option<[#morning | #afternoon | #evening | #night]>,
   }
 
+  // Constructor for learning context.
   let make = (
     ~location: Location.t,
     ~situation=?,
@@ -81,13 +91,15 @@ module Context = {
 }
 
 module Outcome = {
+  // The result or impact of the learning experience.
   type t = {
     success: option<bool>,
-    connections_made: option<array<string>>,
-    next_questions: option<array<string>>,
-    artifacts: option<array<string>>,
+    connections_made: option<array<string>>, // New insights or links identified
+    next_questions: option<array<string>>, // Questions that emerged from the experience
+    artifacts: option<array<string>>, // Created items (URLs, file paths, etc.)
   }
 
+  // Default empty outcome.
   let empty: t = {
     success: None,
     connections_made: None,
@@ -97,17 +109,19 @@ module Outcome = {
 }
 
 module ExperienceData = {
+  // Quantitative/Qualitative data describing the learning activity.
   type intensity = [#low | #medium | #high]
 
   type t = {
-    @as("type") type_: string,
+    @as("type") type_: string, // e.g., "experiment", "reading"
     description: string,
-    domains: option<array<string>>,
+    domains: option<array<string>>, // Subject areas involved
     outcome: option<Outcome.t>,
-    duration: option<int>,
+    duration: option<int>, // Duration in minutes
     intensity: option<intensity>,
   }
 
+  // Factory function for experience data.
   let make = (
     ~type_: string,
     ~description: string,
@@ -128,17 +142,20 @@ module ExperienceData = {
 }
 
 module Privacy = {
+  // Privacy preferences for the learning data.
   type level = [#\"private" | #anonymous | #public]
 
   type t = {
     level: level,
-    shareableWith: option<array<string>>,
+    shareableWith: option<array<string>>, // Specific groups or individuals
   }
 
+  // Helper for anonymous-by-default logic.
   let makeAnonymous: t = {level: #anonymous, shareableWith: None}
 }
 
 module LearningExperience = {
+  // The top-level container for a complete UbiCity learning capture.
   type t = {
     id: string,
     timestamp: string,
@@ -150,16 +167,18 @@ module LearningExperience = {
     version: string,
   }
 
+  // FFI: Bindings to Node.js crypto API for ID generation.
   module Crypto = {
     @module("crypto") @val external randomUUID: unit => string = "randomUUID"
   }
 
+  // ID GENERATION: Creates a unique identifier with the 'ubi-' prefix.
   let generateId = (): string => {
-    // Generate UUID v4 using crypto API
     let uuid = Crypto.randomUUID()
     "ubi-" ++ uuid
   }
 
+  // PRIMARY CONSTRUCTOR: Aggregates all components into a LearningExperience object.
   let make = (
     ~id=?,
     ~timestamp=?,
@@ -178,8 +197,9 @@ module LearningExperience = {
   }
 }
 
-// Functional utilities for analysis
+// ANALYSIS ENGINE: Functional utilities for processing learning datasets.
 module Analysis = {
+  // Returns experiences that involve more than one domain.
   let findInterdisciplinary = (experiences: array<LearningExperience.t>): array<
     LearningExperience.t,
   > => {
@@ -191,6 +211,7 @@ module Analysis = {
     })
   }
 
+  // Group experiences by the location name.
   let groupByLocation = (
     experiences: array<LearningExperience.t>,
   ): Dict.t<array<LearningExperience.t>> => {
@@ -202,6 +223,7 @@ module Analysis = {
     })
   }
 
+  // Group experiences by the learner identifier.
   let groupByLearner = (
     experiences: array<LearningExperience.t>,
   ): Dict.t<array<LearningExperience.t>> => {
@@ -213,6 +235,7 @@ module Analysis = {
     })
   }
 
+  // Calculates the number of unique domains represented in a dataset.
   let calculateDiversity = (experiences: array<LearningExperience.t>): int => {
     let domains = experiences->Array.reduce([], (acc, exp) => {
       switch exp.experience.domains {

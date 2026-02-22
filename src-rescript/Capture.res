@@ -1,21 +1,25 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// UbiCity Learning Experience Capture Tool (ReScript)
-// Quick, frictionless capture of learning moments
+// UbiCity Learning Experience Capture Tool
+// This module implements the interactive capture logic for the CLI.
 
 open UbiCity
 
+// Workflow modes for data capture.
 type captureMode = Quick | Full | Template
 
 module CaptureSession = {
+  // Session state container.
   type t = {
     mode: captureMode,
-    mapper: option<Mapper.t>,
+    mapper: option<Mapper.t>, // Initialized mapper service for storage/retrieval
   }
 
+  // Initialize a new session record.
   let make = (~mode=Quick, ()): t => {
     {mode, mapper: None}
   }
 
+  // Async initialization logic. Loads the Mapper service and handles errors.
   let initialize = (session: t): promise<result<t, string>> => {
     // Initialize mapper
     Mapper.make()
@@ -27,12 +31,13 @@ module CaptureSession = {
     })
   }
 
-  // Prompt utilities using Node readline
+  // FFI: Process bindings for standard input/output.
   module Process = {
     @val external stdin: 'a = "process.stdin"
     @val external stdout: 'a = "process.stdout"
   }
 
+  // FFI: Node.js readline/promises module for interactive CLI input.
   module Readline = {
     type t
 
@@ -53,6 +58,7 @@ module CaptureSession = {
     }
   }
 
+  // PROMPT: WHO is learning?
   let captureLearner = async (
     readline: Readline.t,
     mode: captureMode,
@@ -96,6 +102,7 @@ module CaptureSession = {
     }
   }
 
+  // PROMPT: WHERE did it happen? (Includes GPS support in Full mode)
   let captureLocation = async (
     readline: Readline.t,
     mode: captureMode,
@@ -140,6 +147,7 @@ module CaptureSession = {
     }
   }
 
+  // Orchestrates the capture of physical and situational context.
   let captureContext = async (
     readline: Readline.t,
     mode: captureMode,
@@ -181,6 +189,7 @@ module CaptureSession = {
     }
   }
 
+  // PROMPT: What was the outcome?
   let captureOutcome = async (readline: Readline.t): Outcome.t => {
     Console.log("\nOutcome (optional):\n")
 
@@ -220,6 +229,7 @@ module CaptureSession = {
     }
   }
 
+  // PROMPT: WHAT was learned?
   let captureExperience = async (
     readline: Readline.t,
     mode: captureMode,
@@ -287,80 +297,7 @@ module CaptureSession = {
     }
   }
 
-  let captureOptionalFields = async (
-    readline: Readline.t,
-  ): (option<Privacy.t>, option<array<string>>) => {
-    Console.log("\nOptional metadata:\n")
-
-    let privacy = await readline->Readline.question(
-      "Privacy level (private/anonymous/public) [default: anonymous]: ",
-    )
-    let privacyOpt: option<Privacy.t> = switch privacy->String.trim->String.toLowerCase {
-    | "private" => Some({level: #\"private", shareableWith: None})
-    | "public" => Some({level: #public, shareableWith: None})
-    | "anonymous" | _ => Some(Privacy.makeAnonymous)
-    }
-
-    let tags = await readline->Readline.question("Tags (comma-separated, optional): ")
-    let tagsOpt = if tags->String.trim->String.length > 0 {
-      Some(
-        tags
-        ->String.split(",")
-        ->Array.map(String.trim)
-        ->Array.filter(s => s->String.length > 0),
-      )
-    } else {
-      None
-    }
-
-    (privacyOpt, tagsOpt)
-  }
-
-  let generateTemplate = (readline: Readline.t): promise<unit> => {
-    let template = {
-      "learner": {
-        "id": "your-pseudonym",
-        "name": "Your Name (optional)",
-        "interests": ["interest1", "interest2"],
-      },
-      "context": {
-        "location": {
-          "name": "Location Name",
-          "coordinates": {
-            "latitude": 0.0,
-            "longitude": 0.0,
-          },
-          "type": "makerspace",
-        },
-        "situation": "What was happening",
-        "connections": ["person1", "person2"],
-      },
-      "experience": {
-        "type": "experiment",
-        "description": "What you learned",
-        "domains": ["domain1", "domain2"],
-        "outcome": {
-          "success": true,
-          "connections_made": ["Unexpected insight"],
-          "next_questions": ["What question emerged?"],
-        },
-        "duration": 60,
-        "intensity": "medium",
-      },
-      "privacy": {
-        "level": "anonymous",
-      },
-      "tags": ["tag1", "tag2"],
-    }
-
-    switch JSON.stringifyAny(template) {
-    | Some(json) => Console.log(json)
-    | None => Console.log("Error: Could not generate template")
-    }
-    readline->Readline.close
-    Promise.resolve()
-  }
-
+  // CAPTURE PIPELINE: The main entry point for the capture process.
   let capture = async (session: t): result<string, string> => {
     let readline = Readline.make()
 
@@ -368,11 +305,11 @@ module CaptureSession = {
 
     switch session.mode {
     | Template => {
+        // Generation logic for a blank JSON template.
         let _ = await generateTemplate(readline)
         Ok("template-generated")
       }
     | mode => {
-        // Initialize mapper
         let sessionResult = await session->initialize
 
         switch sessionResult {
@@ -387,7 +324,7 @@ module CaptureSession = {
               Error("Mapper not initialized")
             }
           | Some(mapper) => {
-              // Capture learner
+              // STEP 1: Capture identity
               let learnerResult = await captureLearner(readline, mode)
 
               switch learnerResult {
@@ -396,7 +333,7 @@ module CaptureSession = {
                   Error(err)
                 }
               | Ok(learner) => {
-                  // Capture context
+                  // STEP 2: Capture location
                   let contextResult = await captureContext(readline, mode)
 
                   switch contextResult {
@@ -405,7 +342,7 @@ module CaptureSession = {
                       Error(err)
                     }
                   | Ok(context) => {
-                      // Capture experience
+                      // STEP 3: Capture the learning content
                       let experienceResult = await captureExperience(readline, mode)
 
                       switch experienceResult {
@@ -414,13 +351,13 @@ module CaptureSession = {
                           Error(err)
                         }
                       | Ok(experience) => {
-                          // Optional fields (only in Full mode)
+                          // STEP 4: Metadata and Privacy
                           let (privacy, tags) = switch mode {
                           | Full => await captureOptionalFields(readline)
                           | Quick | Template => (None, None)
                           }
 
-                          // Create learning experience
+                          // STEP 5: Aggregate and Save
                           let learningExperience = LearningExperience.make(
                             ~learner,
                             ~context,
@@ -430,7 +367,6 @@ module CaptureSession = {
                             (),
                           )
 
-                          // Save to mapper
                           let saveResult = await Mapper.captureExperience(
                             mapper,
                             learningExperience,
@@ -460,6 +396,3 @@ module CaptureSession = {
     }
   }
 }
-
-// Import Mapper module
-// (Mapper.res must be compiled first)

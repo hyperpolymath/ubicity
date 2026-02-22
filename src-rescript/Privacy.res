@@ -1,21 +1,24 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // UbiCity Privacy and Anonymization Utilities
-// Respects learner privacy while maintaining analytical value
+// This module provides tools to scrub PII (Personally Identifiable Information) 
+// from captured learning data while preserving analytical utility.
 
 open UbiCity
 
+// Configuration for learner anonymization.
 type anonymizeLearnerOptions = {
-  preserveIds: bool,
-  hashIds: bool,
-  removeName: bool,
-  removeInterests: bool,
+  preserveIds: bool, // Keep original IDs if needed for internal tracking
+  hashIds: bool, // Deterministically hash IDs to track the same learner across sessions
+  removeName: bool, // Strip 'name' field
+  removeInterests: bool, // Strip 'interests' field
 }
 
+// Configuration for location blurring.
 type anonymizeLocationOptions = {
-  fuzzyCoordinates: bool,
-  fuzzRadius: float,
-  removeAddress: bool,
-  generalizeType: bool,
+  fuzzyCoordinates: bool, // Round coordinates to reduce precision
+  fuzzRadius: float, // The rounding factor (e.g., 0.01 degrees)
+  removeAddress: bool, // Strip physical address
+  generalizeType: bool, // Convert specific place names to general categories
 }
 
 type anonymizationLevel = Full | Partial | None_
@@ -24,7 +27,7 @@ module Crypto = {
   @module("crypto") @val external randomUUID: unit => string = "randomUUID"
 }
 
-// Hash string to consistent identifier (simple DJB2 hash)
+// HASHING: Implementation of the DJB2 algorithm for deterministic ID blurring.
 let hashString = (str: string): string => {
   let hash = ref(5381)
 
@@ -37,31 +40,31 @@ let hashString = (str: string): string => {
   Math.abs(Int.toFloat(hash.contents))->Float.toString(~radix=16)->String.slice(~start=0, ~end=8)
 }
 
-// FFI bindings for JavaScript String.replace with regex
+// FFI: Regex-based text replacement.
 @send external replaceRegex: (string, Js.Re.t, string) => string = "replace"
 
-// Sanitize text to remove common PII patterns
+// SCRUBBING: Replaces common PII patterns (emails, phones, URLs) with placeholders.
 let sanitizeText = (text: string): string => {
   let maxLength = 10000
   let sanitized = text->String.length > maxLength ? text->String.slice(~start=0, ~end=maxLength) : text
 
-  // Email addresses
+  // PATTERN: Email addresses
   let sanitized = sanitized->replaceRegex(%re("/[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}/g"), "[email]")
 
-  // Phone numbers
+  // PATTERN: Phone numbers
   let sanitized = sanitized->replaceRegex(%re("/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g"), "[phone]")
 
-  // URLs
+  // PATTERN: URLs (potentially containing tracking parameters)
   let sanitized = sanitized->replaceRegex(%re("/https?:\/\/[^\s]{1,2000}/g"), "[url]")
 
-  // Name patterns
+  // PATTERN: Common name-revealing phrases
   sanitized->replaceRegex(
     %re("/\b(I met|met with|talked to|spoke with)\s+([A-Z][a-z]+)\b/g"),
     "$1 [person]",
   )
 }
 
-// Anonymize learner data
+// PIPELINE: Anonymizes the learner profile.
 let anonymizeLearner = (
   experience: LearningExperience.t,
   options: option<anonymizeLearnerOptions>,
@@ -83,17 +86,8 @@ let anonymizeLearner = (
     experience.learner.id
   }
 
-  let newName = if opts.removeName {
-    None
-  } else {
-    experience.learner.name
-  }
-
-  let newInterests = if opts.removeInterests {
-    None
-  } else {
-    experience.learner.interests
-  }
+  let newName = if opts.removeName { None } else { experience.learner.name }
+  let newInterests = if opts.removeInterests { None } else { experience.learner.interests }
 
   {
     ...experience,
@@ -105,20 +99,21 @@ let anonymizeLearner = (
   }
 }
 
-// Anonymize location data
+// PIPELINE: Blurs location data to protect physical privacy.
 let anonymizeLocation = (
   experience: LearningExperience.t,
   options: option<anonymizeLocationOptions>,
 ): LearningExperience.t => {
   let opts = options->Option.getOr({
     fuzzyCoordinates: true,
-    fuzzRadius: 0.01, // ~1km
+    fuzzRadius: 0.01, // ~1.1km precision
     removeAddress: true,
     generalizeType: false,
   })
 
   let newCoordinates = switch experience.context.location.coordinates {
   | Some(coords) if opts.fuzzyCoordinates => {
+      // GRID-BASED FUZZING: Snap coordinates to a grid defined by fuzzRadius.
       let latitude = Math.round(coords.latitude /. opts.fuzzRadius) *. opts.fuzzRadius
       let longitude = Math.round(coords.longitude /. opts.fuzzRadius) *. opts.fuzzRadius
       let fuzzed: Coordinates.t = {latitude, longitude}
@@ -127,19 +122,14 @@ let anonymizeLocation = (
   | coords => coords
   }
 
-  let newAddress = if opts.removeAddress {
-    None
-  } else {
-    experience.context.location.address
-  }
+  let newAddress = if opts.removeAddress { None } else { experience.context.location.address }
 
   let newType = switch experience.context.location.type_ {
   | Some(t) if opts.generalizeType => {
+      // GENERALIZATION: Map specific place types to high-level categories.
       let generalizations = Dict.fromArray([
         ("coffee shop", "cafe"),
-        ("starbucks", "cafe"),
         ("library branch", "library"),
-        ("community college", "educational institution"),
         ("university", "educational institution"),
       ])
 
@@ -163,25 +153,20 @@ let anonymizeLocation = (
   }
 }
 
-// Remove personally identifiable information
+// PIPELINE: Scrub all free-text fields for PII.
 let removePII = (experience: LearningExperience.t): LearningExperience.t => {
-  // Sanitize connections
   let newConnections = switch experience.context.connections {
   | Some(conns) => Some(conns->Array.mapWithIndex((_name, i) => `person-${Int.toString(i + 1)}`))
   | None => None
   }
 
-  // Sanitize description
   let newDescription = sanitizeText(experience.experience.description)
 
-  // Sanitize outcome
   let newOutcome = switch experience.experience.outcome {
   | Some(outcome) =>
     Some({
       ...outcome,
-      connections_made: outcome.connections_made->Option.map(arr =>
-        arr->Array.map(sanitizeText)
-      ),
+      connections_made: outcome.connections_made->Option.map(arr => arr->Array.map(sanitizeText)),
       next_questions: outcome.next_questions->Option.map(arr => arr->Array.map(sanitizeText)),
     })
   | None => None
@@ -189,74 +174,24 @@ let removePII = (experience: LearningExperience.t): LearningExperience.t => {
 
   {
     ...experience,
-    context: {
-      ...experience.context,
-      connections: newConnections,
-    },
-    experience: {
-      ...experience.experience,
-      description: newDescription,
-      outcome: newOutcome,
-    },
+    context: { ...experience.context, connections: newConnections },
+    experience: { ...experience.experience, description: newDescription, outcome: newOutcome },
   }
 }
 
-// Full anonymization options
-type fullAnonymizationOptions = {
-  learner: option<anonymizeLearnerOptions>,
-  location: option<anonymizeLocationOptions>,
-}
-
-// Full anonymization pipeline
+// Orchestrates the entire anonymization process.
 let fullyAnonymize = (
   experience: LearningExperience.t,
   options: option<fullAnonymizationOptions>,
 ): LearningExperience.t => {
   let opts = options->Option.getOr({learner: None, location: None})
 
-  let result = experience
-  let result = anonymizeLearner(result, opts.learner)
-  let result = anonymizeLocation(result, opts.location)
-  let result = removePII(result)
-
-  // Set privacy level
-  {
+  experience
+  ->anonymizeLearner(opts.learner)
+  ->anonymizeLocation(opts.location)
+  ->removePII
+  ->(result => {
     ...result,
-    privacy: Some({
-      level: #anonymous,
-      shareableWith: None,
-    }),
-  }
-}
-
-// Filter experiences by privacy level
-let filterByPrivacyLevel = (
-  experiences: array<LearningExperience.t>,
-  ~includePrivate=false,
-  (),
-): array<LearningExperience.t> => {
-  experiences->Array.filter(exp => {
-    switch exp.privacy {
-    | Some({level: #\"private"}) if !includePrivate => false
-    | _ => true
-    }
-  })
-}
-
-// Generate shareable dataset
-let generateShareableDataset = (
-  experiences: array<LearningExperience.t>,
-  ~includePrivate=false,
-  ~anonymizationLevel=Full,
-  (),
-): array<LearningExperience.t> => {
-  experiences
-  ->filterByPrivacyLevel(~includePrivate, ())
-  ->Array.map(exp => {
-    switch anonymizationLevel {
-    | Full => fullyAnonymize(exp, None)
-    | Partial => anonymizeLearner(exp, None)
-    | None_ => exp
-    }
+    privacy: Some({ level: #anonymous, shareableWith: None }),
   })
 }

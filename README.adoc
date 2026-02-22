@@ -377,3 +377,8 @@ node mapper.js report
 That's it. You're doing UbiCity.
 
 Welcome to the Ubiquitous City of Learning. 🏙️
+
+
+== Architecture
+
+See link:TOPOLOGY.md[TOPOLOGY.md] for a visual architecture map and completion dashboard.
