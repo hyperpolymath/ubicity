@@ -44,7 +44,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "eslint": "^9.26.0",
+    "eslint": "^10.0.2",
     "prettier": "^3.2.4",
     "@rescript/core": "^1.0.0",
     "rescript": "^11.0.0"
