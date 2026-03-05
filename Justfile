@@ -128,3 +128,8 @@ release: clean build compile
     @echo "🎉 Release build complete!"
     @echo "Executables in ./bin/"
     @ls -lh ./bin/
+
+# [AUTO-GENERATED] Multi-arch / RISC-V target
+build-riscv:
+	@echo "Building for RISC-V..."
+	cross build --target riscv64gc-unknown-linux-gnu
