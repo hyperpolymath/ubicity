@@ -6,29 +6,29 @@
 [source,bibtex]
 ----
 @software{ubicity_2025,
-  author = {Polymath, Hyper},
+  author = {Jewell, Jonathan D.A.},
   title = {UbiCity},
   year = {2025},
-  url = {https://github.com/hyperpolymath/UbiCity},
-  license = {AGPL-3.0-or-later}
+  url = {https://github.com/hyperpolymath/ubicity},
+  license = {PMPL-1.0-or-later}
 }
 ----
 
 == Harvard Style
 
-Polymath, H. (2025) _UbiCity_ [Computer software]. Available at: https://github.com/hyperpolymath/UbiCity
+Jewell, J.D.A. (2025) _UbiCity_ [Computer software]. Available at: https://github.com/hyperpolymath/ubicity
 
 == OSCOLA
 
-Hyper Polymath, 'UbiCity' (2025) <https://github.com/hyperpolymath/UbiCity>
+Jonathan D.A. Jewell, 'UbiCity' (2025) <https://github.com/hyperpolymath/ubicity>
 
 == MLA
 
-Polymath, Hyper. "UbiCity." 2025, github.com/hyperpolymath/UbiCity.
+Jewell, Jonathan D.A. "UbiCity." 2025, github.com/hyperpolymath/ubicity.
 
 == APA 7
 
-Polymath, H. (2025). _UbiCity_ [Computer software]. GitHub. https://github.com/hyperpolymath/UbiCity
+Jewell, J.D.A. (2025). _UbiCity_ [Computer software]. GitHub. https://github.com/hyperpolymath/ubicity
 
 == See Also
 

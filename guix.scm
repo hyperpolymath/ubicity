@@ -19,7 +19,7 @@
     (synopsis "ReScript application")
     (description "ReScript application - part of the RSR ecosystem.")
     (home-page "https://github.com/hyperpolymath/UbiCity")
-    (license license:agpl3+)))
+    (license license:mpl2.0)))
 
 ;; Return package for guix shell
 ubicity

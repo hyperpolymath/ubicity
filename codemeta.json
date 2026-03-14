@@ -7,7 +7,7 @@
   "version": "0.1.0",
   "dateCreated": "2025-12-10",
   "dateModified": "2025-12-10",
-  "license": "https://spdx.org/licenses/AGPL-3.0-or-later.html",
+  "license": "https://spdx.org/licenses/PMPL-1.0-or-later.html",
   "codeRepository": "https://github.com/hyperpolymath/UbiCity",
   "issueTracker": "https://github.com/hyperpolymath/UbiCity/issues",
   "programmingLanguage": ["Guile Scheme"],
@@ -15,9 +15,9 @@
   "keywords": ["RSR", "rhodium-standard"],
   "author": [{
     "@type": "Person",
-    "givenName": "Hyper",
-    "familyName": "Polymath",
-    "email": "hyperpolymath@proton.me"
+    "givenName": "Jonathan D.A.",
+    "familyName": "Jewell",
+    "email": "j.d.a.jewell@open.ac.uk"
   }],
   "isPartOf": [{
     "@type": "SoftwareApplication",
