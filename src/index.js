@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 /**
  * UbiCity - Main module exports
  * Convenient entry point for all UbiCity functionality

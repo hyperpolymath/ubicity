@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 /**
  * Async file-based storage for learning experiences
  * Uses promises instead of sync I/O for better performance

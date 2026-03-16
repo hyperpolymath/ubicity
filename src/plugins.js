@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 /**
  * Plugin system for UbiCity
  * Extensible analyzers and processors

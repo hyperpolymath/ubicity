@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 /**
  * Advanced analysis features for UbiCity
  * Beyond basic mapping - temporal patterns, collaborative networks, recommendations

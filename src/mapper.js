@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 /**
  * UbiCity Urban Knowledge Mapper (ESM + Async + Validated)
  *

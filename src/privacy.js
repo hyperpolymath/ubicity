@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 /**
  * Privacy and anonymization utilities for UbiCity
  * Respects learner privacy while maintaining analytical value
