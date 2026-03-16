@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // Smoke tests for CLI tools (verify they can be invoked)
 
 import { test } from 'node:test';

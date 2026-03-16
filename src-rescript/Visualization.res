@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // UbiCity Visualization Generator
 // Creates interactive HTML reports with filtering and search
 

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
+// SPDX-License-Identifier: PMPL-1.0-or-later
 //! Fuzz target for ubicity-wasm JSON parsing and validation
 
 #![no_main]
