@@ -4,7 +4,8 @@
 
 name: Finishingbot Release Check
 
-permissions: read-all
+permissions:
+  contents: read
 
 on:
   push:

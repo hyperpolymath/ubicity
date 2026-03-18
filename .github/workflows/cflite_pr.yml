@@ -6,7 +6,8 @@ on:
     paths:
       - 'wasm/**'
 
-permissions: read-all
+permissions:
+  contents: read
 
 defaults:
   run:

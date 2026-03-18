@@ -5,7 +5,8 @@
 
 name: Glambot Presentation Quality
 
-permissions: read-all
+permissions:
+  contents: read
 
 on:
   push:
