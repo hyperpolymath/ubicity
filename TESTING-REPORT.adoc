@@ -14,7 +14,7 @@ This report documents the testing and fixes applied to the UbiCity project to en
 * *Deno Version*: 1.45.0
 * *Date*: 2025-12-29
 * *Project*: ubicity
-* *Location*: /var/home/hyper/repos/ubicity
+* *Location*: /var$HOME/repos/ubicity
 
 == Issues Fixed
 
@@ -39,13 +39,13 @@ This report documents the testing and fixes applied to the UbiCity project to en
 
 *Files Fixed*:
 
-* `/var/home/hyper/repos/ubicity/src/mapper.js` - `crypto` -> `node:crypto`
-* `/var/home/hyper/repos/ubicity/src/storage.js` - `fs`, `path`, `url` -> `node:fs`, `node:path`, `node:url`
-* `/var/home/hyper/repos/ubicity/src/capture.js` - `readline/promises` -> `node:readline/promises`
-* `/var/home/hyper/repos/ubicity/src/export.js` - `fs` -> `node:fs`
-* `/var/home/hyper/repos/ubicity/src/performance.js` - `perf_hooks` -> `node:perf_hooks`
-* `/var/home/hyper/repos/ubicity/src/privacy.js` - `crypto` -> `node:crypto`
-* `/var/home/hyper/repos/ubicity/src/import.js` - `fs` -> `node:fs`
+* `/var$HOME/repos/ubicity/src/mapper.js` - `crypto` -> `node:crypto`
+* `/var$HOME/repos/ubicity/src/storage.js` - `fs`, `path`, `url` -> `node:fs`, `node:path`, `node:url`
+* `/var$HOME/repos/ubicity/src/capture.js` - `readline/promises` -> `node:readline/promises`
+* `/var$HOME/repos/ubicity/src/export.js` - `fs` -> `node:fs`
+* `/var$HOME/repos/ubicity/src/performance.js` - `perf_hooks` -> `node:perf_hooks`
+* `/var$HOME/repos/ubicity/src/privacy.js` - `crypto` -> `node:crypto`
+* `/var$HOME/repos/ubicity/src/import.js` - `fs` -> `node:fs`
 
 === 3. CLI Scripts Node.js Globals
 
@@ -53,12 +53,12 @@ This report documents the testing and fixes applied to the UbiCity project to en
 
 *Files Fixed*:
 
-* `/var/home/hyper/repos/ubicity/src/cli.js`:
+* `/var$HOME/repos/ubicity/src/cli.js`:
 ** Changed `process.argv.slice(2)` to `Deno.args`
 ** Changed `process.exit()` to `Deno.exit()`
 ** Updated shebang to `#!/usr/bin/env -S deno run --allow-read --allow-write`
 
-* `/var/home/hyper/repos/ubicity/src/capture.js`:
+* `/var$HOME/repos/ubicity/src/capture.js`:
 ** Changed `process.argv[2]` to `Deno.args[0]`
 ** Changed `process.exit()` to `Deno.exit()`
 ** Changed `import.meta.url === \`file://${process.argv[1]}\`` to `import.meta.main`
@@ -210,7 +210,7 @@ Commands:
 ----
 Storage Statistics:
 ============================================================
-  Directory: /var/home/hyper/repos/ubicity/ubicity-data
+  Directory: /var$HOME/repos/ubicity/ubicity-data
   Total Experiences: 8
   Total Size: 12.05 KB
   Loaded in Memory: 8

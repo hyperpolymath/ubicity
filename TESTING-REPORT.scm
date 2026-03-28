@@ -10,7 +10,7 @@
     (date "2025-12-29")
     (platform "Linux 6.17.12-300.fc43.x86_64")
     (runtime "Deno 1.45.0")
-    (location "/var/home/hyper/repos/ubicity"))
+    (location "/var$HOME/repos/ubicity"))
 
   (summary
     (total-tests 44)
