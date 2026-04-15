@@ -2,6 +2,8 @@
 # Modern build orchestration for Deno + ReScript + WASM
 
 # Default recipe
+import? "contractile.just"
+
 default:
     @just --list
 
