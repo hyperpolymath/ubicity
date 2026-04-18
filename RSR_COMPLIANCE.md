@@ -65,7 +65,7 @@ cat .well-known/humans.txt | grep "TEAM:"
 
 ### 3. Build System (4/4) ✅
 
-- [x] justfile (build orchestration)
+- [x] Justfile (build orchestration)
 - [x] deno.json (Deno tasks)
 - [x] flake.nix (Nix reproducible builds)
 - [x] .gitlab-ci.yml (CI/CD pipeline with RSR verification)

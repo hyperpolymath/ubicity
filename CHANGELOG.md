@@ -355,7 +355,7 @@ deno task capture
 deno task report
 deno task viz
 
-# Or use justfile
+# Or use Justfile
 just capture quick
 just report
 just viz
