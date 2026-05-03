@@ -82,3 +82,15 @@ Both are FOSS with independent governance (no Big Tech).
 - SHA-pinned dependencies
 - SPDX license headers on all files
 
+### TypeScript Exemptions (Approved)
+
+The hyperpolymath "no new TypeScript" policy has the following approved exemptions in this repo. These are *not* policy violations — they are documented carve-outs.
+
+| Path | Files | Rationale | Unblock condition |
+|---|---|---|---|
+| `src/wasm-bridge.ts` | 1 | Explicit FFI bridge between TS host and WASM core; thin glue, no application logic. | AffineScript first-class WASM-direct invocation surface. |
+| `src/rescript-bridge.ts` | 1 | Explicit bridge between TS host and ReScript layer; thin glue. | Replace ReScript layer with AffineScript core (then bridge dissolves). |
+| `src/storage.ts` | 1 | Deno-runtime storage interface (KV/Deno.openKv); ecosystem is Deno-native. | AffineScript Deno KV bindings. |
+| `src/observability.ts` | 1 | Deno-runtime observability — OpenTelemetry exporters and Deno.metrics. | AffineScript OTel bindings (post Node-target #35). |
+
+Adding to this list requires explicit user approval and an unblock condition. New TypeScript files outside this list are blocked by the RSR antipattern check.
