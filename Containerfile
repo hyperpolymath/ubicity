@@ -1,34 +1,38 @@
-# UbiCity Docker Container
-# Provides isolated environment for running UbiCity tools
+# UbiCity container — Deno runtime.
+#
+# This project is Deno-first (deno.json tasks, Deno.* filesystem APIs,
+# jsr:@std/* + npm: deps). The previous Node Containerfile could not run
+# it. Pinned to the .tool-versions deno so a plain `git clone` builds an
+# image that runs the full test suite and CLI with no host toolchain.
+#
+#   docker build -t ubicity .
+#   docker run --rm ubicity                       # CLI help
+#   docker run --rm ubicity deno task stats
+#   docker run --rm -v ./data:/app/ubicity-data ubicity deno task report
+#   docker run --rm ubicity \
+#     deno test --allow-read --allow-write tests/  # full suite (44 tests)
+FROM denoland/deno:2.7.14
 
-FROM node:20-alpine
-
-# Set working directory
 WORKDIR /app
 
-# Install dependencies
-COPY package*.json ./
-RUN npm ci --only=production
+# Manifests first for build-cache friendliness.
+COPY deno.json deno.lock package.json ./
 
-# Copy application code
-COPY src/ ./src/
-COPY schema/ ./schema/
-COPY examples/ ./examples/
-COPY scripts/ ./scripts/
+# Application + tests + assets (.dockerignore trims git/node_modules/etc).
+COPY . .
 
-# Create data directory
+# Warm the module cache: jsr:@std/* + npm: deps. nodeModulesDir "auto"
+# in deno.json materialises node_modules at build time so runtime needs
+# no network.
+RUN deno cache src/index.js
+
+# Data directory (mountable volume for persistence).
 RUN mkdir -p ubicity-data/experiences ubicity-data/analyses ubicity-data/maps
-
-# Expose volume for data persistence
 VOLUME ["/app/ubicity-data"]
 
-# Set Node.js environment
-ENV NODE_ENV=production
+ENV UBICITY_LOG_LEVEL=info
 
-# Default command: show help
-CMD ["node", "src/cli.js", "help"]
-
-# Example usage:
-# docker build -t ubicity .
-# docker run -v ./data:/app/ubicity-data ubicity stats
-# docker run -v ./data:/app/ubicity-data ubicity report
+# Default: CLI help. Override the args to run any deno task / test, e.g.
+#   docker run --rm ubicity test --allow-read --allow-write tests/
+ENTRYPOINT ["deno"]
+CMD ["run", "--allow-read", "--allow-write", "src/cli.js", "help"]

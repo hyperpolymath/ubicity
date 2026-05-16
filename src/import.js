@@ -4,7 +4,7 @@
  * Import from CSV, JSON, and other formats
  */
 
-import { promises as fs } from 'fs';
+import { promises as fs } from 'node:fs';
 import { UrbanKnowledgeMapper } from './mapper.js';
 import { safeValidateExperience } from './schemas.js';
 

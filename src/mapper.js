@@ -6,7 +6,7 @@
  * that wouldn't be visible within traditional institutional boundaries.
  */
 
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 import { validateExperience, safeValidateExperience } from './schemas.js';
 import { ExperienceStorage } from './storage.js';
 
