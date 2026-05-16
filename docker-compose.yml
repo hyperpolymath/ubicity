@@ -1,17 +1,20 @@
-version: '3.8'
-
 services:
   ubicity:
-    build: .
+    build:
+      context: .
+      # Repo uses the OCI-standard `Containerfile` (podman-native);
+      # name it explicitly so `docker compose build` finds it too.
+      dockerfile: Containerfile
     image: ubicity:latest
     container_name: ubicity-app
     volumes:
       - ./ubicity-data:/app/ubicity-data
     environment:
-      - NODE_ENV=production
-    command: node src/cli.js help
+      - UBICITY_LOG_LEVEL=info
+    # Deno entrypoint (see Containerfile). Override per invocation.
+    command: ["run", "--allow-read", "--allow-write", "src/cli.js", "help"]
 
-  # Optional: Web server for visualization
+  # Optional: web server for visualization output
   viz-server:
     image: nginx:alpine
     container_name: ubicity-viz
@@ -23,6 +26,7 @@ services:
       - ubicity
 
 # Usage:
-# docker-compose build
-# docker-compose run ubicity node src/cli.js report
-# docker-compose up viz-server  # View visualizations at http://localhost:8080
+#   docker compose build
+#   docker compose run --rm ubicity task report
+#   docker compose run --rm ubicity test --allow-read --allow-write tests/
+#   docker compose up viz-server   # visualizations at http://localhost:8080

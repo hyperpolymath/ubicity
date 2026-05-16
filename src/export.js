@@ -5,7 +5,7 @@
  */
 
 import { UrbanKnowledgeMapper } from './mapper.js';
-import { promises as fs } from 'fs';
+import { promises as fs } from 'node:fs';
 
 /**
  * Export experiences to CSV format

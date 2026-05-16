@@ -89,14 +89,14 @@ export class ExperienceStorage {
   }
   async loadExperience(id) {
     const filepath = __as_pathJoin(this.experiencesDir, __as_concat(id, ".json"));
-    return (() => { try { return (() => { return JSON.parse(Deno.readTextFileSync(filepath)); return Unit; })(); } catch (__e) { const e = __e; return (__as_isNotFound(e) ? (() => { return null; })() : (() => { return (() => { throw new Error(__as_concat("loadExperience: ", String((e)["message"]))); })(); })()); } })();
+    return (await (async () => { try { return (await (async () => { return JSON.parse(Deno.readTextFileSync(filepath)); return Unit; })()); } catch (__e) { const e = __e; return (__as_isNotFound(e) ? (await (async () => { return null; })()) : (await (async () => { return (() => { throw new Error(__as_concat("loadExperience: ", String((e)["message"]))); })(); })())); } })());
   }
   async loadAllExperiences() {
-    return (() => { try { return (() => { (await this.ensureDirectories()); let acc = []; for (const name of __as_readDirNames(this.experiencesDir)) {  if (has_json_ext(name)) { const fp = __as_pathJoin(this.experiencesDir, name); acc = __as_concat(acc, [JSON.parse(Deno.readTextFileSync(fp))]);  } } return acc; return Unit; })(); } catch (__e) { const e = __e; return (__as_isNotFound(e) ? (() => { return []; })() : (() => { return (() => { throw new Error("loadAllExperiences"); })(); })()); } })();
+    return (await (async () => { try { return (await (async () => { (await this.ensureDirectories()); let acc = []; for (const name of __as_readDirNames(this.experiencesDir)) {  if (has_json_ext(name)) { const fp = __as_pathJoin(this.experiencesDir, name); acc = __as_concat(acc, [JSON.parse(Deno.readTextFileSync(fp))]);  } } return acc; return Unit; })()); } catch (__e) { const e = __e; return (__as_isNotFound(e) ? (await (async () => { return []; })()) : (await (async () => { return (() => { throw new Error("loadAllExperiences"); })(); })())); } })());
   }
   async deleteExperience(id) {
     const filepath = __as_pathJoin(this.experiencesDir, __as_concat(id, ".json"));
-    return (() => { try { return (() => { Deno.removeSync(filepath); return true; return Unit; })(); } catch (__e) { const e = __e; return (__as_isNotFound(e) ? (() => { return false; })() : (() => { return (() => { throw new Error("deleteExperience"); })(); })()); } })();
+    return (await (async () => { try { return (await (async () => { Deno.removeSync(filepath); return true; return Unit; })()); } catch (__e) { const e = __e; return (__as_isNotFound(e) ? (await (async () => { return false; })()) : (await (async () => { return (() => { throw new Error("deleteExperience"); })(); })())); } })());
   }
   async saveReport(report, name) {
     (await this.ensureDirectories());
@@ -113,7 +113,7 @@ export class ExperienceStorage {
     return filepath;
   }
   async listExperienceIds() {
-    return (() => { try { return (() => { let ids = []; for (const name of __as_readDirNames(this.experiencesDir)) {  if (has_json_ext(name)) { ids = __as_concat(ids, [drop_json_ext(name)]);  } } return ids; return Unit; })(); } catch (__e) { const e = __e; return (__as_isNotFound(e) ? (() => { return []; })() : (() => { return (() => { throw new Error("listExperienceIds"); })(); })()); } })();
+    return (await (async () => { try { return (await (async () => { let ids = []; for (const name of __as_readDirNames(this.experiencesDir)) {  if (has_json_ext(name)) { ids = __as_concat(ids, [drop_json_ext(name)]);  } } return ids; return Unit; })()); } catch (__e) { const e = __e; return (__as_isNotFound(e) ? (await (async () => { return []; })()) : (await (async () => { return (() => { throw new Error("listExperienceIds"); })(); })())); } })());
   }
   async getStats() {
     const ids = (await this.listExperienceIds());

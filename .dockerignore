@@ -2,9 +2,6 @@ node_modules
 npm-debug.log
 .git
 .gitignore
-*.md
-!README.md
-tests
 .github
 .eslintrc.json
 .prettierrc.json
@@ -12,3 +9,6 @@ ubicity-data/*
 !ubicity-data/.gitkeep
 DENO_MIGRATION_PREVIEW.md
 STACK_ANALYSIS.md
+bin
+coverage
+wasm/target
