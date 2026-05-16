@@ -1,43 +1,23 @@
 /**
  * Bridge to ReScript-compiled modules
  * Imports the optimized JavaScript generated from ReScript
+ *
+ * NOTE: de-TypeScripted from rescript-bridge.ts (issue #122 / ubicity#30
+ * — no `.ts` in src/). This is ReScript-interop glue; it is deliberately
+ * NOT ported to AffineScript (that would re-implement a ReScript bridge
+ * and cross the estate's ReScript-hands-off boundary). Faithful plain
+ * ESM type-strip; runtime behaviour unchanged. The TS `export type {...}`
+ * re-export is dropped (type-only; consumers were .ts which src/ no
+ * longer permits).
  */
 
-// ReScript compiles to ES6 modules with .res.js extension
-// Import the compiled UbiCity module
+// ReScript compiles to ES6 modules with .res.js extension.
 import * as UbiCity from '../src-rescript/UbiCity.res.js';
-
-export type {
-  Context,
-  Coordinates,
-  Learner,
-  LearningExperience,
-  Location,
-} from '../src-rescript/UbiCity.res.js';
 
 /**
  * Create a validated learning experience using ReScript's type system
  */
-export function createLearningExperience(data: {
-  id?: string;
-  timestamp?: string;
-  learner: { id: string; name?: string; interests?: string[] };
-  context: {
-    location: {
-      name: string;
-      coordinates?: { latitude: number; longitude: number };
-    };
-    situation?: string;
-    connections?: string[];
-  };
-  experience: {
-    type: string;
-    description: string;
-    domains?: string[];
-  };
-  privacy?: { level: 'private' | 'anonymous' | 'public' };
-  tags?: string[];
-}): any {
+export function createLearningExperience(data) {
   // Use ReScript's make functions with strong typing
   const learner = UbiCity.Learner.make(
     data.learner.id,
