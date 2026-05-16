@@ -4,7 +4,7 @@
  * Respects learner privacy while maintaining analytical value
  */
 
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 import { ExperienceStorage } from './storage.js';
 
 /**
