@@ -99,10 +99,29 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
 
+      # NOTE: actions/upload-pages-artifact is a composite that internally
+      # calls actions/upload-artifact@v4 (an UNPINNED upstream tag). The
+      # org ruleset enforces "all actions pinned to a full-length SHA"
+      # recursively, so the nested unpinned tag fails the check even
+      # though our workflow pins everything. Replicate the composite's
+      # behaviour explicitly with a SHA-pinned actions/upload-artifact
+      # (same SHA already used elsewhere in this repo): tar the site as
+      # deploy-pages expects (artifact name `github-pages`).
+      - name: Archive site as the github-pages artifact
+        run: |
+          tar \
+            --dereference --hard-dereference \
+            --directory _site \
+            -cvf "${RUNNER_TEMP}/artifact.tar" \
+            --exclude=.git --exclude=.github \
+            .
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          path: '_site'
+          name: github-pages
+          path: ${{ runner.temp }}/artifact.tar
+          retention-days: 1
+          if-no-files-found: error
 
   deploy:
     environment:
