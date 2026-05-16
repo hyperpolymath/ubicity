@@ -1,6 +1,10 @@
 services:
   ubicity:
-    build: .
+    build:
+      context: .
+      # Repo uses the OCI-standard `Containerfile` (podman-native);
+      # name it explicitly so `docker compose build` finds it too.
+      dockerfile: Containerfile
     image: ubicity:latest
     container_name: ubicity-app
     volumes:
