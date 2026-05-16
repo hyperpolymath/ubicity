@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Finishingbot - Release readiness validation
-# Part of gitbot-fleet
+# Part of gitbot-fleet (hyperpolymath/gitbot-fleet :: bots/finishingbot)
 
 name: Finishingbot Release Check
 
@@ -14,12 +14,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  # Pinned gitbot-fleet commit. Bump in lockstep when the fleet changes.
+  GITBOT_FLEET_REF: 2e0ea3ca67821a91e650f51bf48a6cfd1c7aae1c
+
 jobs:
   release-readiness:
-    # TODO: disabled — hyperpolymath/finishing-bot does not exist yet
-    # (the clone step targets a phantom repo, so this can never pass).
-    # Re-enable (remove `if: false`) once the bot repo is created/restored.
-    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4
@@ -31,19 +31,29 @@ jobs:
 
       - name: Cache dependencies
         uses: Swatinem/rust-cache@ad397744b0d591a723ab90405b7247fac0e6b8db  # v2
+        with:
+          workspaces: ${{ runner.temp }}/gitbot-fleet/bots/finishingbot
 
-      - name: Clone finishing-bot
+      - name: Fetch gitbot-fleet at pinned ref
         run: |
-          git clone https://github.com/hyperpolymath/finishing-bot.git /tmp/finishing-bot
-          cd /tmp/finishing-bot
-          cargo build --release
+          git clone --no-checkout --filter=tree:0 \
+            https://github.com/hyperpolymath/gitbot-fleet.git \
+            "$RUNNER_TEMP/gitbot-fleet"
+          git -C "$RUNNER_TEMP/gitbot-fleet" checkout "$GITBOT_FLEET_REF"
+
+      - name: Build finishingbot
+        working-directory: ${{ runner.temp }}/gitbot-fleet/bots/finishingbot
+        env:
+          OPENSSL_NO_VENDOR: 1
+        run: cargo build --release
 
       - name: Run finishingbot audit
         id: finishingbot
         continue-on-error: true
         run: |
-          cd ${{ github.workspace }}
-          /tmp/finishing-bot/target/release/finishingbot audit > finishingbot-results.txt 2>&1
+          # The finishingbot crate's binary is `finishing-bot` (hyphenated).
+          "$RUNNER_TEMP/gitbot-fleet/bots/finishingbot/target/release/finishing-bot" \
+            --path "$GITHUB_WORKSPACE" audit > finishingbot-results.txt 2>&1
           echo $? > finishingbot-exit-code.txt
 
       - name: Display results

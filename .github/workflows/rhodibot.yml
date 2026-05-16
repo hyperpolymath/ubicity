@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Rhodibot - RSR compliance checking
-# Part of gitbot-fleet
+# Part of gitbot-fleet (hyperpolymath/gitbot-fleet :: bots/rhodibot)
 
 name: Rhodibot RSR Compliance
 
@@ -14,12 +14,13 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  # Pinned gitbot-fleet commit. Must include the `rhodibot check` CLI
+  # subcommand (gitbot-fleet#150). Bump in lockstep when the fleet changes.
+  GITBOT_FLEET_REF: 2e0ea3ca67821a91e650f51bf48a6cfd1c7aae1c
+
 jobs:
   rsr-compliance:
-    # TODO: disabled — hyperpolymath/rhodibot does not exist yet
-    # (the clone step targets a phantom repo, so this can never pass).
-    # Re-enable (remove `if: false`) once the bot repo is created/restored.
-    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4
@@ -31,20 +32,34 @@ jobs:
 
       - name: Cache dependencies
         uses: Swatinem/rust-cache@ad397744b0d591a723ab90405b7247fac0e6b8db  # v2
+        with:
+          workspaces: ${{ runner.temp }}/gitbot-fleet/bots/rhodibot
 
-      - name: Clone rhodibot
+      - name: Fetch gitbot-fleet at pinned ref
         run: |
-          git clone https://github.com/hyperpolymath/rhodibot.git /tmp/rhodibot
-          cd /tmp/rhodibot
-          cargo build --release
+          git clone --no-checkout --filter=tree:0 \
+            https://github.com/hyperpolymath/gitbot-fleet.git \
+            "$RUNNER_TEMP/gitbot-fleet"
+          git -C "$RUNNER_TEMP/gitbot-fleet" checkout "$GITBOT_FLEET_REF"
+
+      - name: Build rhodibot
+        working-directory: ${{ runner.temp }}/gitbot-fleet/bots/rhodibot
+        env:
+          OPENSSL_NO_VENDOR: 1
+        run: cargo build --release
 
       - name: Run rhodibot check
         id: rhodibot
         continue-on-error: true
+        env:
+          # Public-repo read via the GitHub REST API; the built-in,
+          # read-only workflow token is sufficient (no PAT needed).
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          /tmp/rhodibot/target/release/rhodibot check \
-            --owner ${{ github.repository_owner }} \
-            --repo ${{ github.event.repository.name }} > rhodibot-results.txt 2>&1
+          "$RUNNER_TEMP/gitbot-fleet/bots/rhodibot/target/release/rhodibot" check \
+            --owner "${{ github.repository_owner }}" \
+            --repo "${{ github.event.repository.name }}" \
+            > rhodibot-results.txt 2>&1
           echo $? > rhodibot-exit-code.txt
 
       - name: Display results
