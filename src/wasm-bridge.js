@@ -1,11 +1,18 @@
 /**
  * Bridge to WASM modules for performance-critical operations
  * Loads and initializes the Rust-compiled WASM
+ *
+ * NOTE: de-TypeScripted from wasm-bridge.ts (issue #122 / ubicity#30 —
+ * no `.ts` in src/). This is WebAssembly-runtime glue (instantiate +
+ * opaque-export method calls + JSON marshalling) with no importers in
+ * src/ or tests/ — pure runtime plumbing, not algorithm. Faithfully
+ * type-stripped to plain ESM rather than ported to AffineScript (the
+ * #122 AffineScript showcase is storage.js). Behaviour unchanged.
  */
 
-let wasmModule: any = null;
+let wasmModule = null;
 
-export async function initWasm(): Promise<void> {
+export async function initWasm() {
   if (wasmModule) return;
 
   // Load WASM module
@@ -21,10 +28,7 @@ export async function initWasm(): Promise<void> {
 /**
  * High-performance validation using WASM
  */
-export function validateExperienceWasm(experience: unknown): {
-  valid: boolean;
-  errors: string[];
-} {
+export function validateExperienceWasm(experience) {
   if (!wasmModule) {
     throw new Error('WASM module not initialized. Call initWasm() first.');
   }
@@ -37,10 +41,7 @@ export function validateExperienceWasm(experience: unknown): {
 /**
  * High-performance domain network generation using WASM
  */
-export function generateDomainNetworkWasm(experiences: unknown[]): {
-  nodes: Array<{ id: string; size: number }>;
-  edges: Array<{ source: string; target: string; weight: number }>;
-} {
+export function generateDomainNetworkWasm(experiences) {
   if (!wasmModule) {
     throw new Error('WASM module not initialized. Call initWasm() first.');
   }
@@ -53,7 +54,7 @@ export function generateDomainNetworkWasm(experiences: unknown[]): {
 /**
  * High-performance Jaccard similarity using WASM
  */
-export function jaccardSimilarityWasm(set1: string[], set2: string[]): number {
+export function jaccardSimilarityWasm(set1, set2) {
   if (!wasmModule) {
     throw new Error('WASM module not initialized. Call initWasm() first.');
   }

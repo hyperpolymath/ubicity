@@ -1,0 +1,180 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Storage layer using Deno's native filesystem APIs.
+//
+// Migrated from storage.ts to AffineScript (issue
+// hyperpolymath/affinescript#122 / ubicity#30): the source of truth is
+// this .affine; `src/storage.js` is generated, drop-in, dependency-free
+// ESM (no `.ts` in src/). Compiled with:
+//   affinescript compile src/storage.affine -o src/storage.js --deno-esm
+//
+// Self-contained: the host primitives are declared `extern fn` here
+// (the Deno-ESM backend lowers each to its JS form — Deno.*Sync /
+// JSON.* / object indexing), so no cross-package module resolution is
+// needed. The struct + receiver-first free functions synthesise to
+// `export class ExperienceStorage` (the exact surface src/index.js,
+// mapper.js, privacy.js, visualize.js import).
+
+// ── Host primitives (lowered by the Deno-ESM backend) ──────────────
+pub extern type Json;
+pub extern fn writeTextFile(path: String, content: String) -> Int;
+pub extern fn readTextFile(path: String) -> String;
+pub extern fn removePath(path: String) -> Int;
+pub extern fn ensureDir(path: String) -> Int;
+pub extern fn readDirNames(path: String) -> [String];
+pub extern fn statSize(path: String) -> Int;
+pub extern fn pathJoin(a: String, b: String) -> String;
+pub extern fn isNotFound(e: Json) -> Bool;
+pub extern fn jsonParse(s: String) -> Json;
+pub extern fn jsonStringifyPretty(v: Json) -> String;
+pub extern fn jsonNull() -> Json;
+pub extern fn jsonGetStr(value: Json, key: String) -> String;
+pub extern fn orDefault(x: String, d: String) -> String;
+pub extern fn kbString(bytes: Int) -> String;
+pub extern fn dateNow() -> Int;
+pub extern fn int_to_string(n: Int) -> String;
+pub extern fn string_sub(s: String, start: Int, length: Int) -> String;
+
+// ── Small AffineScript helpers (real logic, on string primitives) ──
+
+/// True when `name` ends in the literal `.json` (length 5).
+pub fn has_json_ext(name: String) -> Bool {
+  let nl = len(name);
+  if nl < 5 {
+    return false;
+  }
+  return string_sub(name, nl - 5, 5) == ".json";
+}
+
+/// `name` with a trailing `.json` removed (caller guarantees the ext).
+pub fn drop_json_ext(name: String) -> String =
+  string_sub(name, 0, len(name) - 5);
+
+// ── ExperienceStorage ──────────────────────────────────────────────
+
+struct ExperienceStorage {
+  storageDir: String,
+  experiencesDir: String,
+  mapsDir: String,
+  analysesDir: String
+}
+
+/// `new ExperienceStorage(storageDir = './ubicity-data')` — orDefault
+/// preserves the JS default when the argument is omitted.
+pub fn ExperienceStorage_new(storageDir: String) -> ExperienceStorage {
+  let dir = orDefault(storageDir, "./ubicity-data");
+  ExperienceStorage {
+    storageDir: dir,
+    experiencesDir: pathJoin(dir, "experiences"),
+    mapsDir: pathJoin(dir, "maps"),
+    analysesDir: pathJoin(dir, "analyses")
+  }
+}
+
+pub fn ExperienceStorage_ensureDirectories(s: ExperienceStorage) -> Int {
+  ensureDir(s.storageDir);
+  ensureDir(s.experiencesDir);
+  ensureDir(s.mapsDir);
+  ensureDir(s.analysesDir);
+  return 0;
+}
+
+pub fn ExperienceStorage_saveExperience(s: ExperienceStorage,
+                                        experience: Json) -> String {
+  ExperienceStorage_ensureDirectories(s);
+  let filename = jsonGetStr(experience, "id") ++ ".json";
+  let filepath = pathJoin(s.experiencesDir, filename);
+  writeTextFile(filepath, jsonStringifyPretty(experience));
+  return filepath;
+}
+
+pub fn ExperienceStorage_loadExperience(s: ExperienceStorage,
+                                        id: String) -> Json {
+  let filepath = pathJoin(s.experiencesDir, id ++ ".json");
+  try {
+    return jsonParse(readTextFile(filepath));
+  } catch {
+    e => if isNotFound(e) {
+      jsonNull()
+    } else {
+      panic("loadExperience: " ++ jsonGetStr(e, "message"))
+    }
+  }
+}
+
+pub fn ExperienceStorage_loadAllExperiences(s: ExperienceStorage) -> [Json] {
+  try {
+    ExperienceStorage_ensureDirectories(s);
+    let mut acc: [Json] = [];
+    for name in readDirNames(s.experiencesDir) {
+      if has_json_ext(name) {
+        let fp = pathJoin(s.experiencesDir, name);
+        acc = acc ++ [jsonParse(readTextFile(fp))];
+      }
+    }
+    return acc;
+  } catch {
+    e => if isNotFound(e) { [] } else { panic("loadAllExperiences") }
+  }
+}
+
+pub fn ExperienceStorage_deleteExperience(s: ExperienceStorage,
+                                          id: String) -> Bool {
+  let filepath = pathJoin(s.experiencesDir, id ++ ".json");
+  try {
+    removePath(filepath);
+    return true;
+  } catch {
+    e => if isNotFound(e) { false } else { panic("deleteExperience") }
+  }
+}
+
+pub fn ExperienceStorage_saveReport(s: ExperienceStorage,
+                                    report: Json, name: String) -> String {
+  ExperienceStorage_ensureDirectories(s);
+  let nm = orDefault(name, "report-" ++ int_to_string(dateNow()) ++ ".json");
+  let filepath = pathJoin(s.analysesDir, nm);
+  writeTextFile(filepath, jsonStringifyPretty(report));
+  return filepath;
+}
+
+pub fn ExperienceStorage_saveVisualization(s: ExperienceStorage,
+                                           html: String,
+                                           name: String) -> String {
+  ExperienceStorage_ensureDirectories(s);
+  let nm = orDefault(name, "ubicity-map.html");
+  let filepath = pathJoin(s.storageDir, nm);
+  writeTextFile(filepath, html);
+  return filepath;
+}
+
+pub fn ExperienceStorage_listExperienceIds(s: ExperienceStorage) -> [String] {
+  try {
+    let mut ids: [String] = [];
+    for name in readDirNames(s.experiencesDir) {
+      if has_json_ext(name) {
+        ids = ids ++ [drop_json_ext(name)];
+      }
+    }
+    return ids;
+  } catch {
+    e => if isNotFound(e) { [] } else { panic("listExperienceIds") }
+  }
+}
+
+type Stats = { totalExperiences: Int, totalSizeBytes: Int, totalSizeKB: String, storageDir: String };
+
+pub fn ExperienceStorage_getStats(s: ExperienceStorage) -> Stats {
+  let ids = ExperienceStorage_listExperienceIds(s);
+  let count = len(ids);
+  let mut sizeAcc = 0;
+  for id in ids {
+    let fp = pathJoin(s.experiencesDir, id ++ ".json");
+    sizeAcc = sizeAcc + statSize(fp);
+  }
+  return {
+    totalExperiences: count,
+    totalSizeBytes: sizeAcc,
+    totalSizeKB: kbString(sizeAcc),
+    storageDir: s.storageDir
+  };
+}
