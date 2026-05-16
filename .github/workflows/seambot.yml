@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Seambot - Seam hygiene and integration health
-# Part of gitbot-fleet
+# Part of gitbot-fleet (hyperpolymath/gitbot-fleet :: bots/seambot)
 
 name: Seambot Integration Health
 
@@ -14,29 +14,15 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  # Pinned gitbot-fleet commit. Bump in lockstep when the fleet changes.
+  GITBOT_FLEET_REF: 2e0ea3ca67821a91e650f51bf48a6cfd1c7aae1c
+
 jobs:
   seam-health:
-    # TODO: disabled — hyperpolymath/seambot does not exist yet
-    # (the clone step targets a phantom repo, so this can never pass).
-    # Re-enable (remove `if: false`) once the bot repo is created/restored.
-    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4
-
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@6d9817901c499d6b02debbb57edb38d33daa680b  # stable
-        with:
-          toolchain: stable
-
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@ad397744b0d591a723ab90405b7247fac0e6b8db  # v2
-
-      - name: Clone seambot
-        run: |
-          git clone https://github.com/hyperpolymath/seambot.git /tmp/seambot
-          cd /tmp/seambot
-          cargo build --release
 
       - name: Check for seam register
         id: check-seam
@@ -47,12 +33,40 @@ jobs:
             echo "has_seam=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Setup Rust toolchain
+        if: steps.check-seam.outputs.has_seam == 'true'
+        uses: dtolnay/rust-toolchain@6d9817901c499d6b02debbb57edb38d33daa680b  # stable
+        with:
+          toolchain: stable
+
+      - name: Cache dependencies
+        if: steps.check-seam.outputs.has_seam == 'true'
+        uses: Swatinem/rust-cache@ad397744b0d591a723ab90405b7247fac0e6b8db  # v2
+        with:
+          workspaces: ${{ runner.temp }}/gitbot-fleet/bots/seambot
+
+      - name: Fetch gitbot-fleet at pinned ref
+        if: steps.check-seam.outputs.has_seam == 'true'
+        run: |
+          git clone --no-checkout --filter=tree:0 \
+            https://github.com/hyperpolymath/gitbot-fleet.git \
+            "$RUNNER_TEMP/gitbot-fleet"
+          git -C "$RUNNER_TEMP/gitbot-fleet" checkout "$GITBOT_FLEET_REF"
+
+      - name: Build seambot
+        if: steps.check-seam.outputs.has_seam == 'true'
+        working-directory: ${{ runner.temp }}/gitbot-fleet/bots/seambot
+        env:
+          OPENSSL_NO_VENDOR: 1
+        run: cargo build --release
+
       - name: Run seambot check
         if: steps.check-seam.outputs.has_seam == 'true'
         id: seambot
         continue-on-error: true
         run: |
-          /tmp/seambot/target/release/seambot check > seambot-results.txt 2>&1
+          "$RUNNER_TEMP/gitbot-fleet/bots/seambot/target/release/seambot" check \
+            > seambot-results.txt 2>&1
           echo $? > seambot-exit-code.txt
 
       - name: Display results
