@@ -16,6 +16,10 @@ on:
 
 jobs:
   release-readiness:
+    # TODO: disabled — hyperpolymath/finishing-bot does not exist yet
+    # (the clone step targets a phantom repo, so this can never pass).
+    # Re-enable (remove `if: false`) once the bot repo is created/restored.
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4
