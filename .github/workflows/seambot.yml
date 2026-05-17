@@ -39,19 +39,24 @@ jobs:
         with:
           toolchain: stable
 
+      # Clone BEFORE the rust-cache step: rust-cache needs the workspace
+      # (Cargo.lock) to exist to key the cache, and cloning into a
+      # cache-created directory fails with `destination path ... already
+      # exists and is not an empty directory` (exit 128).
+      - name: Fetch gitbot-fleet at pinned ref
+        if: steps.check-seam.outputs.has_seam == 'true'
+        run: |
+          rm -rf "$RUNNER_TEMP/gitbot-fleet"
+          git clone --no-checkout --filter=tree:0 \
+            https://github.com/hyperpolymath/gitbot-fleet.git \
+            "$RUNNER_TEMP/gitbot-fleet"
+          git -C "$RUNNER_TEMP/gitbot-fleet" checkout "$GITBOT_FLEET_REF"
+
       - name: Cache dependencies
         if: steps.check-seam.outputs.has_seam == 'true'
         uses: Swatinem/rust-cache@ad397744b0d591a723ab90405b7247fac0e6b8db  # v2
         with:
           workspaces: ${{ runner.temp }}/gitbot-fleet/bots/seambot
-
-      - name: Fetch gitbot-fleet at pinned ref
-        if: steps.check-seam.outputs.has_seam == 'true'
-        run: |
-          git clone --no-checkout --filter=tree:0 \
-            https://github.com/hyperpolymath/gitbot-fleet.git \
-            "$RUNNER_TEMP/gitbot-fleet"
-          git -C "$RUNNER_TEMP/gitbot-fleet" checkout "$GITBOT_FLEET_REF"
 
       - name: Build seambot
         if: steps.check-seam.outputs.has_seam == 'true'
@@ -65,9 +70,13 @@ jobs:
         id: seambot
         continue-on-error: true
         run: |
+          # A non-zero check is the intended signal; capture it without
+          # letting `set -e` abort before the exit-code file is written.
+          rc=0
           "$RUNNER_TEMP/gitbot-fleet/bots/seambot/target/release/seambot" check \
-            > seambot-results.txt 2>&1
-          echo $? > seambot-exit-code.txt
+            > seambot-results.txt 2>&1 || rc=$?
+          echo "$rc" > seambot-exit-code.txt
+          exit "$rc"
 
       - name: Display results
         if: always() && steps.check-seam.outputs.has_seam == 'true'
@@ -78,7 +87,7 @@ jobs:
             cat seambot-results.txt >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
 
-            exit_code=$(cat seambot-exit-code.txt)
+            exit_code=$(cat seambot-exit-code.txt 2>/dev/null || echo unknown)
             if [ "$exit_code" = "0" ]; then
               echo "✅ All seam checks passed" >> $GITHUB_STEP_SUMMARY
             else
