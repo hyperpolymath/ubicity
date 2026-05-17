@@ -1,4 +1,200 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
+
+== Maintainers
+
+This document lists the current maintainers of UbiCity.
+
+=== Active Maintainers
+
+==== Core Team
+
+*Hyperpolymath* (@Hyperpolymath)
+
+* *Role*: Project Lead, Architecture
+* *Focus*: Philosophy, constraints, design
+* *Location*: Worldwide (remote)
+* *Timezone*: Multiple
+* *Contact*: hyperpolymath@ubicity.example.org
+* *PGP*: Available on request
+* *Since*: 2024-11 (project inception)
+
+=== Emeritus Maintainers
+
+_(None yet - project is new)_
+
+=== Becoming a Maintainer
+
+==== Path to Maintainership
+
+Maintainership is earned through consistent, high-quality contributions that demonstrate:
+
+[arabic]
+. *Deep Understanding*: Of UbiCity's philosophy and architecture
+. *Quality Contributions*: Sustained high-quality PRs over 6{plus} months
+. *Community Trust*: Respectful, helpful engagement with contributors
+. *Technical Expertise*: In one or more core areas (Deno, ReScript, Rust/WASM)
+. *Judgment*: Good decision-making aligned with project values
+
+==== Process
+
+[arabic]
+. *Nomination*: Any current maintainer can nominate a contributor
+. *Discussion*: Maintainers discuss the nomination privately
+. *Consensus*: All current maintainers must approve
+. *Invitation*: Candidate is invited (can decline)
+. *Onboarding*: 1-month probationary period with mentorship
+. *Confirmation*: After 1 month, becomes full maintainer
+
+==== Expected Time Commitment
+
+* *Minimum*: 4 hours/week
+* *Code Review*: Respond to PRs within 7 days
+* *Issues Triage*: Triage new issues within 3 days
+* *Community*: Participate in discussions, help newcomers
+* *Philosophy*: Preserve and advocate for UbiCity values
+
+=== Maintainer Responsibilities
+
+==== Code Review
+
+* Review pull requests promptly (within 7 days)
+* Provide constructive, educational feedback
+* Ensure code meets quality standards (tests, docs, types)
+* Verify philosophy alignment (tools not platforms, data first, etc.)
+
+==== Issue Triage
+
+* Label new issues appropriately
+* Close duplicates or off-topic issues respectfully
+* Identify high-priority bugs
+* Help refine feature requests
+
+==== Release Management
+
+* Follow semantic versioning
+* Update CHANGELOG.md
+* Tag releases in git
+* Write release notes
+* Monitor for critical bugs post-release
+
+==== Community
+
+* Welcome new contributors
+* Enforce Code of Conduct
+* Facilitate discussions
+* Mentor aspiring maintainers
+* Represent UbiCity at conferences (optional)
+
+==== Strategic
+
+* Participate in architecture decisions
+* Maintain alignment with RSR framework
+* Balance innovation with stability
+* Preserve constraint mechanisms
+
+=== Governance
+
+==== Decision-Making
+
+*Consensus-Based*: Maintainers seek consensus on significant decisions.
+
+*Types of Decisions*:
+
+[cols=",",options="header",]
+|===
+|Decision Type |Process
+|Minor bug fix |Any maintainer can merge
+|Feature addition |2{plus} maintainer approval
+|Breaking change |All maintainer consensus
+|Philosophy change |Community discussion {plus} consensus
+|New maintainer |All maintainer approval
+|===
+
+==== Conflict Resolution
+
+[arabic]
+. *Discussion*: Try to reach consensus through discussion
+. *Mediation*: If stuck, bring in neutral third party
+. *Vote*: As last resort, simple majority (with tie-breaker by project lead)
+. *Transparency*: Document decision rationale publicly
+
+==== Communication Channels
+
+* *Public*: GitHub Issues, Discussions, Pull Requests
+* *Private*: maintainers@ubicity.example.org (for CoC issues, security, personnel)
+* *Urgent*: Signal group (for maintainers only)
+
+=== Stepping Down
+
+Maintainers may step down at any time:
+
+[arabic]
+. *Notice*: Give 2 weeks notice if possible (not required)
+. *Handoff*: Transfer ongoing work to other maintainers
+. *Access*: Repository access will be revoked
+. *Emeritus*: Move to Emeritus Maintainers section (with consent)
+. *Recognition*: Contributions remain in git history
+
+Stepping down is *not a failure*. We recognize that priorities change.
+
+=== Removal
+
+In rare cases, maintainers may be removed for:
+
+* *Inactivity*: No activity for 6{plus} months without notice
+* *CoC Violation*: Serious or repeated Code of Conduct violations
+* *Philosophy Divergence*: Actively working against project values
+
+*Process*:
+
+[arabic]
+. Private discussion among other maintainers
+. Attempt to resolve the issue
+. If unresolvable, unanimous decision (excluding the maintainer in question)
+. Private notification with reasoning
+. Public announcement (if appropriate)
+
+=== Current Focus Areas
+
+==== Areas Needing Maintainers
+
+[arabic]
+. *ReScript Expert*: Focus on `src-rescript/` optimization
+. *WASM/Rust*: Focus on `wasm/` performance
+. *Documentation*: Improve guides, tutorials, API docs
+. *Community*: Manage discussions, welcome newcomers
+. *Testing*: Expand test coverage, add benchmarks
+
+==== How to Help
+
+Even if you're not ready to be a maintainer, you can:
+
+* Review pull requests (anyone can comment!)
+* Answer questions in Discussions
+* Improve documentation
+* Write tutorials or blog posts
+* Report bugs
+* Submit PRs
+
+=== Contact
+
+* *General*: maintainers@ubicity.example.org
+* *Code of Conduct*: conduct@ubicity.example.org
+* *Security*: security@ubicity.example.org
+
+'''''
+
+Last updated: 2025-11-22
+
+*Note*: This is a living document. As UbiCity grows, this structure may evolve.
+
+////
+Appendix preserved verbatim from the legacy .adoc during the
+Item 11 .md/.adoc consolidation (Day 10 lossy-tail). 36 legacy-only
+content tokens were not present in the converted Markdown source;
+retained here so nothing is lost. Reviewer may de-duplicate prose.
+////
+
 = Maintainers
 :toc: preamble
 
