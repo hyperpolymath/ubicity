@@ -29,17 +29,22 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@ad397744b0d591a723ab90405b7247fac0e6b8db  # v2
-        with:
-          workspaces: ${{ runner.temp }}/gitbot-fleet/bots/finishingbot
-
+      # Clone BEFORE the rust-cache step: rust-cache needs the workspace
+      # (Cargo.lock) to exist to key the cache, and cloning into a
+      # cache-created directory fails with `destination path ... already
+      # exists and is not an empty directory` (exit 128).
       - name: Fetch gitbot-fleet at pinned ref
         run: |
+          rm -rf "$RUNNER_TEMP/gitbot-fleet"
           git clone --no-checkout --filter=tree:0 \
             https://github.com/hyperpolymath/gitbot-fleet.git \
             "$RUNNER_TEMP/gitbot-fleet"
           git -C "$RUNNER_TEMP/gitbot-fleet" checkout "$GITBOT_FLEET_REF"
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@ad397744b0d591a723ab90405b7247fac0e6b8db  # v2
+        with:
+          workspaces: ${{ runner.temp }}/gitbot-fleet/bots/finishingbot
 
       - name: Build finishingbot
         working-directory: ${{ runner.temp }}/gitbot-fleet/bots/finishingbot
@@ -52,9 +57,15 @@ jobs:
         continue-on-error: true
         run: |
           # The finishingbot crate's binary is `finishing-bot` (hyphenated).
+          # A non-zero audit is the intended gating signal. Capture it
+          # without letting `set -e` abort the step before the exit-code
+          # file is written, then re-exit with it so this step's outcome
+          # is `failure` and the "Fail on …findings" step below triggers.
+          rc=0
           "$RUNNER_TEMP/gitbot-fleet/bots/finishingbot/target/release/finishing-bot" \
-            --path "$GITHUB_WORKSPACE" audit > finishingbot-results.txt 2>&1
-          echo $? > finishingbot-exit-code.txt
+            --path "$GITHUB_WORKSPACE" audit > finishingbot-results.txt 2>&1 || rc=$?
+          echo "$rc" > finishingbot-exit-code.txt
+          exit "$rc"
 
       - name: Display results
         if: always()
@@ -65,7 +76,7 @@ jobs:
             cat finishingbot-results.txt >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
 
-            exit_code=$(cat finishingbot-exit-code.txt)
+            exit_code=$(cat finishingbot-exit-code.txt 2>/dev/null || echo unknown)
             if [ "$exit_code" = "0" ]; then
               echo "✅ Release readiness checks passed" >> $GITHUB_STEP_SUMMARY
             else

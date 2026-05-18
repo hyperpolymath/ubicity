@@ -30,17 +30,22 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@ad397744b0d591a723ab90405b7247fac0e6b8db  # v2
-        with:
-          workspaces: ${{ runner.temp }}/gitbot-fleet/bots/rhodibot
-
+      # Clone BEFORE the rust-cache step: rust-cache needs the workspace
+      # (Cargo.lock) to exist to key the cache, and cloning into a
+      # cache-created directory fails with `destination path ... already
+      # exists and is not an empty directory` (exit 128).
       - name: Fetch gitbot-fleet at pinned ref
         run: |
+          rm -rf "$RUNNER_TEMP/gitbot-fleet"
           git clone --no-checkout --filter=tree:0 \
             https://github.com/hyperpolymath/gitbot-fleet.git \
             "$RUNNER_TEMP/gitbot-fleet"
           git -C "$RUNNER_TEMP/gitbot-fleet" checkout "$GITBOT_FLEET_REF"
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@ad397744b0d591a723ab90405b7247fac0e6b8db  # v2
+        with:
+          workspaces: ${{ runner.temp }}/gitbot-fleet/bots/rhodibot
 
       - name: Build rhodibot
         working-directory: ${{ runner.temp }}/gitbot-fleet/bots/rhodibot
@@ -56,11 +61,17 @@ jobs:
           # read-only workflow token is sufficient (no PAT needed).
           GITHUB_TOKEN: ${{ github.token }}
         run: |
+          # A non-zero check is the intended gating signal. Capture it
+          # without letting `set -e` abort the step before the exit-code
+          # file is written, then re-exit with it so this step's outcome
+          # is `failure` and the "Fail on …violations" step below triggers.
+          rc=0
           "$RUNNER_TEMP/gitbot-fleet/bots/rhodibot/target/release/rhodibot" check \
             --owner "${{ github.repository_owner }}" \
             --repo "${{ github.event.repository.name }}" \
-            > rhodibot-results.txt 2>&1
-          echo $? > rhodibot-exit-code.txt
+            > rhodibot-results.txt 2>&1 || rc=$?
+          echo "$rc" > rhodibot-exit-code.txt
+          exit "$rc"
 
       - name: Display results
         if: always()
@@ -71,7 +82,7 @@ jobs:
             cat rhodibot-results.txt >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
 
-            exit_code=$(cat rhodibot-exit-code.txt)
+            exit_code=$(cat rhodibot-exit-code.txt 2>/dev/null || echo unknown)
             if [ "$exit_code" = "0" ]; then
               echo "✅ RSR compliance checks passed" >> $GITHUB_STEP_SUMMARY
             else
