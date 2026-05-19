@@ -1,3 +1,11 @@
+# Retained per standards#102 rule 3 (KEEP+DEP). guix.scm is a
+# node-build-system shell with no declared inputs; the sealed
+# Containerfile is Deno-only. This flake's devShell is the SOLE source
+# of the Rust + WASM toolchain (rust-overlay rustToolchain with the
+# wasm32-unknown-unknown target, wasm-pack, wasm-bindgen-cli,
+# binaryen/wasm-opt) and the ReScript build chain (rescript, nodejs,
+# just, cargo-watch). Remove only once a Guix-side Rust/WASM/ReScript
+# story exists.
 {
   description = "UbiCity - Learning Capture System (RSR-Compliant)";
 
