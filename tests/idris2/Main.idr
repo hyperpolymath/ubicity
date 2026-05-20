@@ -5,15 +5,19 @@ module Main
 
 import Test.Spec
 import CoreTest
+import MapperTest
 import System
 
 %default covering
 
 main : IO ()
 main = do
-  (p, f) <- runTestSuite "CoreTest" CoreTest.allSuites
+  (p1, f1) <- runTestSuite "CoreTest" CoreTest.allSuites
+  (p2, f2) <- runTestSuite "MapperTest" MapperTest.allSuites
+  let totalPassed = p1 + p2
+  let totalFailed = f1 + f2
   putStrLn ""
-  putStrLn $ "=== Total: " ++ show p ++ " passed, " ++ show f ++ " failed ==="
-  if f > 0
+  putStrLn $ "=== Total: " ++ show totalPassed ++ " passed, " ++ show totalFailed ++ " failed ==="
+  if totalFailed > 0
     then exitWith (ExitFailure 1)
     else pure ()

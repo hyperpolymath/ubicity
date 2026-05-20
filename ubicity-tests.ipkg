@@ -1,5 +1,6 @@
 -- SPDX-License-Identifier: PMPL-1.0-or-later
--- ubicity Idris2 test suite. Estate port 6/11 (partial — core.test.ts only).
+-- ubicity Idris2 test suite. Estate port 6/11 (partial — core.test.ts +
+-- mapper.test.ts; privacy + export await strategy review).
 
 package ubicity-tests
 
@@ -9,6 +10,7 @@ depends = base
 
 modules = Test.Spec
         , CoreTest
+        , MapperTest
         , Main
 
 main = Main
