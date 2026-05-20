@@ -1,0 +1,16 @@
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+-- ubicity Idris2 test suite. Estate port 6/11 (partial — core.test.ts only).
+
+package ubicity-tests
+
+sourcedir = "tests/idris2"
+
+depends = base
+
+modules = Test.Spec
+        , CoreTest
+        , Main
+
+main = Main
+
+executable = "ubicity-tests"
