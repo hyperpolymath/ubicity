@@ -7,6 +7,13 @@ import? "contractile.just"
 default:
     @just --list
 
+# Run the Idris2 test suite (estate port 6/11; partial — core.test.ts only).
+# Requires idris2 0.8.0+ on PATH.
+test-core:
+    @export IDRIS2_PREFIX="$(dirname "$(dirname "$(command -v idris2)")")" && \
+        idris2 --build ubicity-tests.ipkg && \
+        ./build/exec/ubicity-tests
+
 # Setup development environment
 setup:
     @echo "🔧 Setting up UbiCity development environment..."
