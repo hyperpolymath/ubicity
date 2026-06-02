@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0-or-later
+-- SPDX-License-Identifier: MPL-2.0
 -- ubicity Idris2 test suite. Estate port 6/11 — all 4 TS test files
 -- ported (core + mapper + export + privacy). 3 sub-tests deferred for
 -- crypto/JSON deps (documented inside each module).
