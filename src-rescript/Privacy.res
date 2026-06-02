@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // UbiCity Privacy and Anonymization Utilities
 // This module provides tools to scrub PII (Personally Identifiable Information) 
 // from captured learning data while preserving analytical utility.

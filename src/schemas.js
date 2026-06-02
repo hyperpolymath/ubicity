@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 /**
  * Zod schemas for UbiCity Learning Experiences
  * Provides runtime validation with clear error messages

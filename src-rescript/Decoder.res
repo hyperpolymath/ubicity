@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // UbiCity JSON Decoders
 // Type-safe decoding of JSON data from storage into ReScript types
 

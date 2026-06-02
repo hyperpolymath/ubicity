@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Integration test for ReScript modules
 
 import { make as makeMapper, captureExperience, loadAll, getExperienceCount,
