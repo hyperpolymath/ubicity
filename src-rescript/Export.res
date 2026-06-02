@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // UbiCity Export Utilities
 // Supports CSV, GeoJSON, DOT, Markdown, and JSON formats
 
