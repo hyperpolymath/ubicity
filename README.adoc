@@ -1,6 +1,10 @@
+// SPDX-License-Identifier: MPL-2.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = UbiCity Learning Capture System
+image:https://img.shields.io/badge/OpenSSF-Best_Practices-green?logo=openssourcesecurity[OpenSSF Best Practices,link="https://www.bestpractices.dev/en/projects/new?repo_url=https://github.com/hyperpolymath/ubicity"]
 
-image:https://img.shields.io/badge/License-PMPL--1.0-blue.svg[License: PMPL-1.0,link="https://github.com/hyperpolymath/palimpsest-license"]
+
+image:https://img.shields.io/badge/License-MPL_2.0-blue.svg[License: MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"]
 image:https://img.shields.io/badge/Philosophy-Palimpsest-indigo.svg[Palimpsest,link="https://github.com/hyperpolymath/palimpsest-license"]
 
 
@@ -356,11 +360,9 @@ The GPL3 license means you can fork, modify, and share freely.
 
 == License
 
-GPL3 - Same as the original zotero-voyant-export project.
+This project is licensed under the Mozilla Public License, v. 2.0. See the `LICENSE` file for details.
 
-Learning should be free as in freedom.
-
----
+SPDX-License-Identifier: MPL-2.0
 
 == Get Started
 
