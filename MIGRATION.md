@@ -1,3 +1,7 @@
+<!--
+SPDX-License-Identifier: MPL-2.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
 # Migration Guide: v0.1 to v0.2
 
 This guide helps you migrate from the original CommonJS codebase to the modern ESM version.
