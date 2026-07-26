@@ -5,6 +5,7 @@
 name: Finishingbot Release Check
 
 permissions:
+  actions: read
   contents: read
 
 on:

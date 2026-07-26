@@ -5,6 +5,7 @@
 name: Rhodibot RSR Compliance
 
 permissions:
+  actions: read
   contents: read
 
 on:
