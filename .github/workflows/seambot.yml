@@ -5,6 +5,7 @@
 name: Seambot Integration Health
 
 permissions:
+  actions: read
   contents: read
 
 on:

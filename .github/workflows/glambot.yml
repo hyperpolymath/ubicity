@@ -6,6 +6,7 @@
 name: Glambot Presentation Quality
 
 permissions:
+  actions: read
   contents: read
 
 on:

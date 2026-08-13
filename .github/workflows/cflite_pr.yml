@@ -7,6 +7,7 @@ on:
       - 'wasm/**'
 
 permissions:
+  actions: read
   contents: read
 
 defaults:

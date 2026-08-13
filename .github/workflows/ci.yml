@@ -9,6 +9,7 @@ on:
 
 # Restrict permissions to minimum required (security best practice)
 permissions:
+  actions: read
   contents: read
 
 jobs:
