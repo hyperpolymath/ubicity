@@ -7,61 +7,44 @@ on:
   pull_request:
     branches: [main, master]
 
-# Restrict permissions to minimum required (security best practice)
 permissions:
-  actions: read
   contents: read
 
 jobs:
   test:
+    name: Idris2 core tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
-
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run linter
-        run: npm run lint
-
-      - name: Check formatting
-        run: npm run format:check
-
-      - name: Run tests
-        run: npm test
-
-  build:
-    runs-on: ubuntu-latest
-    needs: test
-    permissions:
-      contents: read
-
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: '20.x'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Verify build
+      - name: Install Idris2 0.8.0
+        env:
+          # Exact commit referenced by the upstream v0.8.0 tag.
+          IDRIS2_REVISION: 15a3e4e70843f7a34100f6470c04b791330788df
         run: |
-          echo "Build verification successful"
-          node src/cli.js help
+          set -euo pipefail
+          sudo apt-get update -qq
+          if sudo apt-get install -y idris2; then
+            idris2 --version
+          else
+            sudo apt-get install -y chezscheme make libgmp-dev
+            git clone --filter=blob:none --no-checkout \
+              https://github.com/idris-lang/Idris2.git /tmp/idris2
+            git -C /tmp/idris2 checkout --detach "$IDRIS2_REVISION"
+            make -C /tmp/idris2 bootstrap SCHEME=scheme
+            make -C /tmp/idris2 install PREFIX="$HOME/.idris2"
+            echo "$HOME/.idris2/bin" >> "$GITHUB_PATH"
+            "$HOME/.idris2/bin/idris2" --version
+          fi
+
+      - name: Build and run core tests
+        run: |
+          set -euo pipefail
+          idris2_prefix="$(dirname "$(dirname "$(command -v idris2)")")"
+          export IDRIS2_PREFIX="$idris2_prefix"
+          idris2 --build ubicity-tests.ipkg
+          ./build/exec/ubicity-tests
