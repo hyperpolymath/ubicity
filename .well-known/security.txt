@@ -30,9 +30,9 @@ Instead:
 ## Security Measures
 
 - **Memory Safety**: WASM (Rust) provides memory safety guarantees
-- **Type Safety**: ReScript compile-time types + TypeScript
+- **Type Safety**:  compile-time types + 
 - **Sandboxing**: WASM runs in isolated linear memory
-- **Permissions**: Deno explicit permissions (--allow-read, --allow-write)
+- **Permissions**:  explicit permissions (--allow-read, --allow-write)
 - **Data Privacy**: Local-first, no network calls, no telemetry
 - **Offline-First**: Works completely air-gapped
 
@@ -43,7 +43,7 @@ Instead:
 - No user tracking or analytics
 - No third-party CDN dependencies
 - All data stays local
-- Explicit file system permissions via Deno
+- Explicit file system permissions via 
 
 ## Known Security Considerations
 
@@ -78,7 +78,7 @@ Security researchers who follow responsible disclosure will be:
 - Social engineering attacks
 - Physical access attacks
 - DoS via legitimate resource exhaustion
-- Bugs in Deno/Rust/ReScript compilers (report upstream)
+- Bugs in /Rust/ compilers (report upstream)
 
 ---
 

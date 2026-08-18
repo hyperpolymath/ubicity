@@ -6,7 +6,7 @@
 
 | Category | Count | Notes |
 |----------|-------|-------|
-| TypeScript/JavaScript tests | 10+ | Multiple `.test.ts` and `.test.js` files |
+| /JavaScript tests | 10+ | Multiple `.test.ts` and `.test.js` files |
 | Test subjects | 5 | Core, export, mapper, privacy, schemas |
 | Test framework | Present | Jest-compatible |
 | Spec directory | Present | `spec/` for specification documents |

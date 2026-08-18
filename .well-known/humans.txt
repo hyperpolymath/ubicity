@@ -18,10 +18,10 @@ See CONTRIBUTING.md for how to join the team.
 
 ## Technology Stack
 
-- **Deno**: Modern JavaScript runtime
-- **ReScript**: Functional programming language (compiles to JavaScript)
+- ****: Modern JavaScript runtime
+- ****: Functional programming language (compiles to JavaScript)
 - **Rust**: Systems programming language (compiles to WASM)
-- **TypeScript**: Type-safe JavaScript
+- ****: Type-safe JavaScript
 
 ## Core Philosophy
 
@@ -48,8 +48,8 @@ License: Dual MIT / Palimpsest v0.8
 
 ## Thanks
 
-- ReScript community
-- Deno team
+-  community
+-  team
 - Rust WASM working group
 - All contributors (see git log)
 
@@ -70,4 +70,4 @@ License: MIT / Palimpsest v0.8
 Standards: RSR-compliant
 
 /* THANKS */
-ReScript, Deno, Rust, WASM, Open Source Community
+, , Rust, WASM, Open Source Community

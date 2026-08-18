@@ -197,6 +197,6 @@ Before exporting data:
 
 == References
 
-- Privacy.res module: `src-rescript/Privacy.res`
+- Privacy.res module: `src-/Privacy.res`
 - Privacy tests: `test/privacy.test.mjs`
 - GDPR considerations: See `docs/PRIVACY.md` (TODO)

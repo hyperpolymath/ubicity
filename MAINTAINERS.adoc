@@ -32,7 +32,7 @@ Maintainership is earned through consistent, high-quality contributions that dem
 . *Deep Understanding*: Of UbiCity's philosophy and architecture
 . *Quality Contributions*: Sustained high-quality PRs over 6{plus} months
 . *Community Trust*: Respectful, helpful engagement with contributors
-. *Technical Expertise*: In one or more core areas (Deno, ReScript, Rust/WASM)
+. *Technical Expertise*: In one or more core areas (, , Rust/WASM)
 . *Judgment*: Good decision-making aligned with project values
 
 ==== Process
@@ -159,7 +159,7 @@ In rare cases, maintainers may be removed for:
 ==== Areas Needing Maintainers
 
 [arabic]
-. *ReScript Expert*: Focus on `src-rescript/` optimization
+. * Expert*: Focus on `src-/` optimization
 . *WASM/Rust*: Focus on `wasm/` performance
 . *Documentation*: Improve guides, tutorials, API docs
 . *Community*: Manage discussions, welcome newcomers

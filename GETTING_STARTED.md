@@ -24,7 +24,7 @@ cd ubicity
 node --version  # Should be v18 or higher
 
 # Test the CLI
-node src-rescript/CaptureCLI.res.js template
+node src-/CaptureCLI.res.js template
 ```
 
 That's it! No \`npm install\` needed.
@@ -36,7 +36,7 @@ That's it! No \`npm install\` needed.
 The fastest way to start is with **quick mode**:
 
 ```bash
-node src-rescript/CaptureCLI.res.js quick
+node src-/CaptureCLI.res.js quick
 ```
 
 You'll be prompted for:
@@ -83,7 +83,7 @@ UbiCity offers three capture modes:
 
 ### Quick Mode (Default)
 ```bash
-node src-rescript/CaptureCLI.res.js quick
+node src-/CaptureCLI.res.js quick
 ```
 - Minimal prompts (WHO/WHERE/WHAT only)
 - Fastest capture (~30 seconds)
@@ -91,14 +91,14 @@ node src-rescript/CaptureCLI.res.js quick
 
 ### Full Mode
 ```bash
-node src-rescript/CaptureCLI.res.js full
+node src-/CaptureCLI.res.js full
 ```
 - Includes all optional fields
 - Detailed capture (~2-3 minutes)
 
 ### Template Mode
 ```bash
-node src-rescript/CaptureCLI.res.js template
+node src-/CaptureCLI.res.js template
 ```
 - Generates a JSON template
 - Edit offline and import later

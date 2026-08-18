@@ -16,12 +16,12 @@
 
 == Post-Implementation
 
-[ ] Type checker enforces typed parameters (ReScript compilation)
+[ ] Type checker enforces typed parameters ( compilation)
 [ ] No NodeJs.Fs imports in Analysis.res
 [ ] Decoder tests verify validation catches invalid data
 
 == Invariant Verification
 
-* **validated-types-only**: Type system enforces (ReScript compiler)
-* **no-raw-json**: grep -r "JSON.parse" src-rescript/Analysis.res (should be empty)
-* **storage-abstraction**: grep -r "NodeJs.Fs" src-rescript/Analysis.res (should be empty)
+* **validated-types-only**: Type system enforces ( compiler)
+* **no-raw-json**: grep -r "JSON.parse" src-/Analysis.res (should be empty)
+* **storage-abstraction**: grep -r "NodeJs.Fs" src-/Analysis.res (should be empty)

@@ -31,7 +31,7 @@ UbiCity is a community project. We welcome contributions from anyone who aligns 
 1. **Fork** the repository
 2. **Create a branch**: `git checkout -b feature/your-feature`
 3. **Make changes** (see below for guidelines)
-4. **Test**: `just test` (or `deno task test`)
+4. **Test**: `just test` (or ` task test`)
 5. **Commit**: Clear commit messages
 6. **Push**: `git push origin feature/your-feature`
 7. **Pull Request**: Open PR with description
@@ -55,7 +55,7 @@ UbiCity is a community project. We welcome contributions from anyone who aligns 
 **Actual**: What actually happened
 **Environment**:
 - OS:
-- Deno version:
+-  version:
 - UbiCity version:
 ```
 
@@ -72,28 +72,28 @@ UbiCity is a community project. We welcome contributions from anyone who aligns 
 
 #### Type Safety Required
 
-- **ReScript**: For business logic (compile-time type safety)
+- ****: For business logic (compile-time type safety)
 - **Rust (WASM)**: For performance-critical code
-- **TypeScript**: For glue layer and I/O
+- ****: For glue layer and I/O
 
 #### Code Style
 
 ```bash
 # Format code
-just fmt  # or: deno fmt
+just fmt  # or:  fmt
 
 # Lint code
-just lint  # or: deno lint
+just lint  # or:  lint
 
 # Type check
-just check  # or: deno check src/**/*.ts
+just check  # or:  check src/**/*.ts
 ```
 
 #### Testing
 
 ```bash
 # Run all tests
-just test  # or: deno task test
+just test  # or:  task test
 
 # Tests must pass
 # Aim for >80% coverage for new code
@@ -102,7 +102,7 @@ just test  # or: deno task test
 #### Documentation
 
 - Update README.md if adding features
-- Add JSDoc comments for TypeScript
+- Add JSDoc comments for 
 - Update CHANGELOG.md (see format below)
 - Add examples to `examples/` if helpful
 
@@ -118,9 +118,9 @@ just test  # or: deno task test
 
 ```bash
 # Required
-curl -fsSL https://deno.land/install.sh | sh  # Deno
+curl -fsSL https:///install.sh | sh  # 
 curl https://sh.rustup.rs -sSf | sh           # Rust
-npm install -g rescript                        # ReScript
+npm install -g                         # 
 
 # Optional (but recommended)
 cargo install just                             # just
@@ -130,15 +130,15 @@ cargo install just                             # just
 
 ```bash
 just setup    # One-time setup
-just build    # Build ReScript + WASM
+just build    # Build  + WASM
 just test     # Run tests
 ```
 
 ### Development Workflow
 
 ```bash
-# Watch mode (ReScript)
-just watch-rescript
+# Watch mode ()
+just watch-
 
 # Run CLI during development
 just cli report
@@ -208,7 +208,7 @@ AI-assisted: Architecture design and initial implementation
 ### Reviewers Look For
 
 1. **Philosophy Alignment**: Does it fit UbiCity's values?
-2. **Type Safety**: Proper types in ReScript/TypeScript/Rust?
+2. **Type Safety**: Proper types in //Rust?
 3. **Tests**: Adequate test coverage?
 4. **Documentation**: Clear docs and comments?
 5. **Performance**: No obvious performance issues?

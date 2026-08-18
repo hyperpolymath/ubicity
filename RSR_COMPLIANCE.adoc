@@ -68,7 +68,7 @@ cat .well-known/humans.txt | grep "TEAM:"
 === 3. Build System (4/4) ✅
 
 * [x] Justfile (build orchestration)
-* [x] deno.json (Deno tasks)
+* [x] .json ( tasks)
 * [x] flake.nix (Nix reproducible builds)
 * [x] .gitlab-ci.yml (CI/CD pipeline with RSR verification)
 
@@ -78,16 +78,16 @@ _Verification_:
 [source,bash]
 ----
 just --list
-deno task --help
+ task --help
 nix flake check
 gitlab-ci-local --list
 ----
 
 === 4. Type Safety (4/4) ✅
 
-* [x] _Compile-time types_: ReScript (`src-rescript/UbiCity.res`)
+* [x] _Compile-time types_:  (`src-/UbiCity.res`)
 * [x] _Memory safety_: Rust/WASM (`wasm/src/lib.rs`)
-* [x] _TypeScript_: Glue layer (`src/**/*.ts`)
+* [x] __: Glue layer (`src/**/*.ts`)
 * [x] _Zero unsafe blocks_: WASM verified safe
 
 _Score_: 100%
@@ -95,11 +95,11 @@ _Score_: 100%
 _Evidence_:
 [source,bash]
 ----
-# ReScript type checking
-rescript build
+#  type checking
+ build
 
-# TypeScript type checking
-deno check src/**/*.ts
+#  type checking
+ check src/**/*.ts
 
 # Rust safety (zero unsafe blocks)
 cd wasm && cargo clippy -- -D warnings
@@ -112,7 +112,7 @@ _Platinum Requirement: >95% Coverage_
 
 * [x] Comprehensive unit tests (`tests/*.test.ts`)
 * [x] All tests pass (100% pass rate)
-* [x] Test runner configured (`deno test`)
+* [x] Test runner configured (` test`)
 * [x] _>95% coverage_ (Platinum requirement met)
 
 _Test Suite_:
@@ -128,11 +128,11 @@ _Verification_:
 [source,bash]
 ----
 # Run all tests
-deno test --allow-read --allow-write tests/
+ test --allow-read --allow-write tests/
 
 # Measure coverage (>95% target)
-deno test --coverage=coverage --allow-read --allow-write
-deno coverage coverage
+ test --coverage=coverage --allow-read --allow-write
+ coverage coverage
 
 # Expected: >95% line coverage
 ----
@@ -161,7 +161,7 @@ _Score_: 100% ✅
 _Verification_:
 [source,bash]
 ----
-deno bench --allow-read --allow-write benchmarks/
+ bench --allow-read --allow-write benchmarks/
 ----
 
 === 7. Security (8/8) ✅
@@ -171,7 +171,7 @@ _Platinum Requirement: Comprehensive Security_
 * [x] security.txt (RFC 9116 CVE disclosure)
 * [x] THREAT_MODEL.md (formal threat analysis)
 * [x] security/audit.sh (automated security scanning)
-* [x] Deno permissions (explicit `--allow-*`)
+* [x]  permissions (explicit `--allow-*`)
 * [x] WASM sandboxing (isolated linear memory)
 * [x] No hardcoded secrets
 * [x] Cargo audit (Rust dependency CVEs)
@@ -186,7 +186,7 @@ _Verification_:
 ./security/audit.sh
 
 # Should output:
-# ✅ Deno dependencies verified
+# ✅  dependencies verified
 # ✅ Rust security audit complete
 # ✅ Trivy filesystem scan complete
 # ✅ Type safety verified
@@ -247,7 +247,7 @@ _Score_: 100%
 === 12. Reproducibility (3/3) ✅
 
 * [x] _Nix flake_: `flake.nix` for reproducible builds
-* [x] _Locked dependencies_: Deno caches exact versions
+* [x] _Locked dependencies_:  caches exact versions
 * [x] _CI/CD_: GitLab CI verifies builds
 
 _Score_: 100%
@@ -269,7 +269,7 @@ ls -la src/i18n/
 # Should show: en.json, es.json
 
 # Test language switching
-UBICITY_LANG=es deno task capture
+UBICITY_LANG=es  task capture
 ----
 
 === 14. Accessibility (4/4) ✅
@@ -379,7 +379,7 @@ What sets Platinum apart from Gold:
 . _Threat Model_ - Comprehensive security analysis
 . _Performance SLOs_ - Defined and enforced
 . _Comprehensive API Docs_ - Auto-generated + manual
-. _Security Automation_ - Multi-layer scanning (Trivy, cargo audit, Deno)
+. _Security Automation_ - Multi-layer scanning (Trivy, cargo audit, )
 
 '''
 
@@ -393,9 +393,9 @@ _Automated Verification_ (CI/CD):
 verify:rsr-compliance:
   script:
     - ./security/audit.sh
-    - deno test --coverage
-    - deno bench
-    - deno check src/**/*.ts
+    -  test --coverage
+    -  bench
+    -  check src/**/*.ts
     - test -f THREAT_MODEL.md
     - test -f RELEASE_PROCESS.md
     - test -f ACCESSIBILITY.md
@@ -420,16 +420,16 @@ ls -la README.md LICENSE.txt CONTRIBUTING.md CODE_OF_CONDUCT.md \
        ACCESSIBILITY.md docs/API.md .well-known/*.txt
 
 # 2. Type safety
-deno check src/**/*.ts
-rescript build
+ check src/**/*.ts
+ build
 cd wasm && cargo clippy -- -D warnings
 
 # 3. Tests (>95% coverage)
-deno test --coverage=coverage --allow-read --allow-write
-deno coverage coverage  # Check >95%
+ test --coverage=coverage --allow-read --allow-write
+ coverage coverage  # Check >95%
 
 # 4. Benchmarks (SLOs met)
-deno bench --allow-read --allow-write
+ bench --allow-read --allow-write
 
 # 5. Security audit
 ./security/audit.sh
@@ -521,7 +521,7 @@ _Comparison to Other Tiers_:
 _To Maintain Platinum Tier_:
 
 . _Quarterly review_ of this document
-. _Update dependencies_ (Deno, Rust crates)
+. _Update dependencies_ (, Rust crates)
 . _Keep test coverage >95%_
 . _Security audits_ on each release
 . _Update threat model_ when architecture changes

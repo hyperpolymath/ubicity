@@ -22,6 +22,6 @@
 
 == Invariant Verification
 
-* **no-direct-storage**: grep -r "NodeJs.Fs" src-rescript/Capture*.res (should be empty)
+* **no-direct-storage**: grep -r "NodeJs.Fs" src-/Capture*.res (should be empty)
 * **validation-in-core**: All .make() calls should be from UbiCity module
 * **no-business-logic-in-cli**: No domain calculations in CLI (only formatting/display)

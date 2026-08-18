@@ -3,10 +3,10 @@
 ## TL;DR
 
 v0.3 is a **complete architectural rewrite** using modern tooling:
-- **Deno** replaces Node.js/npm
-- **ReScript** for type-safe business logic
+- **** replaces Node.js/npm
+- **** for type-safe business logic
 - **WASM** (Rust) for performance-critical code
-- **TypeScript** as glue layer
+- **** as glue layer
 
 Your **data remains 100% compatible**.
 
@@ -14,7 +14,7 @@ Your **data remains 100% compatible**.
 
 ## Breaking Changes
 
-### 1. Runtime: Node.js → Deno
+### 1. Runtime: Node.js → 
 
 **Before (v0.2)**:
 ```bash
@@ -25,21 +25,21 @@ node src/cli.js report
 **After (v0.3)**:
 ```bash
 # No installation needed!
-deno task report
+ task report
 
 # Or use just (recommended)
 just report
 ```
 
-### 2. Module System: npm packages → Deno/JSR
+### 2. Module System: npm packages → /JSR
 
 **Before (v0.2)**:
-```typescript
+```
 import { createMapper } from './src/index.js';
 ```
 
 **After (v0.3)**:
-```typescript
+```
 import { createMapper } from './src/index.ts';  // .ts extension
 ```
 
@@ -51,10 +51,10 @@ import { createMapper } from './src/index.ts';  // .ts extension
 - Zod for validation
 
 **After (v0.3)**:
-- deno.json with JSR imports
+- .json with JSR imports
 - No node_modules
 - WASM for validation (10-100x faster)
-- ReScript for business logic
+-  for business logic
 
 ### 4. Build Process
 
@@ -63,12 +63,12 @@ No build needed (pure JS)
 
 **After (v0.3)**:
 ```bash
-# Build ReScript + WASM
+# Build  + WASM
 just build
 
 # Or separate
-deno task rescript:build
-deno task wasm:build
+ task :build
+ task wasm:build
 ```
 
 ---
@@ -77,9 +77,9 @@ deno task wasm:build
 
 ### Prerequisites
 
-1. **Deno** (required)
+1. **** (required)
 ```bash
-curl -fsSL https://deno.land/install.sh | sh
+curl -fsSL https:///install.sh | sh
 ```
 
 2. **Rust** (for WASM compilation)
@@ -88,9 +88,9 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 rustup target add wasm32-unknown-unknown
 ```
 
-3. **ReScript** (for business logic compilation)
+3. **** (for business logic compilation)
 ```bash
-npm install -g rescript  # One-time global install
+npm install -g   # One-time global install
 ```
 
 4. **just** (optional but recommended)
@@ -105,9 +105,9 @@ cargo install just
 just setup
 just build
 
-# Or using Deno tasks
-deno task rescript:build
-deno task wasm:build
+# Or using  tasks
+ task :build
+ task wasm:build
 ```
 
 ---
@@ -131,7 +131,7 @@ deno task wasm:build
 ### Memory Usage
 
 **Before (v0.2)**: ~50MB for 1000 experiences
-**After (v0.3)**: ~20MB for 1000 experiences (ReScript optimization)
+**After (v0.3)**: ~20MB for 1000 experiences ( optimization)
 
 **60% less memory**
 
@@ -146,12 +146,12 @@ just compile
 ./bin/ubicity report  # Standalone binary!
 ```
 
-No Deno runtime needed for deployment.
+No  runtime needed for deployment.
 
 ### 2. Type Safety
 
-ReScript provides **compile-time type checking**:
-```rescript
+ provides **compile-time type checking**:
+```
 // This won't compile if types don't match
 let experience = LearningExperience.make(
   ~learner=invalidLearner,  // Compile error!
@@ -163,7 +163,7 @@ let experience = LearningExperience.make(
 
 ### 3. Functional Programming
 
-```rescript
+```
 // Immutable data, pure functions
 let interdisciplinary = experiences
   ->Analysis.findInterdisciplinary
@@ -173,8 +173,8 @@ let interdisciplinary = experiences
 
 ### 4. Zero Config
 
-No tsconfig.json, no webpack, no babel.
-Just `deno.json` and you're done.
+No onfig.json, no webpack, no babel.
+Just `.json` and you're done.
 
 ---
 
@@ -183,15 +183,15 @@ Just `deno.json` and you're done.
 ### Step 1: Install Prerequisites
 
 ```bash
-# Deno
-curl -fsSL https://deno.land/install.sh | sh
+# 
+curl -fsSL https:///install.sh | sh
 
 # Rust (for WASM)
 curl https://sh.rustup.rs -sSf | sh
 rustup target add wasm32-unknown-unknown
 
-# ReScript
-npm install -g rescript
+# 
+npm install -g 
 
 # just (optional)
 cargo install just
@@ -214,7 +214,7 @@ just stats  # Should show your existing experiences
 ### Step 4: Run Tests
 
 ```bash
-just test  # Or: deno task test
+just test  # Or:  task test
 ```
 
 ### Step 5: Update Your Scripts
@@ -247,14 +247,14 @@ The JSON schema is identical. Only the runtime changed.
 
 ## Troubleshooting
 
-### "Command not found: deno"
+### "Command not found: "
 
-Install Deno:
+Install :
 ```bash
-curl -fsSL https://deno.land/install.sh | sh
+curl -fsSL https:///install.sh | sh
 
 # Add to PATH
-echo 'export PATH="$HOME/.deno/bin:$PATH"' >> ~/.bashrc
+echo 'export PATH="$HOME/./bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
@@ -265,23 +265,23 @@ Install Rust and wasm32 target:
 rustup target add wasm32-unknown-unknown
 ```
 
-### "ReScript not found"
+### " not found"
 
 Install globally:
 ```bash
-npm install -g rescript
+npm install -g 
 ```
 
 ### "Permission denied"
 
-Deno requires explicit permissions:
+ requires explicit permissions:
 ```bash
-deno run --allow-read --allow-write src/cli.ts report
+ run --allow-read --allow-write src/cli.ts report
 ```
 
 Or use the tasks (permissions pre-configured):
 ```bash
-deno task report
+ task report
 ```
 
 ---
@@ -304,7 +304,7 @@ Your data works with both versions.
 
 ### Benchmark Results
 
-| Operation | v0.2 (Node.js) | v0.3 (Deno+WASM) | Improvement |
+| Operation | v0.2 (Node.js) | v0.3 (+WASM) | Improvement |
 |-----------|----------------|------------------|-------------|
 | Validation | 1.2ms | 0.012ms | 100x |
 | Load 1000 | 45ms | 15ms | 3x |
@@ -318,28 +318,28 @@ Your data works with both versions.
 
 ```
 ┌─────────────────────────────────────────────┐
-│           Deno Runtime (TypeScript)         │
+│            Runtime ()         │
 │  ┌──────────────┐        ┌──────────────┐  │
 │  │   CLI/API    │◄──────►│   Storage    │  │
 │  └──────┬───────┘        └──────────────┘  │
 │         │                                    │
 │         ▼                                    │
 │  ┌─────────────────────────────────┐       │
-│  │     TypeScript Glue Layer        │       │
+│  │      Glue Layer        │       │
 │  └────┬──────────────────┬──────────┘       │
 │       │                  │                   │
 │       ▼                  ▼                   │
 │  ┌──────────┐      ┌──────────┐            │
-│  │ ReScript │      │   WASM   │            │
+│  │  │      │   WASM   │            │
 │  │ Business │      │ Performance│            │
 │  │  Logic   │      │  Critical  │            │
 │  └──────────┘      └──────────┘            │
 └─────────────────────────────────────────────┘
 ```
 
-**ReScript**: Type-safe business logic (functional)
+****: Type-safe business logic (functional)
 **WASM (Rust)**: Validation, analysis, computations
-**TypeScript**: Glue layer, I/O, CLI
+****: Glue layer, I/O, CLI
 
 ---
 
@@ -355,25 +355,25 @@ just viz
 
 ### Explore the Code
 
-- `src-rescript/UbiCity.res` - Functional business logic
+- `src-/UbiCity.res` - Functional business logic
 - `wasm/src/lib.rs` - Performance-critical Rust
-- `src/storage.ts` - Deno file I/O
+- `src/storage.ts` -  file I/O
 - `src/*-bridge.ts` - Integration glue
 
 ### Read the Docs
 
 - `README.md` - Updated architecture overview
 - `justfile` - All available commands
-- `deno.json` - Configuration and tasks
+- `.json` - Configuration and tasks
 
 ---
 
 ## FAQ
 
-**Q: Why Deno over Node.js?**
-A: Built-in TypeScript, secure by default, modern tooling, no node_modules.
+**Q: Why  over Node.js?**
+A: Built-in , secure by default, modern tooling, no node_modules.
 
-**Q: Why ReScript over TypeScript?**
+**Q: Why  over ?**
 A: Stronger type system, better optimization, functional programming, OCaml heritage.
 
 **Q: Why WASM?**

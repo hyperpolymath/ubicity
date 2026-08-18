@@ -19,14 +19,14 @@ The following files in `.machine_readable/` contain structured project metadata:
 
 | Language/Tool | Use Case | Notes |
 |---------------|----------|-------|
-| **ReScript** | Primary application code | Compiles to JS, type-safe |
+| **** | Primary application code | Compiles to JS, type-safe |
 | **Deno** | Runtime & package management | Replaces Node/npm/bun |
 | **Rust** | Performance-critical, systems, WASM | Preferred for CLI tools |
 | **Tauri 2.0+** | Mobile apps (iOS/Android) | Rust backend + web UI |
 | **Dioxus** | Mobile apps (native UI) | Pure Rust, React-like |
 | **Gleam** | Backend services | Runs on BEAM or compiles to JS |
 | **Bash/POSIX Shell** | Scripts, automation | Keep minimal |
-| **JavaScript** | Only where ReScript cannot | MCP protocol glue, Deno APIs |
+| **JavaScript** | Only where  cannot | MCP protocol glue, Deno APIs |
 | **Python** | SaltStack only | No other Python permitted |
 | **Nickel** | Configuration language | For complex configs |
 | **Guile Scheme** | State/meta files | .machine_readable/6a2/STATE.a2ml, .machine_readable/6a2/META.a2ml, .machine_readable/6a2/ECOSYSTEM.a2ml |
@@ -38,13 +38,13 @@ The following files in `.machine_readable/` contain structured project metadata:
 
 | Banned | Replacement |
 |--------|-------------|
-| TypeScript | ReScript |
+|  |  |
 | Node.js | Deno |
 | npm | Deno |
 | Bun | Deno |
 | pnpm/yarn | Deno |
 | Go | Rust |
-| Python (general) | ReScript/Rust |
+| Python (general) | /Rust |
 | Java/Kotlin | Rust/Tauri/Dioxus |
 | Swift | Tauri/Dioxus |
 | React Native | Tauri/Dioxus |
@@ -54,14 +54,14 @@ The following files in `.machine_readable/` contain structured project metadata:
 
 **No exceptions for Kotlin/Swift** - use Rust-first approach:
 
-1. **Tauri 2.0+** - Web UI (ReScript) + Rust backend, MIT/Apache-2.0
+1. **Tauri 2.0+** - Web UI () + Rust backend, MIT/Apache-2.0
 2. **Dioxus** - Pure Rust native UI, MIT/Apache-2.0
 
 Both are FOSS with independent governance (no Big Tech).
 
 ### Enforcement Rules
 
-1. **No new TypeScript files** - Convert existing TS to ReScript
+1. **No new  files** - Convert existing TS to 
 2. **No package.json for runtime deps** - Use deno.json imports
 3. **No node_modules in production** - Deno caches deps automatically
 4. **No Go code** - Use Rust instead
@@ -82,15 +82,15 @@ Both are FOSS with independent governance (no Big Tech).
 - SHA-pinned dependencies
 - SPDX license headers on all files
 
-### TypeScript Exemptions (Approved)
+###  Exemptions (Approved)
 
-The hyperpolymath "no new TypeScript" policy has the following approved exemptions in this repo. These are *not* policy violations — they are documented carve-outs.
+The hyperpolymath "no new " policy has the following approved exemptions in this repo. These are *not* policy violations — they are documented carve-outs.
 
 | Path | Files | Rationale | Unblock condition |
 |---|---|---|---|
 | `src/wasm-bridge.ts` | 1 | Explicit FFI bridge between TS host and WASM core; thin glue, no application logic. | AffineScript first-class WASM-direct invocation surface. |
-| `src/rescript-bridge.ts` | 1 | Explicit bridge between TS host and ReScript layer; thin glue. | Replace ReScript layer with AffineScript core (then bridge dissolves). |
+| `src/-bridge.ts` | 1 | Explicit bridge between TS host and  layer; thin glue. | Replace  layer with AffineScript core (then bridge dissolves). |
 | `src/storage.ts` | 1 | Deno-runtime storage interface (KV/Deno.openKv); ecosystem is Deno-native. | AffineScript Deno KV bindings. |
 | `src/observability.ts` | 1 | Deno-runtime observability — OpenTelemetry exporters and Deno.metrics. | AffineScript OTel bindings (post Node-target #35). |
 
-Adding to this list requires explicit user approval and an unblock condition. New TypeScript files outside this list are blocked by the RSR antipattern check.
+Adding to this list requires explicit user approval and an unblock condition. New  files outside this list are blocked by the RSR antipattern check.

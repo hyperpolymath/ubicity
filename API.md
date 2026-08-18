@@ -1,10 +1,10 @@
 # UbiCity API Reference
 
-Developer documentation for the UbiCity ReScript modules.
+Developer documentation for the UbiCity  modules.
 
 ## Overview
 
-UbiCity is implemented in ReScript (compiles to JavaScript). All modules are in `src-rescript/` and compile to `*.res.js` files.
+UbiCity is implemented in  (compiles to JavaScript). All modules are in `src-/` and compile to `*.res.js` files.
 
 ### Module Architecture
 
@@ -23,7 +23,7 @@ UbiCity.res        - Core domain types
 ## Core Types (UbiCity.res)
 
 ### Coordinates
-```rescript
+```
 type t = {
   latitude: float,
   longitude: float,
@@ -34,7 +34,7 @@ let isValid: t => bool
 ```
 
 ### Location
-```rescript
+```
 type t = {
   name: string,
   coordinates: option<Coordinates.t>,
@@ -52,7 +52,7 @@ let make: (
 ```
 
 ### Learner
-```rescript
+```
 type t = {
   id: string,
   name: option<string>,
@@ -68,7 +68,7 @@ let make: (
 ```
 
 ### LearningExperience
-```rescript
+```
 type t = {
   id: string,
   timestamp: string,
@@ -98,14 +98,14 @@ let make: (
 
 ### Creating a Mapper
 ```javascript
-import { make } from './src-rescript/Mapper.res.js';
+import { make } from './src-/Mapper.res.js';
 
 const mapper = await make();
 ```
 
 ### Storing Experiences
 ```javascript
-import { captureExperience } from './src-rescript/Mapper.res.js';
+import { captureExperience } from './src-/Mapper.res.js';
 
 const result = await captureExperience(mapper, experience);
 // Returns: Ok(experienceId) | Error(message)
@@ -133,7 +133,7 @@ const hotspots = identifyHotspots(mapper);
 
 ### Temporal Analysis
 ```javascript
-import { TemporalAnalyzer } from './src-rescript/Analysis.res.js';
+import { TemporalAnalyzer } from './src-/Analysis.res.js';
 
 // Analyze by time of day
 const byTime = TemporalAnalyzer.analyzeByTimeOfDay(experiences);
@@ -149,7 +149,7 @@ const streaks = TemporalAnalyzer.detectStreaks(experiences, 7);
 
 ### Network Analysis
 ```javascript
-import { CollaborativeNetworkAnalyzer } from './src-rescript/Analysis.res.js';
+import { CollaborativeNetworkAnalyzer } from './src-/Analysis.res.js';
 
 const network = CollaborativeNetworkAnalyzer.buildCollaborationNetwork(experiences);
 // Returns: { nodes: [{id, size}], edges: [{source, target, weight}] }
@@ -157,7 +157,7 @@ const network = CollaborativeNetworkAnalyzer.buildCollaborationNetwork(experienc
 
 ### Recommendations
 ```javascript
-import { RecommendationEngine } from './src-rescript/Analysis.res.js';
+import { RecommendationEngine } from './src-/Analysis.res.js';
 
 // Similar learners
 const similar = RecommendationEngine.recommendSimilarLearners(
@@ -189,7 +189,7 @@ import {
   anonymizeLearner, 
   anonymizeLocation,
   fullyAnonymize 
-} from './src-rescript/Privacy.res.js';
+} from './src-/Privacy.res.js';
 
 // Anonymize learner ID
 const anon = anonymizeLearner(experience, { 
@@ -209,7 +209,7 @@ const fully = fullyAnonymize(experience);
 
 ### PII Removal
 ```javascript
-import { removePII, sanitizeText } from './src-rescript/Privacy.res.js';
+import { removePII, sanitizeText } from './src-/Privacy.res.js';
 
 // Remove emails, phone numbers, URLs from text
 const cleaned = sanitizeText("Contact me at alice@example.com or 555-1234");
@@ -221,7 +221,7 @@ const cleaned = removePII(experience);
 
 ### Shareable Datasets
 ```javascript
-import { generateShareableDataset } from './src-rescript/Privacy.res.js';
+import { generateShareableDataset } from './src-/Privacy.res.js';
 
 const dataset = generateShareableDataset(experiences, {
   anonymizeLearners: true,
@@ -235,7 +235,7 @@ const dataset = generateShareableDataset(experiences, {
 
 ### CSV Export
 ```javascript
-import { exportToCSV } from './src-rescript/Export.res.js';
+import { exportToCSV } from './src-/Export.res.js';
 
 const csv = exportToCSV(experiences);
 // Returns CSV string with proper escaping
@@ -243,7 +243,7 @@ const csv = exportToCSV(experiences);
 
 ### GeoJSON Export
 ```javascript
-import { exportToGeoJSON } from './src-rescript/Export.res.js';
+import { exportToGeoJSON } from './src-/Export.res.js';
 
 const geojson = exportToGeoJSON(experiences);
 // Returns RFC 7946 compliant GeoJSON FeatureCollection
@@ -251,7 +251,7 @@ const geojson = exportToGeoJSON(experiences);
 
 ### DOT/Graphviz Export
 ```javascript
-import { exportToDOT } from './src-rescript/Export.res.js';
+import { exportToDOT } from './src-/Export.res.js';
 
 const network = { nodes: [...], edges: [...] };
 const dot = exportToDOT(network);
@@ -261,7 +261,7 @@ const dot = exportToDOT(network);
 
 ### Markdown Export
 ```javascript
-import { exportJourneysToMarkdown } from './src-rescript/Export.res.js';
+import { exportJourneysToMarkdown } from './src-/Export.res.js';
 
 const markdown = exportJourneysToMarkdown(experiences);
 // Returns learner journey timelines in Markdown format
@@ -269,7 +269,7 @@ const markdown = exportJourneysToMarkdown(experiences);
 
 ### Universal Export
 ```javascript
-import { exportData } from './src-rescript/Export.res.js';
+import { exportData } from './src-/Export.res.js';
 
 // Auto-routes to appropriate exporter
 const data = exportData(experiences, "csv");
@@ -283,7 +283,7 @@ const data = exportData(experiences, "json");
 
 ### HTML Generation
 ```javascript
-import { generateHTML } from './src-rescript/Visualization.res.js';
+import { generateHTML } from './src-/Visualization.res.js';
 
 const html = generateHTML(
   summary,        // { totalExperiences, uniqueLocations, ... }
@@ -298,7 +298,7 @@ const html = generateHTML(
 
 ### Decode Experiences
 ```javascript
-import { decodeExperiences } from './src-rescript/Decoder.res.js';
+import { decodeExperiences } from './src-/Decoder.res.js';
 
 const rawData = JSON.parse(fs.readFileSync('data.json', 'utf-8'));
 const result = decodeExperiences(rawData);
@@ -315,11 +315,11 @@ if (result.TAG === "Ok") {
 The decoder handles legacy JSON formats:
 - `lat`/`lon` → `latitude`/`longitude`
 - Missing `id`/`timestamp`/`version` (auto-generated)
-- String variants → ReScript polymorphic variants
+- String variants →  polymorphic variants
 
 ## Error Handling
 
-All validation functions return ReScript `Result` types:
+All validation functions return  `Result` types:
 
 ```javascript
 // Result type in compiled JS:
@@ -338,8 +338,8 @@ if (result.TAG === "Ok") {
 
 ## Type Safety
 
-UbiCity is written in ReScript for type safety. The compiled JavaScript includes runtime checks. Types are validated at:
-1. **Compile time** (ReScript type checker)
+UbiCity is written in  for type safety. The compiled JavaScript includes runtime checks. Types are validated at:
+1. **Compile time** ( type checker)
 2. **Runtime** (Decoder module for JSON)
 3. **API boundaries** (validation on user input)
 
@@ -351,7 +351,7 @@ See `examples/` directory:
 
 ## Development
 
-### Compile ReScript
+### Compile 
 ```bash
 npm run res:build
 ```

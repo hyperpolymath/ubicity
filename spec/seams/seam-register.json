@@ -7,13 +7,13 @@
       "name": "CLI to Core Module Boundary",
       "description": "Separates interactive user interface from core business logic. CLI modules handle user interaction and delegate all data manipulation to core modules.",
       "side_a": [
-        "src-rescript/Capture.res",
-        "src-rescript/CaptureCLI.res"
+        "src-/Capture.res",
+        "src-/CaptureCLI.res"
       ],
       "side_b": [
-        "src-rescript/UbiCity.res",
-        "src-rescript/Mapper.res",
-        "src-rescript/Decoder.res"
+        "src-/UbiCity.res",
+        "src-/Mapper.res",
+        "src-/Decoder.res"
       ],
       "seam_type": "module",
       "invariants": [
@@ -43,7 +43,7 @@
       "conformance_paths": [
         "spec/seams/conformance/cli-core-conformance.adoc"
       ],
-      "boundary_path": "src-rescript/Capture.res",
+      "boundary_path": "src-/Capture.res",
       "declared_dependencies": [
         "UbiCity.res",
         "Mapper.res"
@@ -54,12 +54,12 @@
       "name": "Privacy Protection Boundary",
       "description": "Security seam that ensures PII protection and anonymization. All data crossing export boundaries must pass through privacy checks.",
       "side_a": [
-        "src-rescript/Mapper.res",
-        "src-rescript/Analysis.res",
-        "src-rescript/UbiCity.res"
+        "src-/Mapper.res",
+        "src-/Analysis.res",
+        "src-/UbiCity.res"
       ],
       "side_b": [
-        "src-rescript/Privacy.res"
+        "src-/Privacy.res"
       ],
       "seam_type": "layer",
       "invariants": [
@@ -107,7 +107,7 @@
       "conformance_paths": [
         "spec/seams/conformance/privacy-boundary-conformance.adoc"
       ],
-      "boundary_path": "src-rescript/Privacy.res",
+      "boundary_path": "src-/Privacy.res",
       "declared_dependencies": []
     },
     {
@@ -115,12 +115,12 @@
       "name": "Data Layer to Analysis Logic Boundary",
       "description": "Separates data decoding/storage from analysis logic. Ensures analysis modules work with validated domain types.",
       "side_a": [
-        "src-rescript/Decoder.res",
-        "src-rescript/Mapper.res (storage functions)"
+        "src-/Decoder.res",
+        "src-/Mapper.res (storage functions)"
       ],
       "side_b": [
-        "src-rescript/Mapper.res (query functions)",
-        "src-rescript/Analysis.res"
+        "src-/Mapper.res (query functions)",
+        "src-/Analysis.res"
       ],
       "seam_type": "module",
       "invariants": [
@@ -150,7 +150,7 @@
       "conformance_paths": [
         "spec/seams/conformance/data-analysis-conformance.adoc"
       ],
-      "boundary_path": "src-rescript/Decoder.res",
+      "boundary_path": "src-/Decoder.res",
       "declared_dependencies": [
         "UbiCity.res"
       ]
@@ -160,12 +160,12 @@
       "name": "Analysis to Export/Visualization Boundary",
       "description": "Separates analytical computations from presentation formats. Analysis produces structured data, Export/Visualization format it.",
       "side_a": [
-        "src-rescript/Analysis.res",
-        "src-rescript/Mapper.res"
+        "src-/Analysis.res",
+        "src-/Mapper.res"
       ],
       "side_b": [
-        "src-rescript/Export.res",
-        "src-rescript/Visualization.res"
+        "src-/Export.res",
+        "src-/Visualization.res"
       ],
       "seam_type": "module",
       "invariants": [
@@ -195,7 +195,7 @@
       "conformance_paths": [
         "spec/seams/conformance/analysis-export-conformance.adoc"
       ],
-      "boundary_path": "src-rescript/Export.res",
+      "boundary_path": "src-/Export.res",
       "declared_dependencies": [
         "UbiCity.res",
         "Analysis.res"

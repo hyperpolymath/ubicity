@@ -17,8 +17,8 @@ ____
 | Technology | Learn More
 
 | **Zig** | https://ziglang.org
-| **Deno** | https://deno.land
-| **ReScript** | https://rescript-lang.org
+| **** | https://
+| **** | https://-lang.org
 | **Idris2 ABI** | https://www.idris-lang.org
 |===
 

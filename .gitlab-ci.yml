@@ -13,10 +13,10 @@ variables:
   NODE_VERSION: "20"
 
 # Templates
-.deno-base:
-  image: denoland/deno:${DENO_VERSION}
+.-base:
+  image: denoland/:${DENO_VERSION}
   before_script:
-    - deno --version
+    -  --version
 
 .rust-base:
   image: rust:${RUST_VERSION}
@@ -26,12 +26,12 @@ variables:
     - rustup target add wasm32-unknown-unknown
 
 # Lint Stage
-lint:deno:
-  extends: .deno-base
+lint::
+  extends: .-base
   stage: lint
   script:
-    - deno lint
-    - deno fmt --check
+    -  lint
+    -  fmt --check
   allow_failure: false
 
 lint:rust:
@@ -44,16 +44,16 @@ lint:rust:
   allow_failure: false
 
 # Build Stage
-build:rescript:
+build::
   image: node:${NODE_VERSION}
   stage: build
   before_script:
-    - npm install -g rescript
+    - npm install -g 
   script:
-    - rescript build
+    -  build
   artifacts:
     paths:
-      - src-rescript/**/*.res.js
+      - src-/**/*.res.js
     expire_in: 1 hour
 
 build:wasm:
@@ -74,29 +74,29 @@ build:wasm:
 
 # Test Stage
 test:unit:
-  extends: .deno-base
+  extends: .-base
   stage: test
   dependencies:
-    - build:rescript
+    - build:
     - build:wasm
   script:
-    - deno test --allow-read --allow-write tests/
+    -  test --allow-read --allow-write tests/
   coverage: '/\d+\.\d+% coverage/'
 
 test:integration:
-  extends: .deno-base
+  extends: .-base
   stage: test
   dependencies:
-    - build:rescript
+    - build:
     - build:wasm
   script:
-    - deno run --allow-read --allow-write src/cli.ts stats
-    - deno run --allow-read --allow-write src/cli.ts help
+    -  run --allow-read --allow-write src/cli.ts stats
+    -  run --allow-read --allow-write src/cli.ts help
   allow_failure: false
 
 # Verify Stage (RSR Compliance)
 verify:rsr-compliance:
-  extends: .deno-base
+  extends: .-base
   stage: verify
   script:
     - |
@@ -121,14 +121,13 @@ verify:rsr-compliance:
       # Check build system
       echo "Checking build system..."
       test -f justfile && echo "✅ justfile" || (echo "❌ justfile missing" && exit 1)
-      test -f deno.json && echo "✅ deno.json" || (echo "❌ deno.json missing" && exit 1)
+      test -f .json && echo "✅ .json" || (echo "❌ .json missing" && exit 1)
       test -f flake.nix && echo "✅ flake.nix" || (echo "❌ flake.nix missing" && exit 1)
 
       # Check type safety
       echo "Checking type safety..."
-      deno check src/**/*.ts && echo "✅ TypeScript type-safe" || (echo "❌ Type errors found" && exit 1)
       test -f wasm/Cargo.toml && echo "✅ Rust WASM present" || (echo "❌ WASM missing" && exit 1)
-      test -f src-rescript/UbiCity.res && echo "✅ ReScript present" || (echo "❌ ReScript missing" && exit 1)
+      test -f src-/UbiCity.res && echo "✅  present" || (echo "❌  missing" && exit 1)
 
       echo ""
       echo "✅ RSR Compliance: PASSED"
@@ -136,7 +135,7 @@ verify:rsr-compliance:
   allow_failure: false
 
 verify:offline-first:
-  extends: .deno-base
+  extends: .-base
   stage: verify
   script:
     - |
@@ -153,17 +152,17 @@ verify:offline-first:
       echo "✅ Offline-First: VERIFIED"
 
 verify:security:
-  extends: .deno-base
+  extends: .-base
   stage: verify
   script:
     - |
       echo "🔒 Security Verification"
       echo "======================="
 
-      # Check Deno permissions
-      echo "Checking Deno permission model..."
-      grep -q "allow-read" deno.json && echo "✅ Explicit read permissions" || echo "⚠️  No read permissions specified"
-      grep -q "allow-write" deno.json && echo "✅ Explicit write permissions" || echo "⚠️  No write permissions specified"
+      # Check  permissions
+      echo "Checking  permission model..."
+      grep -q "allow-read" .json && echo "✅ Explicit read permissions" || echo "⚠️  No read permissions specified"
+      grep -q "allow-write" .json && echo "✅ Explicit write permissions" || echo "⚠️  No write permissions specified"
 
       # Verify no unsafe Rust
       echo "Checking Rust safety..."
@@ -179,12 +178,12 @@ verify:security:
 
 # Deploy Stage (for releases)
 deploy:pages:
-  extends: .deno-base
+  extends: .-base
   stage: deploy
   only:
     - tags
   script:
-    - deno run --allow-read --allow-write src/visualize.ts
+    -  run --allow-read --allow-write src/visualize.ts
     - mkdir -p public
     - cp ubicity-data/ubicity-map.html public/index.html
   artifacts:
@@ -196,16 +195,16 @@ deploy:pages:
 
 # Release compilation (for tags)
 compile:release:
-  extends: .deno-base
+  extends: .-base
   stage: deploy
   only:
     - tags
   dependencies:
-    - build:rescript
+    - build:
     - build:wasm
   script:
-    - deno compile --allow-read --allow-write --output ./bin/ubicity src/cli.ts
-    - deno compile --allow-read --allow-write --output ./bin/ubicity-capture src/capture.ts
+    -  compile --allow-read --allow-write --output ./bin/ubicity src/cli.ts
+    -  compile --allow-read --allow-write --output ./bin/ubicity-capture src/capture.ts
     - ls -lh ./bin/
   artifacts:
     paths:
@@ -214,15 +213,15 @@ compile:release:
 
 # Nightly builds
 nightly:
-  extends: .deno-base
+  extends: .-base
   stage: build
   only:
     - schedules
   dependencies:
-    - build:rescript
+    - build:
     - build:wasm
   script:
-    - deno compile --allow-read --allow-write --output ./bin/ubicity-nightly src/cli.ts
+    -  compile --allow-read --allow-write --output ./bin/ubicity-nightly src/cli.ts
   artifacts:
     paths:
       - bin/

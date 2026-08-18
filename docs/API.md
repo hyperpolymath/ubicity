@@ -578,9 +578,9 @@ try {
 
 See `examples/api-usage.js` for complete working examples.
 
-## TypeScript Support
+##  Support
 
-TypeScript definitions coming in v0.3. For now, use JSDoc:
+ definitions coming in v0.3. For now, use JSDoc:
 
 ```javascript
 /**

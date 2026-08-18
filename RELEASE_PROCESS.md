@@ -38,14 +38,14 @@ This document defines the formal release process for UbiCity, ensuring quality, 
 
 - [ ] Create release branch: `release/vX.Y.Z`
 - [ ] Update `CHANGELOG.md` with all changes
-- [ ] Update version in `deno.json`
+- [ ] Update version in `.json`
 - [ ] Update version in `wasm/Cargo.toml`
-- [ ] Update version in `src-rescript/package.json`
-- [ ] Run full test suite: `deno task test`
-- [ ] Run benchmarks: `deno task bench`
+- [ ] Update version in `src-/package.json`
+- [ ] Run full test suite: ` task test`
+- [ ] Run benchmarks: ` task bench`
 - [ ] Verify performance SLOs met
 - [ ] Run security audit: `./security/audit.sh`
-- [ ] Check test coverage ≥ 95%: `deno coverage`
+- [ ] Check test coverage ≥ 95%: ` coverage`
 - [ ] Verify offline-first (no network calls)
 - [ ] Test all export formats (CSV, GeoJSON, DOT, Markdown)
 - [ ] Verify data migration (if major/minor)
@@ -56,7 +56,7 @@ This document defines the formal release process for UbiCity, ensuring quality, 
 ### 2. Release Candidate (RC)
 
 - [ ] Tag RC: `git tag vX.Y.Z-rc.1`
-- [ ] Build binaries: `deno task compile`
+- [ ] Build binaries: ` task compile`
 - [ ] Test binaries on all platforms (Linux, macOS, Windows)
 - [ ] Smoke test: fresh install, capture experience, export
 - [ ] Beta testing (internal or community)
@@ -92,9 +92,9 @@ This document defines the formal release process for UbiCity, ensuring quality, 
 ### Compiled Binaries
 ```bash
 # Compile for all platforms
-deno task compile:cli      # ubicity CLI
-deno task compile:capture  # capture tool
-deno task compile:wasm     # WASM module
+ task compile:cli      # ubicity CLI
+ task compile:capture  # capture tool
+ task compile:wasm     # WASM module
 ```
 
 **Platforms**:
@@ -222,9 +222,9 @@ Following [Keep a Changelog](https://keepachangelog.com/):
 - ✅ Test coverage ≥ 95%
 - ✅ Benchmarks meet SLOs
 - ✅ Security audit passes
-- ✅ No TypeScript errors (`deno check`)
-- ✅ No lint warnings (`deno lint`)
-- ✅ Format check passes (`deno fmt --check`)
+- ✅ No  errors (` check`)
+- ✅ No lint warnings (` lint`)
+- ✅ Format check passes (` fmt --check`)
 
 ### Regression Testing
 - Test data migration from previous versions
@@ -319,10 +319,10 @@ release:
   only:
     - tags
   script:
-    - deno task test
-    - deno task bench
+    -  task test
+    -  task bench
     - ./security/audit.sh
-    - deno task compile
+    -  task compile
     - ./scripts/checksum.sh
     - ./scripts/sign.sh
     - gh release create $CI_COMMIT_TAG bin/*

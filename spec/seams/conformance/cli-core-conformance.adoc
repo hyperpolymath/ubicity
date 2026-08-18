@@ -11,7 +11,7 @@ The CLI-Core seam separates interactive user interface from core business logic.
 
 === ✓ CLI delegates to Mapper for storage
 
-[source,rescript]
+[source,]
 ----
 // CORRECT: Capture.res delegates to Mapper
 // File: Capture.res
@@ -39,7 +39,7 @@ let captureExperience = async (
 
 === ✓ Validation in core modules
 
-[source,rescript]
+[source,]
 ----
 // CORRECT: Validation in UbiCity.res, not CLI
 // File: UbiCity.res
@@ -66,7 +66,7 @@ switch location {
 
 === ✓ CLI has no business logic
 
-[source,rescript]
+[source,]
 ----
 // CORRECT: CLI only handles presentation
 // File: CaptureCLI.res
@@ -85,7 +85,7 @@ let promptForExperienceType = async () => {
 
 === ✗ CLI directly manipulates files
 
-[source,rescript]
+[source,]
 ----
 // WRONG: Capture.res directly writes to storage
 // File: Capture.res
@@ -107,7 +107,7 @@ let captureExperience = async (~experience) => {
 
 === ✗ Validation in CLI
 
-[source,rescript]
+[source,]
 ----
 // WRONG: CLI validates input instead of delegating to core
 // File: Capture.res
@@ -130,7 +130,7 @@ let validateLocationName = (name: string) => {
 
 === ✗ Business logic in CLI
 
-[source,rescript]
+[source,]
 ----
 // WRONG: CLI calculates domain-specific values
 // File: CaptureCLI.res
@@ -149,7 +149,7 @@ let generateExperienceId = () => {
 
 === ✗ CLI queries storage directly
 
-[source,rescript]
+[source,]
 ----
 // WRONG: CLI reads experiences for count
 // File: CaptureCLI.res
@@ -189,7 +189,7 @@ File System
 
 === Interactive prompts with defaults
 
-[source,rescript]
+[source,]
 ----
 // OK: CLI can have default values for UX
 let promptWithDefault = async (~prompt: string, ~default: string) => {
@@ -210,7 +210,7 @@ let privacy = Privacy.make(~level=userInput)  // Validates in UbiCity.res
 
 === Error formatting
 
-[source,rescript]
+[source,]
 ----
 // OK: CLI can format error messages for display
 // File: Capture.res
@@ -229,19 +229,19 @@ switch Location.make(~name=input, ()) {
 
 == Testing CLI-Core Boundary
 
-[source,rescript]
+[source,]
 ----
 // Unit test: Core modules don't import CLI modules
 // File: test/seam-cli-core.test.mjs
 
 test('UbiCity.res does not import Capture.res', async () => {
-  const source = fs.readFileSync('src-rescript/UbiCity.res', 'utf-8');
+  const source = fs.readFileSync('src-/UbiCity.res', 'utf-8');
   assert(!source.includes('Capture'));
   assert(!source.includes('CaptureCLI'));
 });
 
 test('Mapper.res does not import Capture.res', async () => {
-  const source = fs.readFileSync('src-rescript/Mapper.res', 'utf-8');
+  const source = fs.readFileSync('src-/Mapper.res', 'utf-8');
   assert(!source.includes('Capture'));
 });
 ----
@@ -264,6 +264,6 @@ When modifying core modules:
 
 == References
 
-- CLI modules: `src-rescript/Capture.res`, `src-rescript/CaptureCLI.res`
-- Core modules: `src-rescript/UbiCity.res`, `src-rescript/Mapper.res`
+- CLI modules: `src-/Capture.res`, `src-/CaptureCLI.res`
+- Core modules: `src-/UbiCity.res`, `src-/Mapper.res`
 - CLI tests: `test/cli-smoke.test.mjs`
