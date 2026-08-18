@@ -21,9 +21,9 @@ Instead, please:
 ## Security Measures
 
 - **Memory Safety**: WASM (Rust) provides memory safety guarantees
-- **Type Safety**: ReScript compile-time types
+- **Type Safety**:  compile-time types
 - **Sandboxing**: WASM runs in isolated linear memory
-- **Permissions**: Deno explicit permissions (`--allow-read`, `--allow-write`)
+- **Permissions**:  explicit permissions (`--allow-read`, `--allow-write`)
 - **Data Privacy**: Local-first, no network calls, no telemetry
 - **Offline-First**: Works completely air-gapped
 

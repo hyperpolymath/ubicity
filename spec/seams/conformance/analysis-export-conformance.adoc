@@ -11,7 +11,7 @@ The Analysis-Export seam separates analytical computations from presentation for
 
 === ✓ Analysis produces typed results
 
-[source,rescript]
+[source,]
 ----
 // CORRECT: Analysis returns structured types
 // File: Analysis.res
@@ -43,7 +43,7 @@ let csv = `morning,${results.morning->Int.toString}\n...`
 
 === ✓ Export formats existing data
 
-[source,rescript]
+[source,]
 ----
 // CORRECT: Export.res formats, doesn't compute
 // File: Export.res
@@ -64,7 +64,7 @@ let exportToCSV = (experiences: array<LearningExperience.t>): string => {
 
 === ✓ Visualization generates presentation, not insights
 
-[source,rescript]
+[source,]
 ----
 // CORRECT: Visualization.res generates HTML from pre-computed data
 // File: Visualization.res
@@ -91,7 +91,7 @@ let generateHTML = (
 
 === ✗ Export performs analysis
 
-[source,rescript]
+[source,]
 ----
 // WRONG: Export.res calculates statistics
 // File: Export.res
@@ -116,7 +116,7 @@ let exportToCSV = (experiences: array<LearningExperience.t>): string => {
 
 === ✗ Analysis generates output formats
 
-[source,rescript]
+[source,]
 ----
 // WRONG: Analysis.res returns CSV string
 // File: Analysis.res
@@ -137,7 +137,7 @@ module TemporalAnalyzer = {
 
 === ✗ Export works with analysis-specific structures
 
-[source,rescript]
+[source,]
 ----
 // WRONG: Export coupled to Analysis internals
 // File: Export.res
@@ -163,7 +163,7 @@ let exportAnalysisResults = (internal: analysisInternal): string => {
 
 === ✗ Visualization computes network layout
 
-[source,rescript]
+[source,]
 ----
 // WRONG: Visualization.res performs graph layout
 // File: Visualization.res
@@ -201,7 +201,7 @@ Output (CSV, HTML, GeoJSON, DOT, etc.)
 
 === Lightweight formatting in analysis results
 
-[source,rescript]
+[source,]
 ----
 // OK: Simple data formatting for clarity
 // File: Analysis.res
@@ -228,7 +228,7 @@ This is acceptable - ISO date format is data representation, not presentation.
 
 === Export doing validation
 
-[source,rescript]
+[source,]
 ----
 // CAREFUL: Export can validate inputs
 // File: Export.res
@@ -248,7 +248,7 @@ This is a gray area but acceptable - Export can validate its inputs are suitable
 
 === Analysis that outputs strings for non-format reasons
 
-[source,rescript]
+[source,]
 ----
 // OK: Analysis can return strings if they're domain data
 // File: Analysis.res
@@ -288,7 +288,7 @@ When modifying Export/Visualization modules:
 // File: test/seam-analysis-export.test.mjs
 
 test('Analysis.res does not import Export.res', () => {
-  const source = fs.readFileSync('src-rescript/Analysis.res', 'utf-8');
+  const source = fs.readFileSync('src-/Analysis.res', 'utf-8');
   assert(!source.includes('Export'));
   assert(!source.includes('Visualization'));
 });
@@ -308,6 +308,6 @@ test('Analysis functions return typed objects', () => {
 
 == References
 
-- Analysis modules: `src-rescript/Analysis.res`, `src-rescript/Mapper.res` (hotspots, networks)
-- Export modules: `src-rescript/Export.res`, `src-rescript/Visualization.res`
+- Analysis modules: `src-/Analysis.res`, `src-/Mapper.res` (hotspots, networks)
+- Export modules: `src-/Export.res`, `src-/Visualization.res`
 - Tests: `test/analysis.test.mjs`, `test/export.test.mjs`, `test/visualization.test.mjs`

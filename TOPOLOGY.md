@@ -59,7 +59,7 @@ CORE CAPTURE & DATA
 
 INTERFACES & VIZ
   Voyant Export                     ██████████ 100%    Text analysis bridge active
-  ReScript UI (src-rescript)        ██████░░░░  60%    Web dashboard in progress
+   UI (src-)        ██████░░░░  60%    Web dashboard in progress
   D3.js Learning Maps               ████░░░░░░  40%    Spatial viz prototyping
 
 REPO INFRASTRUCTURE

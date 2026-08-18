@@ -57,7 +57,7 @@ The `examples/populate-examples.js` shows realistic scenarios:
 
 **Runtime**: Node.js v22
 **Module System**: CommonJS (legacy, not ESM)
-**Language**: Plain JavaScript (no TypeScript)
+**Language**: Plain JavaScript (no )
 **Dependencies**: ZERO - only Node.js stdlib (fs, path, crypto, readline)
 
 **Why This Stack?**
@@ -76,7 +76,7 @@ The `examples/populate-examples.js` shows realistic scenarios:
 Critical issues documented in `STACK_ANALYSIS.md` and `DENO_MIGRATION_PREVIEW.md`:
 
 1. **CommonJS not ESM**: Using legacy `require()` instead of modern `import`
-2. **No Type Safety**: Plain JS, no TypeScript, no autocomplete/validation
+2. **No Type Safety**: Plain JS, no , no autocomplete/validation
 3. **No Runtime Validation**: JSON schema exists but never actually used in code
 4. **No Tests**: Zero test coverage
 5. **Synchronous I/O**: `fs.readFileSync()` blocks event loop (bad for scalability)
@@ -87,7 +87,7 @@ Critical issues documented in `STACK_ANALYSIS.md` and `DENO_MIGRATION_PREVIEW.md
 
 Three paths documented for user:
 
-#### Option 1: Migrate to Deno + TypeScript (4-6 hours)
+#### Option 1: Migrate to  +  (4-6 hours)
 - Type safety via Zod schemas
 - Explicit permissions (`--allow-read`, `--allow-write`)
 - Built-in tooling (fmt, lint, test)
@@ -238,7 +238,7 @@ If it's #3, resist. The goal is to test the concept, not build a platform.
 
 **Current state**: None. Tools have full filesystem access.
 
-**If migrating to Deno**: Use explicit permissions
+**If migrating to **: Use explicit permissions
 - `--allow-read=./data` (only read data directory)
 - `--allow-write=./data` (only write to data directory)
 
@@ -261,7 +261,7 @@ If it's #3, resist. The goal is to test the concept, not build a platform.
 - **Original implementation**: `Hyperpolymath/zotero-voyant-export`, branch `claude/ubicity-learning-setup-01H8249ctY6CW1u58MdFWLbB`
 - **Critical doc**: `MINIMAL_VIABLE_PROTOCOL.md` (explains constraint philosophy)
 - **Stack analysis**: `STACK_ANALYSIS.md` (technical debt documentation)
-- **Migration preview**: `DENO_MIGRATION_PREVIEW.md` (if choosing Deno path)
+- **Migration preview**: `DENO_MIGRATION_PREVIEW.md` (if choosing  path)
 
 ## Project-Specific Context
 
@@ -296,7 +296,7 @@ If it's #3, resist. The goal is to test the concept, not build a platform.
 
 **Current Status**: User aware of three migration options, has documentation, no decision made.
 
-**If user chooses Option 1 (Deno)**: Follow `DENO_MIGRATION_PREVIEW.md`, budget 4-6 hours, prioritize type safety + permissions
+**If user chooses Option 1 ()**: Follow `DENO_MIGRATION_PREVIEW.md`, budget 4-6 hours, prioritize type safety + permissions
 
 **If user chooses Option 2 (Node fixes)**: ESM conversion first, then Zod validation, then tests
 

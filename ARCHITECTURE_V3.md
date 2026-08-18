@@ -5,23 +5,23 @@
 v0.3 represents a complete architectural transformation:
 - **100x faster** validation (WASM vs Zod)
 - **10x faster** network generation (WASM vs JavaScript)
-- **60% less** memory usage (ReScript optimization)
-- **Type-safe** business logic (ReScript)
-- **Zero config** deployment (Deno)
+- **60% less** memory usage ( optimization)
+- **Type-safe** business logic ()
+- **Zero config** deployment ()
 - **100% compatible** with v0.2 data
 
 ---
 
 ## Technology Stack
 
-### Runtime: Deno
-- Built-in TypeScript support
+### Runtime: 
+- Built-in  support
 - Secure by default (explicit permissions)
 - Modern standard library
 - No node_modules
 - URL-based imports
 
-### Business Logic: ReScript
+### Business Logic: 
 - Functional programming
 - Compile-time type safety
 - OCaml-inspired syntax
@@ -34,10 +34,10 @@ v0.3 represents a complete architectural transformation:
 - Zero-cost abstractions
 - Ahead-of-time compilation
 
-### Glue Layer: TypeScript
+### Glue Layer: 
 - Type-safe integration
-- Deno APIs for I/O
-- Bridge to ReScript and WASM
+-  APIs for I/O
+- Bridge to  and WASM
 
 ---
 
@@ -53,15 +53,15 @@ v0.3 represents a complete architectural transformation:
 └───────────────────┼──────────────────────────────────────┘
                     │
         ┌───────────▼────────────┐
-        │  TypeScript Glue Layer │ (Deno Runtime)
+        │   Glue Layer │ ( Runtime)
         │  • CLI routing          │
         │  • File I/O (storage.ts)│
         │  • WASM bridge          │
-        │  • ReScript bridge      │
+        │  •  bridge      │
         └──┬────────────────┬────┘
            │                │
     ┌──────▼─────┐    ┌────▼──────┐
-    │  ReScript  │    │   WASM    │
+    │    │    │   WASM    │
     │ (Business) │    │(Performance)│
     └────────────┘    └───────────┘
          │                  │
@@ -76,7 +76,7 @@ v0.3 represents a complete architectural transformation:
 
 ## Component Responsibilities
 
-### TypeScript Layer (Deno)
+###  Layer ()
 
 **Purpose**: I/O, CLI, integration
 
@@ -84,20 +84,20 @@ v0.3 represents a complete architectural transformation:
 - `src/storage.ts` - File system operations
 - `src/cli.ts` - Command-line interface
 - `src/wasm-bridge.ts` - WASM integration
-- `src/rescript-bridge.ts` - ReScript integration
+- `src/-bridge.ts` -  integration
 
-**Why TypeScript**: Deno's native language, great for I/O and glue code
+**Why **: 's native language, great for I/O and glue code
 
-### ReScript Layer
+###  Layer
 
 **Purpose**: Type-safe business logic
 
 **Files**:
-- `src-rescript/UbiCity.res` - Domain model and analysis
+- `src-/UbiCity.res` - Domain model and analysis
 
-**Compiles to**: `src-rescript/UbiCity.res.js` (optimized ES6)
+**Compiles to**: `src-/UbiCity.res.js` (optimized ES6)
 
-**Why ReScript**:
+**Why **:
 - Functional programming (immutability, pure functions)
 - Compile-time type safety (no runtime errors)
 - Excellent optimization (smaller, faster code)
@@ -135,14 +135,14 @@ User Input
          │ Valid ✓
          ▼
 ┌─────────────────┐
-│ Storage Layer   │ ◄── TypeScript (Deno APIs)
-│ (TypeScript)    │
+│ Storage Layer   │ ◄──  ( APIs)
+│ ()    │
 └────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│ Analysis Logic  │ ◄── ReScript (functional)
-│  (ReScript)     │
+│ Analysis Logic  │ ◄──  (functional)
+│  ()     │
 └────────┬────────┘
          │
          ▼
@@ -154,9 +154,9 @@ User Input
 
 ### Cold Path (Less Critical)
 
-- Visualization generation → TypeScript (not performance-critical)
-- File exports → TypeScript (I/O bound, not CPU bound)
-- CLI formatting → TypeScript (user interaction, not bottleneck)
+- Visualization generation →  (not performance-critical)
+- File exports →  (I/O bound, not CPU bound)
+- CLI formatting →  (user interaction, not bottleneck)
 
 ---
 
@@ -169,12 +169,12 @@ just build
 ```
 
 Runs:
-1. `rescript build` → Compile ReScript to JavaScript
+1. ` build` → Compile  to JavaScript
 2. `cargo build --release --target wasm32-unknown-unknown` → Compile Rust to WASM
 3. `wasm-opt -Oz` → Optimize WASM for size
 
 Output:
-- `src-rescript/UbiCity.res.js` - Optimized JavaScript
+- `src-/UbiCity.res.js` - Optimized JavaScript
 - `wasm/pkg/ubicity_bg.wasm` - Optimized WASM binary
 
 ### Production Build
@@ -184,8 +184,8 @@ just compile
 ```
 
 Runs:
-1. `just build` (ReScript + WASM)
-2. `deno compile` → Create standalone executables
+1. `just build` ( + WASM)
+2. ` compile` → Create standalone executables
 
 Output:
 - `bin/ubicity` - Standalone CLI binary
@@ -197,9 +197,9 @@ Output:
 
 ## Type Safety Layers
 
-### Layer 1: ReScript Compile-Time
+### Layer 1:  Compile-Time
 
-```rescript
+```
 // Won't compile if types don't match
 let experience = LearningExperience.make(
   ~learner=learner,  // Must be Learner.t
@@ -222,10 +222,10 @@ pub fn validate(&self, json: &str) -> Result<String, JsValue> {
 
 Catches errors: **At validation (fast)**
 
-### Layer 3: TypeScript Glue
+### Layer 3:  Glue
 
-```typescript
-// TypeScript ensures correct bridge usage
+```
+//  ensures correct bridge usage
 export function validateExperienceWasm(experience: unknown): {
   valid: boolean;
   errors: string[];
@@ -251,13 +251,13 @@ Catches errors: **At integration points**
 └──────────────────────────────────┘
 ```
 
-### After (v0.3 - Deno + ReScript + WASM)
+### After (v0.3 -  +  + WASM)
 
 ```
 ┌──────────────────────────────────┐
-│   Deno Heap (~20MB)              │
+│    Heap (~20MB)              │
 │ ┌────────────────────────────┐  │
-│ │ ReScript immutable data     │  │
+│ │  immutable data     │  │
 │ │  (structural sharing)       │  │
 │ │ + Indices (optimized)       │  │
 │ └────────────────────────────┘  │
@@ -276,19 +276,19 @@ Catches errors: **At integration points**
 
 ## Security Model
 
-### Deno Permissions
+###  Permissions
 
 Explicit, granular permissions:
 
 ```bash
 # Read-only access to data directory
-deno run --allow-read=./ubicity-data src/cli.ts stats
+ run --allow-read=./ubicity-data src/cli.ts stats
 
 # Read-write for capture
-deno run --allow-read --allow-write=./ubicity-data src/capture.ts
+ run --allow-read --allow-write=./ubicity-data src/capture.ts
 
-# Pre-configured in deno.json tasks
-deno task capture  # Permissions already set
+# Pre-configured in .json tasks
+ task capture  # Permissions already set
 ```
 
 ### WASM Sandboxing
@@ -304,18 +304,18 @@ WASM runs in isolated linear memory:
 
 ## Deployment Options
 
-### 1. Deno Runtime
+### 1.  Runtime
 
 ```bash
-# Install Deno on server
-curl -fsSL https://deno.land/install.sh | sh
+# Install  on server
+curl -fsSL https:///install.sh | sh
 
 # Run directly
-deno task report
+ task report
 ```
 
 **Pros**: Easy updates, dynamic
-**Cons**: Requires Deno runtime
+**Cons**: Requires  runtime
 
 ### 2. Compiled Binaries
 
@@ -333,15 +333,15 @@ just compile
 ### 3. Docker Container
 
 ```dockerfile
-FROM denoland/deno:alpine
+FROM denoland/:alpine
 
 WORKDIR /app
 COPY . .
 
-RUN deno task build
-RUN deno cache src/index.ts
+RUN  task build
+RUN  cache src/index.ts
 
-CMD ["deno", "task", "cli"]
+CMD ["", "task", "cli"]
 ```
 
 **Pros**: Consistent environment
@@ -351,13 +351,13 @@ CMD ["deno", "task", "cli"]
 
 ## Testing Strategy
 
-### Unit Tests (Deno Test)
+### Unit Tests ( Test)
 
-```typescript
+```
 // tests/validation.test.ts
 import { assertEquals } from '@std/assert';
 
-Deno.test('WASM validation is fast', async () => {
+.test('WASM validation is fast', async () => {
   const start = performance.now();
   validateExperienceWasm(testData);
   const duration = performance.now() - start;
@@ -369,13 +369,13 @@ Deno.test('WASM validation is fast', async () => {
 ### Integration Tests
 
 ```bash
-deno test --allow-read --allow-write tests/
+ test --allow-read --allow-write tests/
 ```
 
 ### Benchmarks
 
 ```bash
-deno bench --allow-read --allow-write benchmarks/
+ bench --allow-read --allow-write benchmarks/
 ```
 
 ---
@@ -387,7 +387,7 @@ deno bench --allow-read --allow-write benchmarks/
 1. **WASM SIMD**: Vectorized operations for network generation
 2. **Parallel Processing**: Multi-threaded WASM
 3. **GPU Acceleration**: WebGPU for large-scale analysis
-4. **Incremental Compilation**: Faster ReScript rebuilds
+4. **Incremental Compilation**: Faster  rebuilds
 5. **Link-Time Optimization**: Cross-language optimization
 
 ### Not Planned (Against Philosophy)
@@ -416,13 +416,13 @@ The architecture changed. The philosophy didn't.
 
 ## Learning Resources
 
-### Deno
-- Official Guide: https://docs.deno.com
-- Standard Library: https://deno.land/std
+### 
+- Official Guide: https://docs..com
+- Standard Library: https:///std
 
-### ReScript
-- Language Manual: https://rescript-lang.org
-- Belt stdlib: https://rescript-lang.org/docs/manual/latest/api/belt
+### 
+- Language Manual: https://-lang.org
+- Belt stdlib: https://-lang.org/docs/manual/latest/api/belt
 
 ### WASM + Rust
 - Rust Book: https://doc.rust-lang.org/book/
@@ -457,4 +457,4 @@ Both are maintained. Your choice.
 
 See: `MIGRATION_V3.md` for migration steps
 See: `justfile` for all build commands
-See: `deno.json` for configuration details
+See: `.json` for configuration details

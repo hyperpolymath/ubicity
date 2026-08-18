@@ -11,7 +11,7 @@ services:
       - ./ubicity-data:/app/ubicity-data
     environment:
       - UBICITY_LOG_LEVEL=info
-    # Deno entrypoint (see Containerfile). Override per invocation.
+    #  entrypoint (see Containerfile). Override per invocation.
     command: ["run", "--allow-read", "--allow-write", "src/cli.js", "help"]
 
   # Optional: web server for visualization output

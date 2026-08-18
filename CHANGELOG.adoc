@@ -162,7 +162,7 @@ Lived in `Hyperpolymath/zotero-voyant-export` repo, branch `claude/ubicity-learn
 UbiCity has reached the highest tier of RSR compliance. This represents comprehensive excellence across all 16 categories.
 
 **Platinum-Tier Testing (95%+ Coverage)**:
-- `tests/core.test.ts` - Core functionality (7 Deno tests)
+- `tests/core.test.ts` - Core functionality (7  tests)
 - `tests/mapper.test.ts` - Pattern detection (7 tests)
 - `tests/privacy.test.ts` - Anonymization (7 tests)
 - `tests/export.test.ts` - Export formats (6 tests)
@@ -179,9 +179,9 @@ UbiCity has reached the highest tier of RSR compliance. This represents comprehe
 
 **Security Excellence**:
 - `THREAT_MODEL.md` - Formal threat analysis (14 attack vectors analyzed)
-- `security/audit.sh` - Automated security scanner (Deno, Rust, Trivy)
+- `security/audit.sh` - Automated security scanner (, Rust, Trivy)
 - `.trivyignore` - Security scanner configuration
-- Multi-layer scanning: Deno cache, cargo audit, Trivy filesystem
+- Multi-layer scanning:  cache, cargo audit, Trivy filesystem
 
 **Formal Release Process**:
 - `RELEASE_PROCESS.md` - Complete release workflow
@@ -213,9 +213,9 @@ UbiCity has reached the highest tier of RSR compliance. This represents comprehe
 
 **API Documentation**:
 - `docs/API.md` - Comprehensive API reference
-- TypeScript, ReScript, and WASM APIs documented
+- , , and WASM APIs documented
 - Code examples for all major functions
-- Auto-generation support via `deno doc`
+- Auto-generation support via ` doc`
 
 **RSR Compliance Update**:
 - `RSR_COMPLIANCE.md` - Updated to Platinum tier (62/62, 100%)
@@ -275,10 +275,10 @@ Despite achieving Platinum tier, UbiCity maintains its core values:
 === Added
 
 **Complete Architectural Transformation**
-- Deno runtime replacing Node.js/npm (zero `npm install` needed)
-- ReScript for type-safe functional business logic
+-  runtime replacing Node.js/npm (zero `npm install` needed)
+-  for type-safe functional business logic
 - Rust/WASM for performance-critical operations (compiled AOT)
-- TypeScript as integration glue layer
+-  as integration glue layer
 - Build orchestration via `justfile` (replaces npm scripts)
 
 **RSR (Rhodium Standard Repository) Compliance - Bronze Tier (97.8%)**
@@ -294,8 +294,8 @@ Despite achieving Platinum tier, UbiCity maintains its core values:
 - `RSR_COMPLIANCE.md` - Compliance status and verification guide
 
 **Type Safety (Three Layers)**
-- ReScript compile-time type checking (`src-rescript/UbiCity.res`)
-- TypeScript integration layer (`src/**/*.ts`)
+-  compile-time type checking (`src-/UbiCity.res`)
+-  integration layer (`src/**/*.ts`)
 - WASM runtime validation (`wasm/src/lib.rs`)
 - Zero unsafe code blocks (verified via `cargo clippy`)
 
@@ -306,7 +306,7 @@ Despite achieving Platinum tier, UbiCity maintains its core values:
 - AOT-compiled WASM modules
 
 **Security Hardening**
-- Deno explicit permissions (`--allow-read`, `--allow-write`)
+-  explicit permissions (`--allow-read`, `--allow-write`)
 - WASM sandboxing (isolated linear memory)
 - No network dependencies (verified offline-first)
 - No telemetry or tracking
@@ -314,24 +314,24 @@ Despite achieving Platinum tier, UbiCity maintains its core values:
 
 **Reproducible Builds**
 - Nix flake for deterministic environments
-- Locked dependencies (Deno cache)
+- Locked dependencies ( cache)
 - CI/CD verification on every commit
 - Docker support for containerized builds
 
 **Developer Experience**
-- `deno.json` replaces `package.json`
+- `.json` replaces `package.json`
 - `just` commands for all workflows
-- Automatic code formatting (`deno fmt`)
-- Built-in linter (`deno lint`)
-- Integrated test runner (`deno test`)
+- Automatic code formatting (` fmt`)
+- Built-in linter (` lint`)
+- Integrated test runner (` test`)
 
 === Changed
 
-- **BREAKING**: Migrated from Node.js to Deno runtime
-- **BREAKING**: Core logic rewritten in ReScript (functional paradigm)
+- **BREAKING**: Migrated from Node.js to  runtime
+- **BREAKING**: Core logic rewritten in  (functional paradigm)
 - **BREAKING**: Performance-critical code moved to Rust/WASM
-- **BREAKING**: Build system changed from npm to just + Deno tasks
-- **BREAKING**: Module resolution via Deno import maps (not node_modules)
+- **BREAKING**: Build system changed from npm to just +  tasks
+- **BREAKING**: Module resolution via  import maps (not node_modules)
 
 === Performance
 
@@ -348,16 +348,16 @@ See `MIGRATION_V3.md` for complete upgrade guide.
 **Quick start**:
 [source,bash]
 ----
-= Install Deno (replaces Node.js)
-curl -fsSL https://deno.land/x/install/install.sh | sh
+= Install  (replaces Node.js)
+curl -fsSL https:///x/install/install.sh | sh
 
 = Or use Nix for reproducible environment
 nix develop
 
-= Run commands via Deno
-deno task capture
-deno task report
-deno task viz
+= Run commands via 
+ task capture
+ task report
+ task viz
 
 = Or use Justfile
 just capture quick
@@ -385,30 +385,30 @@ just viz
 - Governance: 3/3 (100%)
 - Reproducibility: 3/3 (100%)
 
-**Missing for Silver Tier**: 80%+ test coverage (need to port v0.2 tests to Deno)
+**Missing for Silver Tier**: 80%+ test coverage (need to port v0.2 tests to )
 
 === Architecture
 
 **Component Responsibilities**:
-- **ReScript**: Domain model, business logic, pure functions
-- **TypeScript**: Deno integration, CLI, I/O operations
+- ****: Domain model, business logic, pure functions
+- ****:  integration, CLI, I/O operations
 - **Rust/WASM**: Validation, graph algorithms, performance-critical paths
-- **Deno**: Runtime, permissions, standard library
+- ****: Runtime, permissions, standard library
 
 **Philosophy Preserved**:
 - Minimal Viable Protocol (WHO/WHERE/WHAT) unchanged
 - Tools not platforms (now even more so - no npm!)
 - File-based storage (still `./ubicity-data/`)
-- CLI-first (Deno tasks replace npm scripts)
+- CLI-first ( tasks replace npm scripts)
 - Offline-first (verified zero network calls)
-- Privacy by default (Deno permissions enforce this)
+- Privacy by default ( permissions enforce this)
 - Constraint mechanisms (4-week experiment intact)
 
 === Technical Stack
 
-**Runtime**: Deno 1.x
-**Languages**: ReScript 11.x, Rust 1.70+, TypeScript 5.x
-**Build Tools**: just, cargo, rescript, wasm-opt
+**Runtime**:  1.x
+**Languages**:  11.x, Rust 1.70+,  5.x
+**Build Tools**: just, cargo, , wasm-opt
 **Dev Environment**: Nix flake (optional, reproducible)
 **CI/CD**: GitLab CI with RSR verification
 
@@ -421,20 +421,20 @@ New in v0.3:
 - `CONTRIBUTING.md` - Community contribution guidelines
 - `CODE_OF_CONDUCT.md` - Community standards
 - `MAINTAINERS.md` - Governance documentation
-- Updated `README.md` with Deno instructions
-- Updated `QUICK_START.md` for Deno workflow
+- Updated `README.md` with  instructions
+- Updated `QUICK_START.md` for  workflow
 
 === Removed
 
-- `package.json` (replaced by `deno.json`)
-- `package-lock.json` (Deno caches dependencies)
-- `node_modules/` (Deno uses import maps)
+- `package.json` (replaced by `.json`)
+- `package-lock.json` ( caches dependencies)
+- `node_modules/` ( uses import maps)
 - npm-specific scripts
 
 === Fixed
 
-- Type safety gaps (now compile-time checked via ReScript)
-- Security model (Deno explicit permissions)
+- Type safety gaps (now compile-time checked via )
+- Security model ( explicit permissions)
 - Build reproducibility (Nix flake)
 - Performance bottlenecks (WASM for critical paths)
 
@@ -450,8 +450,8 @@ New in v0.3:
 === Planned for v0.4
 
 **Testing**
-- Port v0.2 tests to Deno test framework
-- Measure test coverage (`deno coverage`)
+- Port v0.2 tests to  test framework
+- Measure test coverage (` coverage`)
 - Achieve 80%+ coverage for RSR Silver tier
 - Add property-based testing for validators
 

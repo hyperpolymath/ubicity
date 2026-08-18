@@ -22,13 +22,13 @@ UbiCity is a privacy-first learning capture system. This threat model identifies
        │
        v
 ┌─────────────┐
-│     CLI     │ (TypeScript/Deno runtime)
+│     CLI     │ (/ runtime)
 │ (src/*.ts)  │
 └──────┬──────┘
        │
        v
 ┌─────────────┐
-│  Validator  │ (Rust/WASM, ReScript)
+│  Validator  │ (Rust/WASM, )
 │   (WASM)    │
 └──────┬──────┘
        │
@@ -59,7 +59,7 @@ UbiCity is a privacy-first learning capture system. This threat model identifies
 **Likelihood**: Medium
 **Impact**: Medium (privacy violation)
 
-### 4. WASM/ReScript Exploit
+### 4. WASM/ Exploit
 **Motivation**: Code execution, memory corruption
 **Capability**: Exploit WASM sandbox escape
 **Likelihood**: Very Low
@@ -97,8 +97,8 @@ UbiCity is a privacy-first learning capture system. This threat model identifies
 
 **Mitigations**:
 - ✅ WASM validation (integrity checks)
-- ✅ Deno permissions (`--allow-write` limited to data dir)
-- ✅ TypeScript compile-time checks
+- ✅  permissions (`--allow-write` limited to data dir)
+- ✅  compile-time checks
 - ⚠️ Cryptographic signatures (not implemented - future)
 
 **Risk**: LOW
@@ -110,12 +110,12 @@ UbiCity is a privacy-first learning capture system. This threat model identifies
 **Threat**: Malicious dependency exfiltrates data
 **Attack Vector**:
 - Compromised npm package
-- Malicious Deno module
+- Malicious  module
 - Backdoored compiler
 
 **Mitigations**:
 - ✅ ZERO npm dependencies (production)
-- ✅ Deno JSR registry (cryptographically signed)
+- ✅  JSR registry (cryptographically signed)
 - ✅ Nix reproducible builds (pinned dependencies)
 - ✅ GitLab CI verification on every commit
 - ✅ `cargo audit` for Rust dependencies
@@ -133,7 +133,7 @@ UbiCity is a privacy-first learning capture system. This threat model identifies
 - Shell metacharacters
 
 **Mitigations**:
-- ✅ Deno sandboxing (explicit permissions)
+- ✅  sandboxing (explicit permissions)
 - ✅ Path validation (no directory traversal)
 - ✅ Input sanitization (Zod schemas)
 - ✅ No `eval()` or dynamic code execution
@@ -165,14 +165,14 @@ UbiCity is a privacy-first learning capture system. This threat model identifies
 
 **Threat**: WASM code escapes sandbox, accesses host system
 **Attack Vector**:
-- WASM exploit (CVE in Deno's V8 engine)
+- WASM exploit (CVE in 's V8 engine)
 - Unsafe Rust code in WASM module
 
 **Mitigations**:
-- ✅ Deno WASM sandbox (linear memory isolation)
+- ✅  WASM sandbox (linear memory isolation)
 - ✅ Zero `unsafe` blocks in Rust code
 - ✅ `cargo clippy` enforces safety
-- ✅ Deno auto-updates (security patches)
+- ✅  auto-updates (security patches)
 - ⚠️ Regular dependency updates
 
 **Risk**: VERY LOW
@@ -202,7 +202,7 @@ UbiCity is a privacy-first learning capture system. This threat model identifies
 ### Capture Flow
 
 ```
-User Input → Deno CLI → WASM Validator → JSON File
+User Input →  CLI → WASM Validator → JSON File
     ↓           ↓             ↓              ↓
   [PII?]   [Sanitize]    [Validate]    [Encrypt?]
 ```
@@ -228,7 +228,7 @@ JSON Files → Mapper → Privacy Filter → Export (CSV/GeoJSON/DOT)
 ## Security Controls
 
 ### Preventive Controls
-- ✅ Deno explicit permissions (`--allow-read`, `--allow-write`)
+- ✅  explicit permissions (`--allow-read`, `--allow-write`)
 - ✅ WASM sandboxing (linear memory isolation)
 - ✅ Input validation (Zod + WASM validators)
 - ✅ Zero npm dependencies (supply chain risk reduction)
@@ -332,7 +332,7 @@ Found a vulnerability? See `.well-known/security.txt`
 
 - [OWASP Threat Modeling](https://owasp.org/www-community/Threat_Modeling)
 - [NIST SP 800-154 (Data Integrity)](https://csrc.nist.gov/publications/detail/sp/800-154/draft)
-- [Deno Security Model](https://deno.land/manual/runtime/permission_apis)
+- [ Security Model](https:///manual/runtime/permission_apis)
 - [WASM Security](https://webassembly.org/docs/security/)
 
 ---

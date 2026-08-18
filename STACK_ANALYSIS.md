@@ -6,7 +6,7 @@
 - **Runtime**: Node.js v22.21.1
 - **Module System**: CommonJS (`require()`)
 - **Package Manager**: npm (though no dependencies currently)
-- **Language**: Plain JavaScript (no TypeScript)
+- **Language**: Plain JavaScript (no )
 
 ### Dependencies
 **Zero external dependencies** - Only uses Node.js standard library:
@@ -42,10 +42,10 @@ ubicity/
 
 **Impact**: Technical debt, harder to integrate with modern tools
 
-#### 2. **No Deno Support**
-- You likely prefer Deno based on your question
-- Deno offers:
-  - TypeScript by default
+#### 2. **No  Support**
+- You likely prefer  based on your question
+-  offers:
+  -  by default
   - Secure by default (explicit permissions)
   - No node_modules
   - Built-in formatter/linter/test runner
@@ -70,7 +70,7 @@ ubicity/
 
 ### 🟡 Medium Issues
 
-#### 5. **No TypeScript**
+#### 5. **No **
 - Plain JavaScript means no type safety
 - Schema exists as JSON but not as types
 - Runtime errors instead of compile-time checks
@@ -140,13 +140,13 @@ ubicity/
 
 ### Option A: Modern Node.js + ESM
 
-```typescript
-// Modern Node.js with TypeScript
+```
+// Modern Node.js with 
 import { readFile, writeFile } from 'node:fs/promises';
 import { z } from 'zod'; // Runtime validation
 import { Command } from 'commander'; // CLI framework
 
-// Schema as TypeScript type + Zod validator
+// Schema as  type + Zod validator
 const LearningExperienceSchema = z.object({
   learner: z.object({ id: z.string() }),
   context: z.object({
@@ -164,26 +164,26 @@ type LearningExperience = z.infer<typeof LearningExperienceSchema>;
 **Pros**: Incremental migration path, familiar ecosystem
 **Cons**: Still Node.js quirks, still need npm
 
-### Option B: Deno + TypeScript (Recommended)
+### Option B:  +  (Recommended)
 
-```typescript
-// Deno with TypeScript
-import { z } from "https://deno.land/x/zod/mod.ts";
-import { parse } from "https://deno.land/std/flags/mod.ts";
+```
+//  with 
+import { z } from "https:///x/zod/mod.ts";
+import { parse } from "https:///std/flags/mod.ts";
 
 // Built-in permissions
-await Deno.writeTextFile("./data.json", json, {
+await .writeTextFile("./data.json", json, {
   create: true
 }); // Fails without --allow-write
 
 // Built-in formatter, linter, test runner
-// deno fmt, deno lint, deno test
+//  fmt,  lint,  test
 
 // No node_modules, dependencies from URLs
 ```
 
 **Pros**:
-- TypeScript native
+-  native
 - Better security model
 - Modern standard library
 - No build step needed
@@ -232,18 +232,18 @@ struct LearningExperience {
 
 **Result**: Better but still Node.js
 
-### Path 2: Deno Migration (4-6 hours)
-1. Create `deno.json` config
-2. Convert all files to Deno imports
-3. Add TypeScript types
-4. Use Deno standard library
+### Path 2:  Migration (4-6 hours)
+1. Create `.json` config
+2. Convert all files to  imports
+3. Add  types
+4. Use  standard library
 5. Add permissions flags
 
-**Result**: Modern, secure, TypeScript
+**Result**: Modern, secure, 
 
 ### Path 3: Hybrid Approach (2-3 hours)
 1. Keep core mapper in Node.js (matches existing repo)
-2. Add Deno wrapper scripts for new features
+2. Add  wrapper scripts for new features
 3. Use FFI or JSON pipe for communication
 
 **Result**: Best of both worlds, incremental
@@ -260,8 +260,8 @@ Given your concerns and the project goals:
 3. **Add basic tests** - At least smoke tests
 
 ### Short-term (This Week):
-4. **Port to Deno** - Better DX, matches your style
-5. **Add TypeScript** - Type safety for the schema
+4. **Port to ** - Better DX, matches your style
+5. **Add ** - Type safety for the schema
 6. **Add CLI framework** - Better UX
 
 ### Long-term (When Needed):
@@ -275,16 +275,16 @@ Given your concerns and the project goals:
 
 **Do you want me to:**
 
-**A)** Migrate everything to Deno + TypeScript now?
+**A)** Migrate everything to  +  now?
 
 **B)** Quick fixes to the Node.js version (ESM + validation)?
 
-**C)** Create a parallel Deno implementation you can compare?
+**C)** Create a parallel  implementation you can compare?
 
 **D)** Document the issues but leave as-is (working prototype)?
 
 The current version **works** but has technical debt. Given that UbiCity is about starting quickly and iterating, option D might align best with the Minimal Viable Protocol philosophy - use it, see if it works for you, then invest in better infrastructure only if needed.
 
-But if you have strong preferences (especially Deno), I should migrate now before you build habits around the Node.js version.
+But if you have strong preferences (especially ), I should migrate now before you build habits around the Node.js version.
 
 **What's your preference?**

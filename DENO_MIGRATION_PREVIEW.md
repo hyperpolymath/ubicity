@@ -1,4 +1,4 @@
-# Deno Migration Preview
+#  Migration Preview
 
 ## Side-by-Side Comparison
 
@@ -41,12 +41,12 @@ class LearningExperience {
 - CommonJS (legacy)
 - No compile-time checks
 
-### Deno + TypeScript Version
+###  +  Version
 
-```typescript
-// mapper.ts (Deno + TypeScript)
-import { z } from "https://deno.land/x/zod/mod.ts";
-import { join } from "https://deno.land/std/path/mod.ts";
+```
+// mapper.ts ( + )
+import { z } from "https:///x/zod/mod.ts";
+import { join } from "https:///std/path/mod.ts";
 
 // Schema with runtime validation
 const LearningExperienceSchema = z.object({
@@ -148,12 +148,12 @@ switch (mode) {
 
 **Run:** `node capture.js quick`
 
-### Deno Version
+###  Version
 
-```typescript
+```
 // capture.ts
-import { parse } from "https://deno.land/std/flags/mod.ts";
-import { Input, Select } from "https://deno.land/x/cliffy/mod.ts";
+import { parse } from "https:///std/flags/mod.ts";
+import { Input, Select } from "https:///x/cliffy/mod.ts";
 
 // Typed CLI args
 interface CaptureArgs {
@@ -161,7 +161,7 @@ interface CaptureArgs {
   help?: boolean;
 }
 
-const args = parse(Deno.args, {
+const args = parse(.args, {
   boolean: ["help"],
   string: ["mode"],
   default: { mode: "full" },
@@ -173,17 +173,17 @@ if (args.help) {
 UbiCity Capture Tool
 
 Usage:
-  deno run --allow-read --allow-write capture.ts [options]
+   run --allow-read --allow-write capture.ts [options]
 
 Options:
   -m, --mode <mode>    Capture mode: quick, full, template
   -h, --help           Show this help
 
 Examples:
-  deno run --allow-read --allow-write capture.ts -m quick
-  deno run --allow-read --allow-write capture.ts
+   run --allow-read --allow-write capture.ts -m quick
+   run --allow-read --allow-write capture.ts
   `);
-  Deno.exit(0);
+  .exit(0);
 }
 
 // Better prompts with validation
@@ -205,7 +205,7 @@ const locationType = await Select.prompt({
 });
 ```
 
-**Run:** `deno run --allow-read --allow-write capture.ts --mode quick`
+**Run:** ` run --allow-read --allow-write capture.ts --mode quick`
 
 **Benefits:**
 - Explicit permissions (--allow-read, --allow-write)
@@ -235,11 +235,11 @@ files.forEach(file => {
 - No error handling
 - Full filesystem access
 
-### Deno Version (Async)
+###  Version (Async)
 
-```typescript
+```
 // Non-blocking
-await Deno.writeTextFile(
+await .writeTextFile(
   filepath,
   JSON.stringify(data, null, 2),
   { create: true }  // Explicit creation flag
@@ -247,7 +247,7 @@ await Deno.writeTextFile(
 
 // Parallel reads with proper error handling
 const files = [];
-for await (const entry of Deno.readDir(experiencesDir)) {
+for await (const entry of .readDir(experiencesDir)) {
   if (entry.isFile && entry.name.endsWith('.json')) {
     files.push(entry.name);
   }
@@ -256,7 +256,7 @@ for await (const entry of Deno.readDir(experiencesDir)) {
 // Load all in parallel
 const experiences = await Promise.all(
   files.map(async (file) => {
-    const text = await Deno.readTextFile(join(experiencesDir, file));
+    const text = await .readTextFile(join(experiencesDir, file));
     return JSON.parse(text);
   })
 );
@@ -277,14 +277,14 @@ const experiences = await Promise.all(
 // No tests!
 ```
 
-### Deno Version
+###  Version
 
-```typescript
+```
 // capture_test.ts
-import { assertEquals, assertRejects } from "https://deno.land/std/assert/mod.ts";
+import { assertEquals, assertRejects } from "https:///std/assert/mod.ts";
 import { LearningExperienceManager } from "./mapper.ts";
 
-Deno.test("LearningExperience - valid data", () => {
+.test("LearningExperience - valid data", () => {
   const data = {
     learner: { id: "test-user" },
     context: { location: { name: "Test Location" } },
@@ -298,7 +298,7 @@ Deno.test("LearningExperience - valid data", () => {
   assertEquals(exp.toJSON().learner.id, "test-user");
 });
 
-Deno.test("LearningExperience - invalid data", () => {
+.test("LearningExperience - invalid data", () => {
   const data = { invalid: "data" };
 
   assertRejects(
@@ -309,7 +309,7 @@ Deno.test("LearningExperience - invalid data", () => {
 });
 ```
 
-**Run:** `deno test`
+**Run:** ` test`
 
 **Built-in:**
 - Test runner
@@ -329,21 +329,21 @@ node mapper.js report
 node visualize.js
 ```
 
-### Deno Version
+###  Version
 ```bash
 cd ubicity
 
 # First run (downloads deps)
-deno run --allow-read --allow-write capture.ts --mode quick
+ run --allow-read --allow-write capture.ts --mode quick
 
 # Permissions are explicit and visible
-deno run --allow-read --allow-write mapper.ts report
-deno run --allow-read --allow-write visualize.ts
+ run --allow-read --allow-write mapper.ts report
+ run --allow-read --allow-write visualize.ts
 
-# Or create task shortcuts in deno.json
-deno task capture:quick
-deno task report
-deno task visualize
+# Or create task shortcuts in .json
+ task capture:quick
+ task report
+ task visualize
 ```
 
 **Better security:**
@@ -358,12 +358,12 @@ deno task visualize
 ### Time Estimate: 4-6 hours
 
 **Step 1: Setup (30 min)**
-- Create `deno.json` config
+- Create `.json` config
 - Define import map
 - Set up tasks
 
 **Step 2: Convert mapper.js → mapper.ts (2 hours)**
-- Add TypeScript types
+- Add  types
 - Implement Zod schema
 - Convert to async/await
 - Add tests
@@ -387,16 +387,16 @@ deno task visualize
 
 ## Recommendation
 
-**If you plan to use UbiCity seriously**, migrate to Deno.
+**If you plan to use UbiCity seriously**, migrate to .
 
 **If this is a quick experiment**, the Node.js version works fine.
 
 The Node.js version captures the essence - it **works**. But it has technical debt that will slow you down as the project evolves.
 
-Given your background (formal methods, Rust experience implied by your interests), you'd likely appreciate Deno's:
+Given your background (formal methods, Rust experience implied by your interests), you'd likely appreciate 's:
 - Type safety
 - Explicit permissions
 - Better tooling
 - No magic
 
-**Shall I migrate it to Deno?** I can do it now while the codebase is small, or create a parallel implementation so you can compare.
+**Shall I migrate it to ?** I can do it now while the codebase is small, or create a parallel implementation so you can compare.
