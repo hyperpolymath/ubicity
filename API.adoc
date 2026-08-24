@@ -1,14 +1,15 @@
-# UbiCity API Reference
+== UbiCity API Reference
 
-Developer documentation for the UbiCity  modules.
+Developer documentation for the UbiCity modules.
 
-## Overview
+=== Overview
 
-UbiCity is implemented in  (compiles to JavaScript). All modules are in `src-/` and compile to `*.res.js` files.
+UbiCity is implemented in (compiles to JavaScript). All modules are in
+`+src-/+` and compile to `+*.res.js+` files.
 
-### Module Architecture
+==== Module Architecture
 
-```
+....
 UbiCity.res        - Core domain types
 ├── Decoder.res    - JSON validation
 ├── Mapper.res     - Data indexing and queries
@@ -18,12 +19,13 @@ UbiCity.res        - Core domain types
 ├── Visualization.res - HTML generation
 ├── Capture.res    - CLI capture logic
 └── CaptureCLI.res - CLI entry point
-```
+....
 
-## Core Types (UbiCity.res)
+=== Core Types (UbiCity.res)
 
-### Coordinates
-```
+==== Coordinates
+
+....
 type t = {
   latitude: float,
   longitude: float,
@@ -31,10 +33,11 @@ type t = {
 
 let make: (~latitude: float, ~longitude: float) => option<t>
 let isValid: t => bool
-```
+....
 
-### Location
-```
+==== Location
+
+....
 type t = {
   name: string,
   coordinates: option<Coordinates.t>,
@@ -49,10 +52,11 @@ let make: (
   ~address: option<string>=?,
   unit,
 ) => result<t, string>
-```
+....
 
-### Learner
-```
+==== Learner
+
+....
 type t = {
   id: string,
   name: option<string>,
@@ -65,10 +69,11 @@ let make: (
   ~interests: option<array<string>>=?,
   unit,
 ) => result<t, string>
-```
+....
 
-### LearningExperience
-```
+==== LearningExperience
+
+....
 type t = {
   id: string,
   timestamp: string,
@@ -92,27 +97,33 @@ let make: (
   ~version: option<string>=?,
   unit,
 ) => t
-```
+....
 
-## Data Access (Mapper.res)
+=== Data Access (Mapper.res)
 
-### Creating a Mapper
-```javascript
+==== Creating a Mapper
+
+[source,javascript]
+----
 import { make } from './src-/Mapper.res.js';
 
 const mapper = await make();
-```
+----
 
-### Storing Experiences
-```javascript
+==== Storing Experiences
+
+[source,javascript]
+----
 import { captureExperience } from './src-/Mapper.res.js';
 
 const result = await captureExperience(mapper, experience);
 // Returns: Ok(experienceId) | Error(message)
-```
+----
 
-### Querying
-```javascript
+==== Querying
+
+[source,javascript]
+----
 // Get all experiences
 const allExperiences = await loadAll(mapper);
 
@@ -127,12 +138,14 @@ const aliceExperiences = getByLearner(mapper, "alice-maker");
 
 // Identify hotspots
 const hotspots = identifyHotspots(mapper);
-```
+----
 
-## Analysis (Analysis.res)
+=== Analysis (Analysis.res)
 
-### Temporal Analysis
-```javascript
+==== Temporal Analysis
+
+[source,javascript]
+----
 import { TemporalAnalyzer } from './src-/Analysis.res.js';
 
 // Analyze by time of day
@@ -145,18 +158,22 @@ const byDay = TemporalAnalyzer.analyzeByDayOfWeek(experiences);
 // Detect learning streaks
 const streaks = TemporalAnalyzer.detectStreaks(experiences, 7);
 // Returns: [{ startDate, endDate, dayCount, experienceCount }]
-```
+----
 
-### Network Analysis
-```javascript
+==== Network Analysis
+
+[source,javascript]
+----
 import { CollaborativeNetworkAnalyzer } from './src-/Analysis.res.js';
 
 const network = CollaborativeNetworkAnalyzer.buildCollaborationNetwork(experiences);
 // Returns: { nodes: [{id, size}], edges: [{source, target, weight}] }
-```
+----
 
-### Recommendations
-```javascript
+==== Recommendations
+
+[source,javascript]
+----
 import { RecommendationEngine } from './src-/Analysis.res.js';
 
 // Similar learners
@@ -179,12 +196,14 @@ const domains = RecommendationEngine.recommendDomains(
   "alice-maker",
   5
 );
-```
+----
 
-## Privacy (Privacy.res)
+=== Privacy (Privacy.res)
 
-### Anonymization
-```javascript
+==== Anonymization
+
+[source,javascript]
+----
 import { 
   anonymizeLearner, 
   anonymizeLocation,
@@ -205,10 +224,12 @@ const anonLocation = anonymizeLocation(experience, {
 
 // Full anonymization
 const fully = fullyAnonymize(experience);
-```
+----
 
-### PII Removal
-```javascript
+==== PII Removal
+
+[source,javascript]
+----
 import { removePII, sanitizeText } from './src-/Privacy.res.js';
 
 // Remove emails, phone numbers, URLs from text
@@ -217,10 +238,12 @@ const cleaned = sanitizeText("Contact me at alice@example.com or 555-1234");
 
 // Remove PII from entire experience
 const cleaned = removePII(experience);
-```
+----
 
-### Shareable Datasets
-```javascript
+==== Shareable Datasets
+
+[source,javascript]
+----
 import { generateShareableDataset } from './src-/Privacy.res.js';
 
 const dataset = generateShareableDataset(experiences, {
@@ -229,46 +252,56 @@ const dataset = generateShareableDataset(experiences, {
   removePII: true,
   includePrivate: false,
 });
-```
+----
 
-## Export (Export.res)
+=== Export (Export.res)
 
-### CSV Export
-```javascript
+==== CSV Export
+
+[source,javascript]
+----
 import { exportToCSV } from './src-/Export.res.js';
 
 const csv = exportToCSV(experiences);
 // Returns CSV string with proper escaping
-```
+----
 
-### GeoJSON Export
-```javascript
+==== GeoJSON Export
+
+[source,javascript]
+----
 import { exportToGeoJSON } from './src-/Export.res.js';
 
 const geojson = exportToGeoJSON(experiences);
 // Returns RFC 7946 compliant GeoJSON FeatureCollection
-```
+----
 
-### DOT/Graphviz Export
-```javascript
+==== DOT/Graphviz Export
+
+[source,javascript]
+----
 import { exportToDOT } from './src-/Export.res.js';
 
 const network = { nodes: [...], edges: [...] };
 const dot = exportToDOT(network);
 // Returns: "digraph G { ... }"
 // Visualize with: dot -Tpng domains.dot -o domains.png
-```
+----
 
-### Markdown Export
-```javascript
+==== Markdown Export
+
+[source,javascript]
+----
 import { exportJourneysToMarkdown } from './src-/Export.res.js';
 
 const markdown = exportJourneysToMarkdown(experiences);
 // Returns learner journey timelines in Markdown format
-```
+----
 
-### Universal Export
-```javascript
+==== Universal Export
+
+[source,javascript]
+----
 import { exportData } from './src-/Export.res.js';
 
 // Auto-routes to appropriate exporter
@@ -277,12 +310,14 @@ const data = exportData(experiences, "geojson");
 const data = exportData(experiences, "dot", network);
 const data = exportData(experiences, "markdown");
 const data = exportData(experiences, "json");
-```
+----
 
-## Visualization (Visualization.res)
+=== Visualization (Visualization.res)
 
-### HTML Generation
-```javascript
+==== HTML Generation
+
+[source,javascript]
+----
 import { generateHTML } from './src-/Visualization.res.js';
 
 const html = generateHTML(
@@ -292,12 +327,14 @@ const html = generateHTML(
   coordsCount     // number of locations with GPS
 );
 // Returns complete HTML document with CSS and JavaScript
-```
+----
 
-## JSON Decoding (Decoder.res)
+=== JSON Decoding (Decoder.res)
 
-### Decode Experiences
-```javascript
+==== Decode Experiences
+
+[source,javascript]
+----
 import { decodeExperiences } from './src-/Decoder.res.js';
 
 const rawData = JSON.parse(fs.readFileSync('data.json', 'utf-8'));
@@ -309,19 +346,20 @@ if (result.TAG === "Ok") {
 } else {
   console.error("Validation errors:", result._0);
 }
-```
+----
 
-### Legacy Format Support
-The decoder handles legacy JSON formats:
-- `lat`/`lon` → `latitude`/`longitude`
-- Missing `id`/`timestamp`/`version` (auto-generated)
-- String variants →  polymorphic variants
+==== Legacy Format Support
 
-## Error Handling
+The decoder handles legacy JSON formats: - `+lat+`/`+lon+` →
+`+latitude+`/`+longitude+` - Missing `+id+`/`+timestamp+`/`+version+`
+(auto-generated) - String variants → polymorphic variants
 
-All validation functions return  `Result` types:
+=== Error Handling
 
-```javascript
+All validation functions return `+Result+` types:
+
+[source,javascript]
+----
 // Result type in compiled JS:
 // Ok: { TAG: "Ok", _0: value }
 // Error: { TAG: "Error", _0: errorMessage }
@@ -334,40 +372,45 @@ if (result.TAG === "Ok") {
   const error = result._0;
   // Handle error
 }
-```
+----
 
-## Type Safety
+=== Type Safety
 
-UbiCity is written in  for type safety. The compiled JavaScript includes runtime checks. Types are validated at:
-1. **Compile time** ( type checker)
-2. **Runtime** (Decoder module for JSON)
-3. **API boundaries** (validation on user input)
+UbiCity is written in for type safety. The compiled JavaScript includes
+runtime checks. Types are validated at: 1. *Compile time* ( type
+checker) 2. *Runtime* (Decoder module for JSON) 3. *API boundaries*
+(validation on user input)
 
-## Examples
+=== Examples
 
-See `examples/` directory:
-- `populate-examples.js` - Sample data generation
-- `api-usage.js` - API usage patterns
+See `+examples/+` directory: - `+populate-examples.js+` - Sample data
+generation - `+api-usage.js+` - API usage patterns
 
-## Development
+=== Development
 
-### Compile 
-```bash
+==== Compile
+
+[source,bash]
+----
 npm run res:build
-```
+----
 
-### Watch Mode
-```bash
+==== Watch Mode
+
+[source,bash]
+----
 npm run res:dev
-```
+----
 
-### Tests
-```bash
+==== Tests
+
+[source,bash]
+----
 npm test                # Unit tests
 npm run test:integration # Integration tests
 npm run test:all         # Both
-```
+----
 
----
+'''''
 
-**UbiCity v1.0.0 API Reference**
+*UbiCity v1.0.0 API Reference*
