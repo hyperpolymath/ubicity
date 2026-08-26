@@ -8,15 +8,16 @@ stages:
   - deploy
 
 variables:
-  DENO_VERSION: "1.40.0"
+  BUN_VERSION: "1"
   RUST_VERSION: "1.75.0"
   NODE_VERSION: "20"
 
 # Templates
-.-base:
-  image: denoland/:${DENO_VERSION}
+.bun-base:
+  image: oven/bun:${BUN_VERSION}
   before_script:
-    -  --version
+    - bun --version
+    - bun install --frozen-lockfile || bun install
 
 .rust-base:
   image: rust:${RUST_VERSION}
@@ -26,12 +27,12 @@ variables:
     - rustup target add wasm32-unknown-unknown
 
 # Lint Stage
-lint::
-  extends: .-base
+lint:js:
+  extends: .bun-base
   stage: lint
   script:
-    -  lint
-    -  fmt --check
+    - bunx eslint .
+    - bunx prettier --check .
   allow_failure: false
 
 lint:rust:
@@ -44,16 +45,16 @@ lint:rust:
   allow_failure: false
 
 # Build Stage
-build::
-  image: node:${NODE_VERSION}
+build:js:
+  extends: .bun-base
   stage: build
-  before_script:
-    - npm install -g 
   script:
-    -  build
+    - mkdir -p bin
+    - bun build --compile --outfile ./bin/ubicity src/cli.js
+    - bun build --compile --outfile ./bin/ubicity-capture src/capture.js
   artifacts:
     paths:
-      - src-/**/*.res.js
+      - bin/
     expire_in: 1 hour
 
 build:wasm:
@@ -74,29 +75,29 @@ build:wasm:
 
 # Test Stage
 test:unit:
-  extends: .-base
+  extends: .bun-base
   stage: test
   dependencies:
-    - build:
+    - build:js
     - build:wasm
   script:
-    -  test --allow-read --allow-write tests/
+    - bun test tests/
   coverage: '/\d+\.\d+% coverage/'
 
 test:integration:
-  extends: .-base
+  extends: .bun-base
   stage: test
   dependencies:
-    - build:
+    - build:js
     - build:wasm
   script:
-    -  run --allow-read --allow-write src/cli.ts stats
-    -  run --allow-read --allow-write src/cli.ts help
+    - bun run src/cli.js stats
+    - bun run src/cli.js help
   allow_failure: false
 
 # Verify Stage (RSR Compliance)
 verify:rsr-compliance:
-  extends: .-base
+  extends: .bun-base
   stage: verify
   script:
     - |
@@ -127,7 +128,6 @@ verify:rsr-compliance:
       # Check type safety
       echo "Checking type safety..."
       test -f wasm/Cargo.toml && echo "✅ Rust WASM present" || (echo "❌ WASM missing" && exit 1)
-      test -f src-/UbiCity.res && echo "✅  present" || (echo "❌  missing" && exit 1)
 
       echo ""
       echo "✅ RSR Compliance: PASSED"
@@ -135,7 +135,7 @@ verify:rsr-compliance:
   allow_failure: false
 
 verify:offline-first:
-  extends: .-base
+  extends: .bun-base
   stage: verify
   script:
     - |
@@ -152,7 +152,7 @@ verify:offline-first:
       echo "✅ Offline-First: VERIFIED"
 
 verify:security:
-  extends: .-base
+  extends: .bun-base
   stage: verify
   script:
     - |
@@ -178,12 +178,12 @@ verify:security:
 
 # Deploy Stage (for releases)
 deploy:pages:
-  extends: .-base
+  extends: .bun-base
   stage: deploy
   only:
     - tags
   script:
-    -  run --allow-read --allow-write src/visualize.ts
+    - bun run src/visualize.js
     - mkdir -p public
     - cp ubicity-data/ubicity-map.html public/index.html
   artifacts:
@@ -195,16 +195,16 @@ deploy:pages:
 
 # Release compilation (for tags)
 compile:release:
-  extends: .-base
+  extends: .bun-base
   stage: deploy
   only:
     - tags
   dependencies:
-    - build:
+    - build:js
     - build:wasm
   script:
-    -  compile --allow-read --allow-write --output ./bin/ubicity src/cli.ts
-    -  compile --allow-read --allow-write --output ./bin/ubicity-capture src/capture.ts
+    - bun build --compile --outfile ./bin/ubicity src/cli.js
+    - bun build --compile --outfile ./bin/ubicity-capture src/capture.js
     - ls -lh ./bin/
   artifacts:
     paths:
@@ -213,15 +213,15 @@ compile:release:
 
 # Nightly builds
 nightly:
-  extends: .-base
+  extends: .bun-base
   stage: build
   only:
     - schedules
   dependencies:
-    - build:
+    - build:js
     - build:wasm
   script:
-    -  compile --allow-read --allow-write --output ./bin/ubicity-nightly src/cli.ts
+    - bun build --compile --outfile ./bin/ubicity-nightly src/cli.js
   artifacts:
     paths:
       - bin/
