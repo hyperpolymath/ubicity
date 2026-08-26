@@ -81,7 +81,7 @@ test:unit:
     - build:js
     - build:wasm
   script:
-    - bun test tests/
+    - bun test --coverage tests/
   coverage: '/\d+\.\d+% coverage/'
 
 test:integration:
