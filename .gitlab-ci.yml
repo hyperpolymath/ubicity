@@ -17,7 +17,7 @@ variables:
   image: oven/bun:${BUN_VERSION}
   before_script:
     - bun --version
-    - bun install --frozen-lockfile || bun install
+    - bun install --frozen-lockfile
 
 .rust-base:
   image: rust:${RUST_VERSION}
