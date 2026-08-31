@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
+# This workflow is managed by gh actions-lock.
 # Rhodibot - RSR compliance checking
 # Part of gitbot-fleet (hyperpolymath/gitbot-fleet :: bots/rhodibot)
 
@@ -24,10 +25,10 @@ jobs:
   rsr-compliance:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4
+      - uses: actions/checkout@v4.1.1
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@6d9817901c499d6b02debbb57edb38d33daa680b  # stable
+        uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
 
@@ -44,7 +45,7 @@ jobs:
           git -C "$RUNNER_TEMP/gitbot-fleet" checkout "$GITBOT_FLEET_REF"
 
       - name: Cache dependencies
-        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6  # v2
+        uses: Swatinem/rust-cache@v2.7.8
         with:
           workspaces: ${{ runner.temp }}/gitbot-fleet/bots/rhodibot
 
@@ -93,7 +94,7 @@ jobs:
 
       - name: Upload results
         if: always()
-        uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595  # v4
+        uses: actions/upload-artifact@v4.1.0
         with:
           name: rhodibot-results
           path: rhodibot-results.txt

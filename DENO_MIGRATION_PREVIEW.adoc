@@ -1,10 +1,11 @@
-#  Migration Preview
+== Migration Preview
 
-## Side-by-Side Comparison
+=== Side-by-Side Comparison
 
-### Current Node.js Version
+==== Current Node.js Version
 
-```javascript
+[source,javascript]
+----
 // mapper.js (CommonJS)
 const fs = require('fs');
 const path = require('path');
@@ -33,17 +34,14 @@ class LearningExperience {
     return true;
   }
 }
-```
+----
 
-**Issues:**
-- No type safety
-- Manual validation (error-prone)
-- CommonJS (legacy)
-- No compile-time checks
+*Issues:* - No type safety - Manual validation (error-prone) - CommonJS
+(legacy) - No compile-time checks
 
-###  +  Version
+==== + Version
 
-```
+....
 // mapper.ts ( + )
 import { z } from "https:///x/zod/mod.ts";
 import { join } from "https:///std/path/mod.ts";
@@ -112,23 +110,20 @@ class LearningExperienceManager {
     return this.data;
   }
 }
-```
+....
 
-**Benefits:**
-- Full type safety (compile-time errors)
-- Automatic runtime validation
-- Helpful error messages
-- Modern ESM
-- IDE autocomplete
-- Refactor-safe
+*Benefits:* - Full type safety (compile-time errors) - Automatic runtime
+validation - Helpful error messages - Modern ESM - IDE autocomplete -
+Refactor-safe
 
----
+'''''
 
-## CLI Tool Comparison
+=== CLI Tool Comparison
 
-### Current Node.js
+==== Current Node.js
 
-```javascript
+[source,javascript]
+----
 // capture.js
 const readline = require('readline');
 
@@ -144,13 +139,13 @@ switch (mode) {
 }
 
 // No help text, no validation
-```
+----
 
-**Run:** `node capture.js quick`
+*Run:* `+node capture.js quick+`
 
-###  Version
+==== Version
 
-```
+....
 // capture.ts
 import { parse } from "https:///std/flags/mod.ts";
 import { Input, Select } from "https:///x/cliffy/mod.ts";
@@ -203,23 +198,22 @@ const locationType = await Select.prompt({
     "other",
   ],
 });
-```
+....
 
-**Run:** ` run --allow-read --allow-write capture.ts --mode quick`
+*Run:* `+run --allow-read --allow-write capture.ts --mode quick+`
 
-**Benefits:**
-- Explicit permissions (--allow-read, --allow-write)
-- Auto-generated help text
-- Better prompts with validation
-- Type-safe arguments
+*Benefits:* - Explicit permissions (–allow-read, –allow-write) -
+Auto-generated help text - Better prompts with validation - Type-safe
+arguments
 
----
+'''''
 
-## File Operations Comparison
+=== File Operations Comparison
 
-### Current Node.js (Sync)
+==== Current Node.js (Sync)
 
-```javascript
+[source,javascript]
+----
 // Blocks event loop
 fs.writeFileSync(filepath, JSON.stringify(data, null, 2));
 
@@ -228,16 +222,14 @@ files.forEach(file => {
   const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
   // ...
 });
-```
+----
 
-**Issues:**
-- Synchronous (blocks)
-- No error handling
-- Full filesystem access
+*Issues:* - Synchronous (blocks) - No error handling - Full filesystem
+access
 
-###  Version (Async)
+==== Version (Async)
 
-```
+....
 // Non-blocking
 await .writeTextFile(
   filepath,
@@ -260,26 +252,25 @@ const experiences = await Promise.all(
     return JSON.parse(text);
   })
 );
-```
+....
 
-**Benefits:**
-- Non-blocking
-- Must request permissions
-- Parallel operations
-- Better error handling
+*Benefits:* - Non-blocking - Must request permissions - Parallel
+operations - Better error handling
 
----
+'''''
 
-## Testing Comparison
+=== Testing Comparison
 
-### Current Node.js
-```javascript
+==== Current Node.js
+
+[source,javascript]
+----
 // No tests!
-```
+----
 
-###  Version
+==== Version
 
-```
+....
 // capture_test.ts
 import { assertEquals, assertRejects } from "https:///std/assert/mod.ts";
 import { LearningExperienceManager } from "./mapper.ts";
@@ -307,30 +298,31 @@ import { LearningExperienceManager } from "./mapper.ts";
     "learner"
   );
 });
-```
+....
 
-**Run:** ` test`
+*Run:* `+test+`
 
-**Built-in:**
-- Test runner
-- Assertions
-- Coverage reports
-- No dependencies needed
+*Built-in:* - Test runner - Assertions - Coverage reports - No
+dependencies needed
 
----
+'''''
 
-## What Changes for Users
+=== What Changes for Users
 
-### Node.js Version
-```bash
+==== Node.js Version
+
+[source,bash]
+----
 cd ubicity
 node capture.js quick
 node mapper.js report
 node visualize.js
-```
+----
 
-###  Version
-```bash
+==== Version
+
+[source,bash]
+----
 cd ubicity
 
 # First run (downloads deps)
@@ -344,59 +336,47 @@ cd ubicity
  task capture:quick
  task report
  task visualize
-```
+----
 
-**Better security:**
-- See exactly what permissions are needed
-- Can deny permissions and tool fails gracefully
-- No accidental network access or file operations
+*Better security:* - See exactly what permissions are needed - Can deny
+permissions and tool fails gracefully - No accidental network access or
+file operations
 
----
+'''''
 
-## Migration Effort
+=== Migration Effort
 
-### Time Estimate: 4-6 hours
+==== Time Estimate: 4-6 hours
 
-**Step 1: Setup (30 min)**
-- Create `.json` config
-- Define import map
-- Set up tasks
+*Step 1: Setup (30 min)* - Create `+.json+` config - Define import map -
+Set up tasks
 
-**Step 2: Convert mapper.js → mapper.ts (2 hours)**
-- Add  types
-- Implement Zod schema
-- Convert to async/await
-- Add tests
+*Step 2: Convert mapper.js → mapper.ts (2 hours)* - Add types -
+Implement Zod schema - Convert to async/await - Add tests
 
-**Step 3: Convert capture.js → capture.ts (1.5 hours)**
-- Add Cliffy for CLI
-- Type arguments
-- Better prompts
+*Step 3: Convert capture.js → capture.ts (1.5 hours)* - Add Cliffy for
+CLI - Type arguments - Better prompts
 
-**Step 4: Convert visualize.js → visualize.ts (1 hour)**
-- Add types
-- Async operations
-- Better error handling
+*Step 4: Convert visualize.js → visualize.ts (1 hour)* - Add types -
+Async operations - Better error handling
 
-**Step 5: Update docs (1 hour)**
-- New installation instructions
-- New usage examples
-- Permission explanations
+*Step 5: Update docs (1 hour)* - New installation instructions - New
+usage examples - Permission explanations
 
----
+'''''
 
-## Recommendation
+=== Recommendation
 
-**If you plan to use UbiCity seriously**, migrate to .
+*If you plan to use UbiCity seriously*, migrate to .
 
-**If this is a quick experiment**, the Node.js version works fine.
+*If this is a quick experiment*, the Node.js version works fine.
 
-The Node.js version captures the essence - it **works**. But it has technical debt that will slow you down as the project evolves.
+The Node.js version captures the essence - it *works*. But it has
+technical debt that will slow you down as the project evolves.
 
-Given your background (formal methods, Rust experience implied by your interests), you'd likely appreciate 's:
-- Type safety
-- Explicit permissions
-- Better tooling
-- No magic
+Given your background (formal methods, Rust experience implied by your
+interests), you’d likely appreciate ’s: - Type safety - Explicit
+permissions - Better tooling - No magic
 
-**Shall I migrate it to ?** I can do it now while the codebase is small, or create a parallel implementation so you can compare.
+*Shall I migrate it to ?* I can do it now while the codebase is small,
+or create a parallel implementation so you can compare.

@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
+# This workflow is managed by gh actions-lock.
 # Glambot - Presentation quality (accessibility, SEO, visual polish)
 # Part of gitbot-fleet
 # NOTE: Glambot is currently <10% implemented (design phase)
@@ -20,7 +21,7 @@ jobs:
   presentation-quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4
+      - uses: actions/checkout@v4.1.1
 
       - name: Glambot status
         run: |
