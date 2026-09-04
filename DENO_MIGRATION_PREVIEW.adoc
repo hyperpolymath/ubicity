@@ -43,8 +43,8 @@ class LearningExperience {
 
 ....
 // mapper.ts ( + )
-import { z } from "https:///x/zod/mod.ts";
-import { join } from "https:///std/path/mod.ts";
+import { z } from "https://deno.land/x/zod/mod.ts";
+import { join } from "https://deno.land/std/path/mod.ts";
 
 // Schema with runtime validation
 const LearningExperienceSchema = z.object({
@@ -147,8 +147,8 @@ switch (mode) {
 
 ....
 // capture.ts
-import { parse } from "https:///std/flags/mod.ts";
-import { Input, Select } from "https:///x/cliffy/mod.ts";
+import { parse } from "https://deno.land/std/flags/mod.ts";
+import { Input, Select } from "https://deno.land/x/cliffy/mod.ts";
 
 // Typed CLI args
 interface CaptureArgs {
@@ -272,7 +272,7 @@ operations - Better error handling
 
 ....
 // capture_test.ts
-import { assertEquals, assertRejects } from "https:///std/assert/mod.ts";
+import { assertEquals, assertRejects } from "https://deno.land/std/assert/mod.ts";
 import { LearningExperienceManager } from "./mapper.ts";
 
 .test("LearningExperience - valid data", () => {

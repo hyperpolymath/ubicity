@@ -185,8 +185,8 @@ Node.js quirks, still need npm
 
 ....
 //  with 
-import { z } from "https:///x/zod/mod.ts";
-import { parse } from "https:///std/flags/mod.ts";
+import { z } from "https://deno.land/x/zod/mod.ts";
+import { parse } from "https://deno.land/std/flags/mod.ts";
 
 // Built-in permissions
 await .writeTextFile("./data.json", json, {

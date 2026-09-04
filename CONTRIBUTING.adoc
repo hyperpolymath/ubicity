@@ -133,7 +133,7 @@ just test  # or:  task test
 [source,bash]
 ----
 # Required
-curl -fsSL https:///install.sh | sh  # 
+curl -fsSL https://deno.land/install.sh | sh  # Deno
 curl https://sh.rustup.rs -sSf | sh           # Rust
 npm install -g                         # 
 

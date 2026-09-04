@@ -82,7 +82,7 @@ just build
 
 [source,bash]
 ----
-curl -fsSL https:///install.sh | sh
+curl -fsSL https://deno.land/install.sh | sh
 ----
 
 [arabic, start=2]
@@ -199,7 +199,7 @@ No onfig.json, no webpack, no babel. Just `+.json+` and you’re done.
 [source,bash]
 ----
 # 
-curl -fsSL https:///install.sh | sh
+curl -fsSL https://deno.land/install.sh | sh
 
 # Rust (for WASM)
 curl https://sh.rustup.rs -sSf | sh
@@ -275,7 +275,7 @@ Install :
 
 [source,bash]
 ----
-curl -fsSL https:///install.sh | sh
+curl -fsSL https://deno.land/install.sh | sh
 
 # Add to PATH
 echo 'export PATH="$HOME/./bin:$PATH"' >> ~/.bashrc
