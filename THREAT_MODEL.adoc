@@ -300,7 +300,7 @@ Found a vulnerability? See `+.well-known/security.txt+`
 * https://owasp.org/www-community/Threat_Modeling[OWASP Threat Modeling]
 * https://csrc.nist.gov/publications/detail/sp/800-154/draft[NIST SP
 800-154 (Data Integrity)]
-* https:///manual/runtime/permission_apis[Security Model]
+* https://deno.land/manual/runtime/permission_apis[Security Model]
 * https://webassembly.org/docs/security/[WASM Security]
 
 '''''

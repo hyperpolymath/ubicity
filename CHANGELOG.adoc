@@ -349,7 +349,7 @@ See `MIGRATION_V3.md` for complete upgrade guide.
 [source,bash]
 ----
 = Install  (replaces Node.js)
-curl -fsSL https:///x/install/install.sh | sh
+curl -fsSL https://deno.land/x/install/install.sh | sh
 
 = Or use Nix for reproducible environment
 nix develop

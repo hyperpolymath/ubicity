@@ -302,7 +302,7 @@ Cannot make network requests - Cannot execute arbitrary code
 [source,bash]
 ----
 # Install  on server
-curl -fsSL https:///install.sh | sh
+curl -fsSL https://deno.land/install.sh | sh
 
 # Run directly
  task report
@@ -415,7 +415,7 @@ The architecture changed. The philosophy didn’t.
 ==== 
 
 * Official Guide: https://docs..com
-* Standard Library: https:///std
+* Standard Library: https://deno.land/std
 
 ==== 
 
