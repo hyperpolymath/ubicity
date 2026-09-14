@@ -4,6 +4,6 @@
   "type": "module",
   "dependencies": {
     "glob": "^13.0.6",
-    "zod": "^3.23.8"
+    "zod": "^4.6.2"
   }
 }
