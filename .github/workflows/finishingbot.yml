@@ -24,7 +24,7 @@ jobs:
   release-readiness:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v7.0.1
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@v1
@@ -44,7 +44,7 @@ jobs:
           git -C "$RUNNER_TEMP/gitbot-fleet" checkout "$GITBOT_FLEET_REF"
 
       - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2.7.8
+        uses: Swatinem/rust-cache@v2.9.2
         with:
           workspaces: ${{ runner.temp }}/gitbot-fleet/bots/finishingbot
 
@@ -88,7 +88,7 @@ jobs:
 
       - name: Upload results
         if: always()
-        uses: actions/upload-artifact@v4.1.0
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: finishingbot-results
           path: finishingbot-results.txt
