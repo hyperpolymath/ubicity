@@ -21,7 +21,7 @@ jobs:
   presentation-quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v7.0.1
 
       - name: Glambot status
         run: |
