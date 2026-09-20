@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Template: QUICKSTART-MAINTAINER.adoc — packaging, deploying, and maintaining
-// Replace ubicity, ubicity, {{DEPS}} with actuals
+// Replace ubicity, ubicity, * Deno 1.40+ (JS/TS runtime)
+* Rust + cargo (WASM build, optional)
+* ReScript (frontend, optional)
+* wasm-pack + wasm-opt (WASM optimization, optional)
+* Idris2 0.8.0+ (ABI proofs, optional — for formal verification)
+* just (task runner) with actuals
 = ubicity — Quick Start for Platform Maintainers
 :toc:
 :toclevels: 2
@@ -12,7 +17,12 @@ distribution on your platform.
 
 == Runtime Dependencies
 
-{{DEPS}}
+* Deno 1.40+ (JS/TS runtime)
+* Rust + cargo (WASM build, optional)
+* ReScript (frontend, optional)
+* wasm-pack + wasm-opt (WASM optimization, optional)
+* Idris2 0.8.0+ (ABI proofs, optional — for formal verification)
+* just (task runner)
 
 == Build from Source
 
@@ -23,7 +33,7 @@ cd ubicity
 just build-release
 ----
 
-Output: `{{BUILD_OUTPUT_PATH}}`
+Output: `./bin/ubicity and ./bin/ubicity-capture (Deno compile), ./wasm/pkg/ (WASM), ./lib/ (ReScript JS)`
 
 == Packaging
 

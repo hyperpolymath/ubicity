@@ -35,12 +35,12 @@
 
   ; === Purpose (what this repo IS) ===
   (purpose
-    "{{ONE_PARAGRAPH_PURPOSE}}"
+    "UbiCity (Ubiquitous City of Learning) captures, maps, and analyzes learning experiences that happen outside traditional institutional boundaries — making the city itself a learning environment. Provides JSON Schema for experiences, CLI capture tool (quick/full/template), mapper for hotspots/network/learner journeys, minimal viable protocol (4-week experiment), and Voyant export for text analysis."
   )
 
   ; === Anti-Purpose (what this repo is NOT — prevents scope creep) ===
   (anti-purpose
-    "{{ONE_PARAGRAPH_ANTI_PURPOSE}}"
+    "This is NOT a general-purpose LMS or formal education platform, NOT smart-city infrastructure or surveillance, NOT a framework — it is a focused toolkit for documenting urban learning as it happens and discovering patterns organically from captured data, not prescribing curriculum."
     ; Examples:
     ; "This is NOT a general-purpose database — it solves one specific problem."
     ; "This is NOT a framework — it is a library with a focused API."
@@ -65,8 +65,8 @@
 
   ; === Ecosystem Position ===
   (ecosystem
-    (belongs-to "{{MONOREPO_OR_STANDALONE}}")
-    (depends-on ("{{DEP1}}" "{{DEP2}}"))
-    (depended-on-by ("{{CONSUMER1}}" "{{CONSUMER2}}"))
+    (belongs-to "standalone")
+    (depends-on ("deno" "rescript"))
+    (depended-on-by ("ubicity-data" "voyant-tools"))
   )
 )
