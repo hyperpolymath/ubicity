@@ -55,7 +55,7 @@ perfective = 10   # % for SPDX headers, doc updates, formatting, style
 # Customise this per project — the template default is generic.
 
 [methodology.unique-strength]
-description = "{{PROJECT_UNIQUE_STRENGTH}}"
+description = "Ubiquitous city learning capture — dissolving formal/informal learning boundaries by capturing, mapping, and analyzing urban learning experiences that happen outside traditional institutional boundaries; JSON Schema + capture CLI + mapper analysis + Voyant export"
 deepen-not-broaden = true
 
 # ============================================================================
