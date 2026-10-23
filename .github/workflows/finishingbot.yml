@@ -45,7 +45,7 @@ jobs:
           git -C "$RUNNER_TEMP/gitbot-fleet" checkout "$GITBOT_FLEET_REF"
 
       - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2.9.2
+        uses: Swatinem/rust-cache@v2.9.3
         with:
           workspaces: ${{ runner.temp }}/gitbot-fleet/bots/finishingbot
 
