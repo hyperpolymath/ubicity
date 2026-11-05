@@ -27,7 +27,7 @@ jobs:
           for f in .github/workflows/*.yml .github/workflows/*.yaml; do
             [ -f "$f" ] || continue
             if ! awk '/^[[:space:]]*(#|$)/ { if (/SPDX-License-Identifier/) found = 1; next } { exit } END { exit !found }' "$f"; then
-              echo "ERROR: $f missing SPDX header"
+              echo "ERROR: $f missing SPDX header" >&2
               errors=$((errors + 1))
             fi
           done
@@ -39,7 +39,7 @@ jobs:
           for f in .github/workflows/*.yml .github/workflows/*.yaml; do
             [ -f "$f" ] || continue
             if ! grep -q "^permissions:" "$f"; then
-              echo "ERROR: $f missing permissions declaration"
+              echo "ERROR: $f missing permissions declaration" >&2
               errors=$((errors + 1))
             fi
           done
